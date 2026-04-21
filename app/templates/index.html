@@ -1,0 +1,2049 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Farm AI Agent</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: #f5f5f5;
+            padding: 16px;
+            padding-bottom: 80px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #2e7d32, #1b5e20);
+            color: white;
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #2e7d32;
+            border-left: 4px solid #2e7d32;
+            padding-left: 12px;
+        }
+
+        /* Form inputs */
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            font-size: 16px;
+            margin-bottom: 12px;
+            font-family: inherit;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: #2e7d32;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        button:active {
+            background: #1b5e20;
+            transform: scale(0.98);
+        }
+
+        button.secondary {
+            background: #ff9800;
+        }
+
+        button.danger {
+            background: #f44336;
+        }
+
+        /* Message alerts */
+        .message {
+            padding: 12px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            display: none;
+        }
+
+        .message.success {
+            background: #c8e6c9;
+            color: #2e7d32;
+            display: block;
+        }
+
+        .message.error {
+            background: #ffcdd2;
+            color: #c62828;
+            display: block;
+        }
+
+        /* Location grid */
+        .location-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .location-item {
+            background: #e8f5e9;
+            padding: 12px;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .location-item strong {
+            display: block;
+            color: #2e7d32;
+        }
+
+        /* Bottom nav */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 16px;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            border-top: 1px solid #eee;
+        }
+
+        .nav-btn {
+            flex: 1;
+            text-align: center;
+            padding: 8px;
+            background: none;
+            color: #666;
+            font-size: 12px;
+            margin: 0 4px;
+        }
+
+        .nav-btn.active {
+            color: #2e7d32;
+            background: #e8f5e9;
+        }
+
+        /* Hide sections */
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        /* Task list */
+        .task-item {
+            background: #f9f9f9;
+            padding: 12px;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            border-left: 3px solid #2e7d32;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌾 Farm AI Agent</h1>
+            <p>Multi-Location Farm Management</p>
+        </div>
+
+        <div id="message" class="message"></div>
+
+        <!-- Login Section -->
+        <div id="loginSection" class="section active">
+            <div class="card">
+                <div class="card-title">🔐 Login</div>
+                <input type="text" id="loginUsername" placeholder="Username" value="arun">
+                <input type="password" id="loginPassword" placeholder="Password" value="1234">
+                <button onclick="login()">Login</button>
+            </div>
+        </div>
+
+        <!-- Main App Section (shown after login) -->
+        <div id="appSection" class="section">
+            <!-- User Info -->
+            <div class="card" id="userInfoCard">
+                <div class="card-title">👤 Welcome, <span id="userName">---</span></div>
+                <p>Role: <span id="userRole">---</span></p>
+            </div>
+
+            <!-- Admin Panel Section (only visible to admin) -->
+            <div id="adminSection" class="section">
+                <div class="card">
+                    <div class="card-title">👑 Admin Panel</div>
+                    
+                    <!-- Tab buttons -->
+                    <div style="display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap;">
+                        <button onclick="showAdminTab('addTask')" id="tabAddTask" style="width: auto; padding: 8px 16px;">📋 Add Task</button>
+                        <button onclick="showAdminTab('viewTasks')" style="width: auto; padding: 8px 16px;">📊 Task Status</button>
+                        <button onclick="showAdminTab('viewZones')" style="width: auto; padding: 8px 16px;">📋 View Zones</button>
+                        <button onclick="showAdminTab('manageTasks')" style="width: auto; padding: 8px 16px;">✏️ Manage Tasks</button>
+                        <button onclick="showAdminTab('manageZones')" style="width: auto; padding: 8px 16px;">✏️ Manage Zones</button>
+                        <button onclick="showAdminTab('addLocation')" id="tabAddLocation" style="width: auto; padding: 8px 16px;">📍 Add Location</button>
+                        <button onclick="showAdminTab('addZone')" id="tabAddZone" style="width: auto; padding: 8px 16px;">🗺️ Add Zone</button>
+                        <button onclick="showAdminTab('addContact')" id="tabAddContact" style="width: auto; padding: 8px 16px;">📞 Add Contact</button>
+                        <button onclick="showAdminTab('addUser')" style="width: auto; padding: 8px 16px;">👤 Add User</button>
+                        <button onclick="showAdminTab('viewUsers')" style="width: auto; padding: 8px 16px;">👥 View Users</button>
+                    </div>
+                    
+                    <!-- Add User Form -->
+                    <div id="addUserForm" class="admin-tab" style="display: none;">
+                        <h3>➕ Add New User</h3>
+                        <input type="text" id="newUserName" placeholder="Full Name" required>
+                        <input type="text" id="userUsername" placeholder="Username" required>
+                        <input type="password" id="userPassword" placeholder="Password" required>
+                        <input type="tel" id="userPhone" placeholder="Phone Number">
+                        <select id="newUserRole">
+                        <option value="admin">Admin</option>
+                        <option value="supervisor">Supervisor</option>
+                        <option value="worker">Worker</option>
+                    </select>
+                        <select id="userRegion">
+                            <option value="">Select Region</option>
+                            <option value="Ramanjapur">Ramanjapur</option>
+                            <option value="Maharashtra">Maharashtra</option>
+                        </select>
+                        <select id="userLanguage">
+                            <option value="english">English</option>
+                            <option value="hindi">Hindi</option>
+                            <option value="telugu">Telugu</option>
+                        </select>
+                        <button onclick="addUser()">Add User</button>
+                    </div>
+
+                    <!-- Add Task Form -->
+                    <div id="addTaskForm" class="admin-tab" style="display: none;">
+                        <h3>➕ Add New Task Template</h3>
+                        <input type="text" id="taskTitle" placeholder="Task Title" required>
+                        <textarea id="taskDesc" placeholder="Description (optional)"></textarea>
+                        
+                        <select id="taskType">
+                            <option value="daily">Daily</option>
+                            <option value="interval">Interval</option>
+                            <option value="manual">Manual</option>
+                        </select>
+                        
+                        <select id="taskTimeSlot">
+                            <option value="morning">🌅 Morning</option>
+                            <option value="night">🌙 Night</option>
+                            <option value="anytime">🕐 Anytime</option>
+                        </select>
+                        
+                        <select id="taskLocationId"></select>
+                        
+                        <select id="taskZoneId">
+                            <option value="">No Zone (Whole Farm)</option>
+                        </select>
+                        
+                        <!-- Recurring Options -->
+                        <label style="display: block; margin-top: 12px; font-weight: 500;">Recurring:</label>
+                        <select id="taskRecurring" onchange="toggleRecurringOptions()">
+                            <option value="none">None (One-time task)</option>
+                            <option value="daily">Daily (Every day)</option>
+                            <option value="interval">Interval (Every X days)</option>
+                            <option value="monthly">Monthly (Same day each month)</option>
+                        </select>
+                        
+                        <div id="intervalDaysDiv" style="display: none;">
+                            <input type="number" id="taskIntervalDays" placeholder="Interval days (e.g., 10, 30)">
+                        </div>
+                        
+                        <button onclick="createTask()">Create Task Template</button>
+                    </div>
+                    
+                    <!-- Add Location Form -->
+                    <div id="addLocationForm" class="admin-tab" style="display: none;">
+                        <h3>➕ Add New Location</h3>
+                        <input type="text" id="locationName" placeholder="Location Name (e.g., 8 Acre)">
+                        <input type="number" id="locationArea" placeholder="Area in Acres">
+                        <select id="locationRegion">
+                            <option value="Ramanjapur">Ramanjapur</option>
+                            <option value="Maharashtra">Maharashtra</option>
+                        </select>
+                        <button onclick="createLocation()">Add Location</button>
+                    </div>
+                    
+                    <!-- Add Zone Form -->
+                    <div id="addZoneForm" class="admin-tab" style="display: none;">
+                        <h3>➕ Add New Zone</h3>
+                        <select id="zoneLocationId"></select>
+                        <input type="text" id="zoneName" placeholder="Zone Name (e.g., Purana Upar)">
+                        <input type="number" id="zoneArea" placeholder="Area in Acres">
+                        <button onclick="createZone()">Add Zone</button>
+                    </div>
+                    
+                    <!-- Add Contact Form -->
+                    <div id="addContactForm" class="admin-tab" style="display: none;">
+                        <h3>➕ Add New Contact</h3>
+                        <input type="text" id="contactName" placeholder="Contact Name">
+                        <input type="tel" id="contactPhone" placeholder="Phone Number">
+                        <select id="contactIssueType">
+                            <option value="Motor Problem">Motor Problem</option>
+                            <option value="Line Problem">Line Problem</option>
+                            <option value="Leakage">Leakage</option>
+                            <option value="Starter Problem">Starter Problem</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <select id="contactLocationId"></select>
+                        <button onclick="createContact()">Add Contact</button>
+                    </div>
+                    
+                    <!-- View Tasks List -->
+                    <<div id="viewTasksForm" class="admin-tab" style="display: none;">
+                        <h3>📊 Task Status (Assign, Complete, View Media)</h3>
+                        
+                        <!-- Date Filter for Admin -->
+                        <label style="display: block; margin: 12px 0 8px 0; font-weight: 500;">Filter by Date:</label>
+                        <input type="date" id="adminTaskDatePicker" style="margin-bottom: 12px; width: auto; display: inline-block; margin-right: 10px;">
+                        <button onclick="loadAllTasks()" style="width: auto; padding: 8px 16px; background: #2196F3;">🔍 Filter</button>
+                        <button onclick="clearAdminDateFilter()" style="width: auto; padding: 8px 16px; background: #999;">Clear</button>
+                        
+                        <div id="allTasksList" style="max-height: 400px; overflow-y: auto; margin-top: 12px;"></div>
+                    </div>
+
+                    <!-- Manage Tasks (Edit/Delete) -->
+                    <div id="manageTasksForm" class="admin-tab" style="display: none;">
+                        <h3>✏️ Manage Tasks (Edit or Delete)</h3>
+                        <div id="manageTasksList" style="max-height: 400px; overflow-y: auto;"></div>
+                    </div>
+                    
+                    <!-- View Zones List -->
+                    <div id="viewZonesForm" class="admin-tab" style="display: none;">
+                        <h3>📋 All Zones</h3>
+                        <div id="allZonesList" style="max-height: 400px; overflow-y: auto;"></div>
+                    </div>
+
+                    <!-- View Users List -->
+                    <div id="viewUsersForm" class="admin-tab" style="display: none;">
+                        <h3>👥 All Users</h3>
+                        <div id="allUsersList" style="max-height: 400px; overflow-y: auto;"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Edit User Modal -->
+            <div id="editUserModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;">
+                <div style="background: white; margin: 20% auto; max-width: 400px; padding: 20px; border-radius: 16px;">
+                    <h3>✏️ Edit User</h3>
+                    <input type="text" id="editUserName" placeholder="Full Name">
+                    <select id="editUserRole">
+                        <option value="admin">Admin</option>
+                        <option value="supervisor">Supervisor</option>
+                        <option value="worker">Worker</option>
+                    </select>
+                    <select id="editUserRegion">
+                        <option value="">Select Region</option>
+                        <option value="Ramanjapur">Ramanjapur</option>
+                        <option value="Maharashtra">Maharashtra</option>
+                    </select>
+                    <input type="tel" id="editUserPhone" placeholder="Phone Number">
+                    <input type="password" id="editUserPassword" placeholder="New Password (leave empty to keep same)">
+                    <div style="display: flex; gap: 10px; margin-top: 10px;">
+                        <button onclick="updateUser()" style="background: #2196F3;">💾 Save</button>
+                        <button onclick="closeEditModal()" style="background: #999;">Cancel</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Manage Zones Form (Edit/Delete) -->
+            <div id="manageZonesForm" class="admin-tab" style="display: none;">
+                <h3>✏️ Manage Zones</h3>
+                <select id="manageZoneLocationId" onchange="loadZonesForManage()">
+                    <option value="">Select Location</option>
+                </select>
+                <select id="manageZoneSelect" onchange="showZoneDetails()" style="margin-bottom: 12px;">
+                    <option value="">Select Zone</option>
+                </select>
+                <div id="zoneDetails" style="display: none;">
+                    <input type="text" id="editZoneName" placeholder="Zone Name">
+                    <input type="number" id="editZoneArea" placeholder="Area in Acres">
+                    <div style="display: flex; gap: 10px;">
+                        <button onclick="updateZone()" style="background: #2196F3;">💾 Update Zone</button>
+                        <button onclick="deleteZone()" style="background: #f44336;">🗑️ Delete Zone</button>
+
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quick Actions - Hidden for Admin/Supervisor -->
+            <div id="quickActionsCard" class="card" style="display: none;">
+                <div class="card-title">⚡ Quick Actions</div>
+                <button class="secondary" onclick="showSection('tasks')">📋 View Tasks</button>
+                <button onclick="showSection('locations')">📍 View Locations</button>
+                <button class="secondary" onclick="showSection('reportIssue')">🚨 Report Issue</button>
+                <button id="adminBtn" onclick="showSection('admin')" style="background: #9c27b0; color: white; display: none; margin-top: 10px;">👑 Admin Panel</button>
+            </div>
+
+
+            <!-- Tasks Section -->
+            <div id="tasksSection" class="section">
+                <div id="quickActionsCard" class="card">
+                    <div class="card-title">📋 Tasks</div>
+                    
+                    <!-- Date Picker -->
+                    <label style="display: block; margin-bottom: 12px; font-weight: 500;">Select Date:</label>
+                    <input type="date" id="taskDatePicker" style="margin-bottom: 12px;" onchange="loadTasks()">
+                    
+                    <label style="display: flex; align-items: center; margin-bottom: 12px; gap: 8px;">
+                        <input type="checkbox" id="showAllTasks" onchange="loadTasks()">
+                        <span>Show all tasks (ignore morning/night filter)</span>
+                    </label>
+                    
+                    <div id="tasksList">
+                        <p style="color: #999;">Loading tasks...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Locations Section -->
+            <div id="locationsSection" class="section">
+                <div class="card">
+                    <div class="card-title">📍 Farm Locations</div>
+                    <div id="locationsList" class="location-grid">
+                        <p style="color: #999;">Loading...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Report Issue Section -->
+            <div id="reportIssueSection" class="section">
+                <div class="card">
+                    <div class="card-title">🚨 Report Issue</div>
+                    <select id="issueType">
+                        <option value="Motor Problem">Motor Problem</option>
+                        <option value="Line Problem">Line Problem</option>
+                        <option value="Leakage">Leakage</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <select id="issueLocation">
+                        <option value="">Select Location</option>
+                    </select>
+                    <textarea id="issueDescription" rows="3" placeholder="Describe the issue..."></textarea>
+                    <button onclick="reportIssue()">Submit Report</button>
+                </div>
+            </div>
+
+            <!-- Logout -->
+            <div class="card">
+                <button class="danger" onclick="logout()">🚪 Logout</button>
+            </div>
+        </div>
+    </div>
+
+    
+            <!-- Task Completion Modal -->
+            <div id="completionModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000;">
+                <div style="background: white; margin: 5% auto; max-width: 500px; max-height: 80vh; overflow-y: auto; padding: 20px; border-radius: 16px;">
+                    <h3>✅ Complete Task</h3>
+                    <p id="completionTaskTitle"></p>
+                    <input type="hidden" id="completionTaskId">
+                    
+                    <label>Notes:</label>
+                    <textarea id="completionNotes" rows="3" style="width: 100%; margin-bottom: 12px;"></textarea>
+                    
+                    <label>📸 Take Photo:</label>
+                    <input type="file" id="completionPhoto" accept="image/*" capture="environment" style="margin-bottom: 12px; width: 100%;">
+                    
+                    <label>🎤 Record Audio:</label>
+                    <input type="file" id="completionAudio" accept="audio/*" capture="user" style="margin-bottom: 12px; width: 100%;">
+                    
+                    <label>🎥 Record Video:</label>
+                    <input type="file" id="completionVideo" accept="video/*" capture="environment" style="margin-bottom: 12px; width: 100%;">
+                    
+                    <div style="display: flex; gap: 10px; position: sticky; bottom: 0; background: white; padding-top: 10px; margin-top: 10px;">
+                        <button onclick="submitTaskCompletion()" style="background: #4CAF50; flex: 1; padding: 12px;">✓ Submit Task</button>
+                        <button onclick="closeCompletionModal()" style="background: #999; flex: 1; padding: 12px;">Cancel</button>
+                    </div>
+                </div>
+            </div>
+    
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav" id="bottomNav" style="display: none;">
+        <button class="nav-btn" onclick="showSection('tasks')">📋 Tasks</button>
+        <button class="nav-btn" onclick="showSection('locations')">📍 Farms</button>
+        <button class="nav-btn" onclick="showSection('reportIssue')">🚨 Report</button>
+    </div>
+
+    <script>
+        let currentUser = null;
+        const API_URL = ""; // Empty means same origin
+
+        function showMessage(msg, type = "success") {
+            const msgDiv = document.getElementById("message");
+            msgDiv.textContent = msg;
+            msgDiv.className = `message ${type}`;
+            setTimeout(() => {
+                msgDiv.className = "message";
+            }, 3000);
+        }
+
+
+        // 👇 ADD THIS HERE 👇
+        function getCurrentTimeSlot() {
+            const hour = new Date().getHours();
+            if (hour >= 6 && hour < 12) {
+                return "morning";
+            } else if (hour >= 18 && hour < 22) {
+                return "night";
+            } else {
+                return "anytime";
+            }
+        }
+
+        function showSection(sectionName) {
+                if (sectionName === 'admin' && currentUser.role === 'worker') { showMessage("Access denied", "error"); return; }
+                // Hide all sections in app
+            document.getElementById("tasksSection").classList.remove("active");
+            document.getElementById("locationsSection").classList.remove("active");
+            document.getElementById("reportIssueSection").classList.remove("active");
+            document.getElementById("adminSection").classList.remove("active");  // 👈 ADD THIS
+
+            // Show selected section
+            document.getElementById(`${sectionName}Section`).classList.add("active");
+            
+            // Load data when showing section
+            if (sectionName === "locations") {
+                loadLocations();
+            }
+            if (sectionName === "reportIssue") {
+                loadLocations();  // Load locations for dropdown
+            }
+            if (sectionName === "tasks") {
+                loadTasks();
+            }
+
+            if (sectionName === "admin") {
+                // Only admin and supervisor can access admin panel
+                if (currentUser.role !== "admin" && currentUser.role !== "supervisor" && currentUser.role !== "Admin") {
+                    showMessage("Access denied. Admin or Supervisor only.", "error");
+                    return;
+                }
+                loadAllUsers();
+                loadLocationsForDropdowns();
+            }
+        }
+
+        async function login() {
+            const username = document.getElementById("loginUsername").value;
+            const password = document.getElementById("loginPassword").value;
+
+            try {
+                const response = await fetch(`${API_URL}/login`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ username, password })
+                });
+
+                if (response.ok) {
+                    currentUser = await response.json();
+                    document.getElementById("userName").textContent = currentUser.name;
+                    document.getElementById("userRole").textContent = currentUser.role;
+                    
+                    // Show app, hide login
+                    document.getElementById("loginSection").classList.remove("active");
+                    document.getElementById("appSection").classList.add("active");
+                    document.getElementById("bottomNav").style.display = "flex";
+                    
+                    // Show admin button only for admin and supervisor (NOT for worker)
+                    if (currentUser.role.toLowerCase() === "admin" || currentUser.role.toLowerCase() === "supervisor") {
+                        const adminBtn = document.getElementById("adminBtn");
+                        if (adminBtn) adminBtn.style.display = "block";
+                    } else {
+                        const adminBtn = document.getElementById("adminBtn");
+                        if (adminBtn) adminBtn.style.display = "none";
+                    }
+                    
+                    showMessage(`Welcome ${currentUser.name}!`);
+                    
+                    // Show/hide Quick Actions card
+                    const quickActionsCard = document.getElementById("quickActionsCard");
+                    if (quickActionsCard) {
+                        if (currentUser.role.toLowerCase() === "admin" || currentUser.role.toLowerCase() === "supervisor") {
+                            quickActionsCard.style.display = "none";
+                            // Auto-show admin panel for admin/supervisor
+                            showSection('admin');
+                            // Also load tasks in admin view
+                            loadAllTasks();
+                        } else {
+                            quickActionsCard.style.display = "block";
+                            showSection('tasks');
+                        }
+                    }
+
+                    // Load initial data
+                    loadLocations();
+                    loadTasks();
+                    loadLocationsForDropdowns();
+                    // REMOVED: showSection('tasks'); from here
+                    
+                } else {
+                    const error = await response.json();
+                    showMessage(error.detail || "Login failed", "error");
+                }
+            } catch (err) {
+                showMessage("Network error. Is the server running?", "error");
+            }
+        }
+
+        
+        // Edit Task
+        let editingTaskId = null;
+
+        async function editTask(taskId) {
+            editingTaskId = taskId;
+            
+            // Get task details
+            const response = await fetch('/tasks/all');
+            const tasks = await response.json();
+            const task = tasks.find(t => t.id === taskId);
+            
+            if (!task) {
+                showMessage('Task not found', 'error');
+                return;
+            }
+            
+            // Fill the form
+            document.getElementById('editTaskId').value = task.id;
+            document.getElementById('editTaskTitle').value = task.title;
+            document.getElementById('editTaskDesc').value = task.description || '';
+            document.getElementById('editTaskType').value = task.task_type;
+            document.getElementById('editTaskTimeSlot').value = task.time_slot;
+            
+            // Load locations for dropdown
+            const locRes = await fetch('/locations/all');
+            const locations = await locRes.json();
+            const locationSelect = document.getElementById('editTaskLocationId');
+            locationSelect.innerHTML = '<option value="">Select Location</option>';
+            locations.forEach(loc => {
+                const selected = task.location_id === loc.id ? 'selected' : '';
+                locationSelect.innerHTML += `<option value="${loc.id}" ${selected}>${loc.name}</option>`;
+            });
+            
+            locationSelect.onchange = updateEditTaskZones;
+
+            // Load zones for the selected location
+            if (task.location_id) {
+                const zoneRes = await fetch(`/zones/location/${task.location_id}`);
+                const zones = await zoneRes.json();
+                const zoneSelect = document.getElementById('editTaskZoneId');
+                zoneSelect.innerHTML = '<option value="">No Zone (Whole Farm)</option>';
+                zones.forEach(zone => {
+                    const selected = task.zone_id === zone.id ? 'selected' : '';
+                    zoneSelect.innerHTML += `<option value="${zone.id}" ${selected}>${zone.name}</option>`;
+                });
+            }
+            
+            // Show modal
+            document.getElementById('editTaskModal').style.display = 'block';
+        }
+
+        function closeEditTaskModal() {
+            document.getElementById('editTaskModal').style.display = 'none';
+            editingTaskId = null;
+        }
+
+        async function saveTaskEdit() {
+            const taskId = document.getElementById('editTaskId').value;
+            const taskData = {
+                title: document.getElementById('editTaskTitle').value,
+                description: document.getElementById('editTaskDesc').value,
+                task_type: document.getElementById('editTaskType').value,
+                time_slot: document.getElementById('editTaskTimeSlot').value,
+                location_id: parseInt(document.getElementById('editTaskLocationId').value),
+                zone_id: document.getElementById('editTaskZoneId').value ? parseInt(document.getElementById('editTaskZoneId').value) : null
+            };
+            
+            if (!taskData.title) {
+                showMessage('Title is required', 'error');
+                return;
+            }
+            
+            const response = await fetch(`/tasks/update/${taskId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(taskData)
+            });
+            
+            if (response.ok) {
+                showMessage('Task updated successfully!');
+                closeEditTaskModal();
+                loadManageTasks();  // Refresh Manage Tasks tab
+                loadAllTasks();     // Refresh Task Status tab
+            } else {
+                const error = await response.json();
+                showMessage(error.detail || 'Failed to update task', 'error');
+            }
+        }
+
+        // Delete Task
+        async function deleteTask(taskId) {
+            console.log("Delete called for task:", taskId);
+            if (confirm('Are you sure you want to delete this task?')) {
+                try {
+                    const response = await fetch(`/tasks/delete/${taskId}`, {
+                        method: 'DELETE'
+                    });
+                    
+                    if (response.ok) {
+                        const result = await response.json();
+                        showMessage(result.message, 'success');
+                        // Refresh all views
+                        loadManageTasks();   // Refresh Manage Tasks tab
+                        loadAllTasks();      // Refresh Task Status tab
+                        loadTasks();         // Refresh Worker view
+                    } else {
+                        const error = await response.json();
+                        showMessage(error.detail || 'Failed to delete task', 'error');
+                    }
+                } catch (err) {
+                    console.error("Delete error:", err);
+                    showMessage('Network error', 'error');
+                }
+            }
+        }
+
+        async function updateTaskAssignment(taskId) {
+            const selectElement = document.getElementById(`assignSelect_${taskId}`);
+            const assignedTo = selectElement.value;
+            
+            if (!assignedTo) {
+                if (confirm('Unassign this task? The task will not be assigned to anyone.')) {
+                    // Proceed with unassign
+                } else {
+                    // Reset dropdown to previous value
+                    loadAllTasks();
+                    return;
+                }
+            }
+            
+            try {
+                const response = await fetch(`/tasks/assign/${taskId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ assigned_to: assignedTo ? parseInt(assignedTo) : null })
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    showMessage(result.message, 'success');
+                    loadAllTasks(); // Refresh the table
+                } else {
+                    const error = await response.json();
+                    showMessage(error.detail || 'Failed to assign task', 'error');
+                    loadAllTasks(); // Refresh to reset dropdown
+                }
+            } catch (err) {
+                showMessage('Network error', 'error');
+                loadAllTasks();
+            }
+        }
+        
+        // Complete Task from Admin
+        async function completeTaskFromAdmin(taskId) {
+            if (!currentUser) {
+                showMessage("Please login first", "error");
+                return;
+            }
+            
+            if (confirm('Mark this task as completed?')) {
+                const response = await fetch(`/tasks/complete`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        task_id: taskId,
+                        completed_by: currentUser.id,
+                        notes: 'Completed by admin'
+                    })
+                });
+                
+                if (response.ok) {
+                    showMessage('Task completed successfully!');
+                    loadAllTasks(); // Refresh the list
+                    loadTasks(); // Also refresh worker view
+                } else {
+                    showMessage('Failed to complete task', 'error');
+                }
+            }
+        }
+
+                
+        async function deleteUser(userId) {
+            if (confirm('Are you sure you want to delete this user?')) {
+                try {
+                    const response = await fetch(`/user/delete/${userId}`, {
+                        method: 'DELETE'
+                    });
+                    
+                    if (response.ok) {
+                        showMessage('User deleted successfully!');
+                        loadAllUsers(); // Refresh the list
+                    } else {
+                        const error = await response.text();
+                        showMessage('Failed to delete user: ' + error, 'error');
+                    }
+                } catch (err) {
+                    showMessage('Error deleting user', 'error');
+                }
+            }
+        }
+        
+        async function loadLocations() {
+            try {
+                const response = await fetch(`${API_URL}/locations/all`);
+                if (response.ok) {
+                    const locations = await response.json();
+                    const locationsDiv = document.getElementById("locationsList");
+                    const issueLocationSelect = document.getElementById("issueLocation");
+                    
+                    locationsDiv.innerHTML = "";
+                    issueLocationSelect.innerHTML = '<option value="">Select Location</option>';
+                    
+                    locations.forEach(loc => {
+                        locationsDiv.innerHTML += `
+                            <div class="location-item">
+                                <strong>${loc.name}</strong>
+                                ${loc.area_acres > 0 ? `${loc.area_acres} Acres` : ''}
+                                <small>${loc.region}</small>
+                            </div>
+                        `;
+                        issueLocationSelect.innerHTML += `<option value="${loc.id}">${loc.name} (${loc.region})</option>`;
+                    });
+                }
+            } catch (err) {
+                console.error("Error loading locations:", err);
+            }
+        }
+
+        async function loadTasks() {
+            if (!currentUser) return;
+            
+            const showAll = document.getElementById("showAllTasks")?.checked || false;
+            const currentSlot = getCurrentTimeSlot();
+            
+            // Get selected date or default to today
+            let selectedDate = document.getElementById("taskDatePicker")?.value;
+            if (!selectedDate) {
+                const today = new Date();
+                selectedDate = today.toISOString().split('T')[0];
+                const datePicker = document.getElementById("taskDatePicker");
+                if (datePicker) datePicker.value = selectedDate;
+            }
+            
+            try {
+                const response = await fetch(`${API_URL}/tasks/user/${currentUser.user_id}`);
+                if (response.ok) {
+                    let tasks = await response.json();
+                    
+                    // Filter by selected date
+                    tasks = tasks.filter(task => {
+                        const taskDate = task.due_date ? task.due_date.split('T')[0] : task.created_at.split('T')[0];
+                        return taskDate === selectedDate;
+                    });
+                    
+                    // Filter by time slot if not showing all
+                    if (!showAll && currentSlot !== "anytime") {
+                        tasks = tasks.filter(task => 
+                            task.time_slot === currentSlot || task.time_slot === "anytime"
+                        );
+                    }
+                    
+                    const tasksDiv = document.getElementById("tasksList");
+                    
+                    const displayDate = new Date(selectedDate).toLocaleDateString('en-US', {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    });
+                    
+                    if (tasks.length === 0) {
+                        tasksDiv.innerHTML = `<p style="color: #999;">No tasks for ${displayDate}</p>`;
+                        return;
+                    }
+                    
+                    tasksDiv.innerHTML = `<p style="margin-bottom: 8px; color: #666;">📅 ${displayDate}</p>`;
+                    
+                    for (const task of tasks) {
+                        const statusColor = task.status === "completed" ? "#4CAF50" : "#ff9800";
+                        const timeBadge = task.time_slot === "morning" ? "🌅 Morning" : 
+                                        (task.time_slot === "night" ? "🌙 Night" : "🕐 Anytime");
+                        
+                        // Get completion media if task is completed
+                        let mediaButtons = '';
+                        if (task.status === "completed") {
+                            try {
+                                const completionsRes = await fetch(`/tasks/completions/${task.id}`);
+                                if (completionsRes.ok) {
+                                    const completions = await completionsRes.json();
+                                    if (completions.length > 0) {
+                                        const media = completions[0];
+                                        if (media.image_url) {
+                                            mediaButtons += `<button onclick="viewMedia('${media.image_url}', 'image')" style="background: #2196F3; padding: 3px 8px; width: auto; margin-right: 3px; font-size: 11px;">📷 Photo</button>`;
+                                        }
+                                        if (media.audio_url) {
+                                            mediaButtons += `<button onclick="viewMedia('${media.audio_url}', 'audio')" style="background: #9c27b0; padding: 3px 8px; width: auto; margin-right: 3px; font-size: 11px;">🎧 Audio</button>`;
+                                        }
+                                        if (media.video_url) {
+                                            mediaButtons += `<button onclick="viewMedia('${media.video_url}', 'video')" style="background: #e91e63; padding: 3px 8px; width: auto; margin-right: 3px; font-size: 11px;">🎥 Video</button>`;
+                                        }
+                                    }
+                                }
+                            } catch (err) {
+                                console.error("Error fetching media:", err);
+                            }
+                        }
+                        
+                        tasksDiv.innerHTML += `
+                            <div class="task-item" style="border-left-color: ${statusColor};">
+                                <strong>${task.title}</strong>
+                                <p style="font-size: 12px; color: #666;">${task.description || "No description"}</p>
+                                <p style="font-size: 11px; margin-top: 8px;">
+                                    <span style="background: #f0f0f0; padding: 2px 8px; border-radius: 10px;">${timeBadge}</span>
+                                    Status: <span style="color: ${statusColor}; font-weight: bold;">${task.status}</span>
+                                </p>
+                                ${mediaButtons ? `<div style="margin-top: 8px;">${mediaButtons}</div>` : ''}
+                                ${task.status !== "completed" ? `
+                                    <button onclick="openCompletionModal(${task.id}, '${task.title.replace(/'/g, "\\'")}')" style="margin-top: 8px; padding: 8px; font-size: 12px; background: #4CAF50;">
+                                        📸 Complete with Media
+                                    </button>
+                                ` : `
+                                    <p style="margin-top: 8px; font-size: 11px; color: green;">✓ Completed</p>
+                                `}
+                            </div>
+                        `;
+                    }
+                }
+            } catch (err) {
+                console.error("Error loading tasks:", err);
+            }
+        }
+
+        async function completeTask(taskId) {
+            if (!currentUser) return;
+            
+            const notes = prompt("Any notes about this task?");
+            
+            try {
+                const response = await fetch(`${API_URL}/tasks/complete`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        task_id: taskId,
+                        completed_by: currentUser.user_id,
+                        notes: notes || ""
+                    })
+                });
+                
+                if (response.ok) {
+                    showMessage("Task completed successfully!");
+                    loadTasks(); // Refresh the list
+                } else {
+                    const error = await response.json();
+                    showMessage(error.detail || "Failed to complete task", "error");
+                }
+            } catch (err) {
+                showMessage("Network error", "error");
+            }
+        }
+
+        async function reportIssue() {
+            const issueType = document.getElementById("issueType").value;
+            const locationId = document.getElementById("issueLocation").value;
+            const description = document.getElementById("issueDescription").value;
+
+            if (!locationId) {
+                showMessage("Please select a location", "error");
+                return;
+            }
+
+            showMessage("Issue reported! (API coming soon)", "success");
+            document.getElementById("issueDescription").value = "";
+        }
+
+        function logout() {
+            currentUser = null;
+            document.getElementById("loginSection").classList.add("active");
+            document.getElementById("appSection").classList.remove("active");
+            document.getElementById("bottomNav").style.display = "none";
+            showMessage("Logged out successfully");
+        }
+
+        async function loadAllTasks(selectedDate = null) {
+            console.log("Loading tasks...");
+            try {
+                // Get date from admin date picker if not provided
+                if (selectedDate === null) {
+                    const adminDatePicker = document.getElementById("adminTaskDatePicker");
+                    if (adminDatePicker && adminDatePicker.value) {
+                        selectedDate = adminDatePicker.value;
+                    }
+                }
+                
+                const response = await fetch('/tasks/all');
+                let tasks = await response.json();
+                console.log("Tasks found:", tasks.length);
+                
+                // Filter by date if selected
+                if (selectedDate) {
+                    tasks = tasks.filter(task => {
+                        const taskDate = task.due_date ? task.due_date.split('T')[0] : task.created_at.split('T')[0];
+                        return taskDate === selectedDate;
+                    });
+                    console.log(`Filtered to ${selectedDate}:`, tasks.length);
+                }
+                
+                // Fetch all workers for assignment dropdown
+                const usersResponse = await fetch('/users');
+                const allUsers = await usersResponse.json();
+                const workers = allUsers.filter(u => u.role.toLowerCase() === 'worker');
+                
+                const container = document.getElementById('allTasksList');
+                
+                if (!container) {
+                    console.error("allTasksList not found");
+                    return;
+                }
+                
+                if (tasks.length === 0) {
+                    container.innerHTML = selectedDate ? 
+                        `<p style="color: #999;">No tasks found for ${selectedDate}</p>` :
+                        '<p style="color: #999;">No tasks added yet</p>';
+                    return;
+                }
+                
+                let html = '<table style="width:100%; border-collapse: collapse;">';
+                html += '<tr style="background: #f0f0f0;"><th>ID</th><th>Title</th><th>Description</th><th>Assigned To</th><th>Time Slot</th><th>Status</th><th>Media</th><th>Actions</th></tr>';
+                
+                for (const task of tasks) {
+                    // Get current assigned user name
+                    let assignedToName = 'Unassigned';
+                    if (task.assigned_to) {
+                        const assignedUser = allUsers.find(u => u.id === task.assigned_to);
+                        assignedToName = assignedUser ? assignedUser.name : 'Unknown';
+                    }
+                    
+                    // Build dropdown options
+                    let dropdownOptions = '<option value="">Unassign</option>';
+                    workers.forEach(worker => {
+                        const selected = task.assigned_to === worker.id ? 'selected' : '';
+                        dropdownOptions += `<option value="${worker.id}" ${selected}>${worker.name}</option>`;
+                    });
+                    
+                    // Fetch completion media if task is completed
+                    let mediaButtons = '';
+                    if (task.status === "completed") {
+                        try {
+                            const completionsRes = await fetch(`/tasks/completions/${task.id}`);
+                            if (completionsRes.ok) {
+                                const completions = await completionsRes.json();
+                                if (completions.length > 0) {
+                                    const media = completions[0];
+                                    if (media.image_url) {
+                                        mediaButtons += `<button onclick="viewMedia('${media.image_url}', 'image')" style="background: #2196F3; padding: 3px 8px; width: auto; margin-right: 3px; font-size: 11px;">📷 Photo</button>`;
+                                    }
+                                    if (media.audio_url) {
+                                        mediaButtons += `<button onclick="viewMedia('${media.audio_url}', 'audio')" style="background: #9c27b0; padding: 3px 8px; width: auto; margin-right: 3px; font-size: 11px;">🎧 Audio</button>`;
+                                    }
+                                    if (media.video_url) {
+                                        mediaButtons += `<button onclick="viewMedia('${media.video_url}', 'video')" style="background: #e91e63; padding: 3px 8px; width: auto; margin-right: 3px; font-size: 11px;">🎥 Video</button>`;
+                                    }
+                                }
+                            }
+                        } catch (err) {
+                            console.error("Error fetching media:", err);
+                        }
+                    }
+                    
+                    html += `
+                        <tr>
+                            <td>${task.id}</td>
+                            <td><strong>${task.title}</strong></td>
+                            <td>${task.description || '-'}</td>
+                            <td>
+                                <select id="assignSelect_${task.id}" style="width: 100%; padding: 6px; margin-bottom: 5px;">
+                                    ${dropdownOptions}
+                                </select>
+                                <button onclick="updateTaskAssignment(${task.id})" style="background: #2196F3; padding: 5px 10px; width: auto; font-size: 12px;">📋 Update</button>
+                                <br><small style="color: #666;">Current: ${assignedToName}</small>
+                            </td>
+                            <td>${task.time_slot}</td>
+                            <td><span style="background: ${task.status === 'completed' ? '#4CAF50' : '#ff9800'}; color: white; padding: 2px 8px; border-radius: 10px;">${task.status}</span></td>
+                            <td>${mediaButtons || '-'}</td>
+                            <td>
+                                <button onclick="openCompletionModal(${task.id}, '${task.title.replace(/'/g, "\\'")}')" style="background: #4CAF50; padding: 5px 10px; width: auto; margin-right: 5px; font-size: 12px;">📸 Complete</button>
+                                <button onclick="deleteTask(${task.id})" style="background: #f44336; padding: 5px 10px; width: auto; font-size: 12px;">🗑️ Delete</button>
+                            </td>
+                        </tr>
+                    `;
+                }
+                html += '</table>';
+                container.innerHTML = html;
+                console.log("✅ Tasks displayed:", tasks.length);
+            } catch (error) {
+                console.error("Error loading tasks:", error);
+                const container = document.getElementById('allTasksList');
+                if (container) container.innerHTML = '<p style="color: red;">Error loading tasks</p>';
+            }
+        }
+
+        function clearAdminDateFilter() {
+            const adminDatePicker = document.getElementById("adminTaskDatePicker");
+            if (adminDatePicker) {
+                adminDatePicker.value = '';
+            }
+            loadAllTasks();
+        }
+
+        async function loadManageTasks() {
+            console.log("Loading tasks for manage...");
+            try {
+                const response = await fetch('/tasks/all');
+                let tasks = await response.json();
+                
+                const container = document.getElementById('manageTasksList');
+                
+                if (!container) {
+                    console.error("manageTasksList not found");
+                    return;
+                }
+                
+                if (tasks.length === 0) {
+                    container.innerHTML = '<p style="color: #999;">No tasks added yet</p>';
+                    return;
+                }
+                
+                let html = '<table style="width:100%; border-collapse: collapse;">';
+                html += '<tr style="background: #f0f0f0;"><th>ID</th><th>Title</th><th>Type</th><th>Time Slot</th><th>Location</th><th>Zone</th><th>Actions</th></tr>';
+                
+                for (const task of tasks) {
+                    // Get location name
+                    const locRes = await fetch('/locations/all');
+                    const locations = await locRes.json();
+                    const location = locations.find(l => l.id === task.location_id);
+                    const locationName = location ? location.name : 'Unknown';
+                    
+                    html += `
+                        <tr>
+                            <td>${task.id}</td>
+                            <td><strong>${task.title}</strong></td>
+                            <td>${task.task_type}</td>
+                            <td>${task.time_slot}</td>
+                            <td>${locationName}</td>
+                            <td>${task.zone_id ? task.zone_id : 'None'}</td>
+                            <td>
+                                <button onclick="editTask(${task.id})" style="background: #2196F3; padding: 5px 10px; width: auto; margin-right: 5px;">✏️ Edit</button>
+                                <button onclick="deleteTask(${task.id})" style="background: #f44336; padding: 5px 10px; width: auto;">🗑️ Delete</button>
+                            </td>
+                        </tr>
+                    `;
+                }
+                html += '</table>';
+                container.innerHTML = html;
+                console.log("✅ Manage tasks loaded:", tasks.length);
+            } catch (error) {
+                console.error("Error loading manage tasks:", error);
+                const container = document.getElementById('manageTasksList');
+                if (container) container.innerHTML = '<p style="color: red;">Error loading tasks</p>';
+            }
+        }
+        
+        // Load and display all users (like zones view)
+        async function loadAllUsersForAdmin() {
+            const response = await fetch('/users');
+            if (response.ok) {
+                const users = await response.json();
+                const container = document.getElementById('allUsersList');
+                
+                if (users.length === 0) {
+                    container.innerHTML = '<p style="color: #999;">No users found</p>';
+                    return;
+                }
+                
+                let html = '<table style="width:100%; border-collapse: collapse;">';
+                html += '<tr style="background: #f0f0f0;"><th style="padding: 8px;">Name</th><th style="padding: 8px;">Role</th><th style="padding: 8px;">Username</th><th style="padding: 8px;">Phone</th><th style="padding: 8px;">Region</th><th style="padding: 8px;">Actions</th></tr>';
+                
+                users.forEach(user => {
+                    html += `
+                        <tr style="border-bottom: 1px solid #ddd;">
+                            <td style="padding: 8px;">${user.name}</td>
+                            <td style="padding: 8px;">${user.role}</td>
+                            <td style="padding: 8px;">${user.username}</td>
+                            <td style="padding: 8px;">${user.phone || '-'}</td>
+                            <td style="padding: 8px;">${user.region || '-'}</td>
+                            <td style="padding: 8px;">
+                                <button onclick="editUser(${user.id})" style="background: #2196F3; padding: 5px 10px; width: auto;">✏️ Edit</button>
+                                <button onclick="deleteUser(${user.id})" style="background: #f44336; padding: 5px 10px; width: auto;">🗑️ Delete</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                html += '</table>';
+                container.innerHTML = html;
+            }
+        }
+
+        function showAdminTab(tabName) {
+            const tabs = ['addTask', 'addLocation', 'addZone', 'manageZones', 'viewZones', 'addContact', 'viewUsers', 'viewTasks', 'addUser'];
+            
+            tabs.forEach(tab => {
+                const element = document.getElementById(`${tab}Form`);
+                if (element) {
+                    element.style.display = 'none';
+                }
+            });
+            
+            const selectedTab = document.getElementById(`${tabName}Form`);
+            if (selectedTab) {
+                selectedTab.style.display = 'block';
+            }
+            
+            if (tabName === 'viewZones') {
+                loadAllZones();
+            }
+            if (tabName === 'viewUsers') {
+                loadAllUsers();  // This now uses allUsersList
+            }
+            if (tabName === 'viewTasks') {
+                loadAllTasks();
+            }
+            if (tabName === 'manageZones') {
+                loadLocationsForDropdowns();
+            }
+        }
+
+        async function loadAllZones() {
+            const response = await fetch('/zones/all');
+            if (response.ok) {
+                const zones = await response.json();
+                const container = document.getElementById('allZonesList');
+                
+                if (zones.length === 0) {
+                    container.innerHTML = '<p style="color: #999;">No zones added yet</p>';
+                    return;
+                }
+                
+                container.innerHTML = '<table style="width:100%; border-collapse: collapse;">';
+                zones.forEach(zone => {
+                    container.innerHTML += `
+                        <tr style="border-bottom: 1px solid #ddd;">
+                            <td style="padding: 8px;"><strong>${zone.name}</strong></td>
+                            <td style="padding: 8px;">${zone.area_acres || 0} acres</td>
+                            <td style="padding: 8px;">Location ID: ${zone.location_id}</td>
+                        </tr>
+                    `;
+                });
+                container.innerHTML += '</table>';
+            }
+        }
+        
+        async function loadZonesForManage() {
+            const locationId = document.getElementById('manageZoneLocationId').value;
+            if (!locationId) return;
+            
+            const response = await fetch(`/zones/location/${locationId}`);
+            if (response.ok) {
+                const zones = await response.json();
+                const zoneSelect = document.getElementById('manageZoneSelect');
+                zoneSelect.innerHTML = '<option value="">Select Zone</option>';
+                zones.forEach(zone => {
+                    zoneSelect.innerHTML += `<option value="${zone.id}" data-name="${zone.name}" data-area="${zone.area_acres || 0}">${zone.name} (${zone.area_acres || 0} acres)</option>`;
+                });
+                document.getElementById('zoneDetails').style.display = 'none';
+            }
+        }
+
+        async function deleteZone() {
+            const zoneId = document.getElementById('zoneDetails').getAttribute('data-zone-id');
+            const zoneName = document.getElementById('editZoneName').value;
+            
+            if (confirm(`Are you sure you want to delete zone "${zoneName}"? This cannot be undone.`)) {
+                const response = await fetch(`/zones/delete/${zoneId}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    showMessage('Zone deleted successfully!');
+                    // Refresh the zone list
+                    loadZonesForManage();
+                    document.getElementById('zoneDetails').style.display = 'none';
+                    document.getElementById('manageZoneSelect').innerHTML = '<option value="">Select Zone</option>';
+                } else {
+                    const error = await response.json();
+                    showMessage(error.detail || 'Failed to delete zone', 'error');
+                }
+            }
+        }
+        
+        function showZoneDetails() {
+            const select = document.getElementById('manageZoneSelect');
+            const selectedOption = select.options[select.selectedIndex];
+            const zoneId = select.value;
+            
+            if (zoneId) {
+                document.getElementById('editZoneName').value = selectedOption.getAttribute('data-name');
+                document.getElementById('editZoneArea').value = selectedOption.getAttribute('data-area');
+                document.getElementById('zoneDetails').style.display = 'block';
+                document.getElementById('zoneDetails').setAttribute('data-zone-id', zoneId);
+            } else {
+                document.getElementById('zoneDetails').style.display = 'none';
+            }
+        }
+
+        async function updateZone() {
+            const zoneId = document.getElementById('zoneDetails').getAttribute('data-zone-id');
+            const newName = document.getElementById('editZoneName').value;
+            const newArea = document.getElementById('editZoneArea').value;
+            const locationId = document.getElementById('manageZoneLocationId').value;
+            
+            if (!newName) {
+                showMessage('Please enter zone name', 'error');
+                return;
+            }
+            
+            const response = await fetch(`/zones/update/${zoneId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: newName,
+                    area_acres: parseFloat(newArea) || 0,
+                    location_id: parseInt(locationId)
+                })
+            });
+            
+            if (response.ok) {
+                showMessage('Zone updated successfully!');
+                loadZonesForManage();
+                document.getElementById('zoneDetails').style.display = 'none';
+            } else {
+                const error = await response.json();
+                showMessage(error.detail || 'Failed to update zone', 'error');
+            }
+        }
+
+        async function loadLocationsForDropdowns() {
+            const response = await fetch('/locations/all');
+            if (response.ok) {
+                const locations = await response.json();
+                
+                // For Zone Location dropdown (Add Zone)
+                const zoneLocationSelect = document.getElementById('zoneLocationId');
+                if (zoneLocationSelect) {
+                    zoneLocationSelect.innerHTML = '<option value="">Select Location</option>';
+                    locations.forEach(loc => {
+                        zoneLocationSelect.innerHTML += `<option value="${loc.id}">${loc.name} (${loc.region})</option>`;
+                    });
+                }
+                
+                // For Manage Zone Location dropdown (Edit/Delete)
+                const manageZoneLocationSelect = document.getElementById('manageZoneLocationId');
+                if (manageZoneLocationSelect) {
+                    manageZoneLocationSelect.innerHTML = '<option value="">Select Location</option>';
+                    locations.forEach(loc => {
+                        manageZoneLocationSelect.innerHTML += `<option value="${loc.id}">${loc.name} (${loc.region})</option>`;
+                    });
+                }
+                
+                // For Task Location dropdown
+                const taskLocationSelect = document.getElementById('taskLocationId');
+                if (taskLocationSelect) {
+                    taskLocationSelect.innerHTML = '<option value="">Select Location</option>';
+                    locations.forEach(loc => {
+                        taskLocationSelect.innerHTML += `<option value="${loc.id}">${loc.name} (${loc.region})</option>`;
+                    });
+                }
+                
+                
+                                
+                // For Contact Location dropdown
+                const contactLocationSelect = document.getElementById('contactLocationId');
+                if (contactLocationSelect) {
+                    contactLocationSelect.innerHTML = '<option value="">Select Location</option>';
+                    locations.forEach(loc => {
+                        contactLocationSelect.innerHTML += `<option value="${loc.id}">${loc.name} (${loc.region})</option>`;
+                    });
+                }
+                
+                // For Task Assigned To dropdown (users)
+                const taskAssignedTo = document.getElementById('taskAssignedTo');
+                if (taskAssignedTo) {
+                    const usersResponse = await fetch('/users');
+                    if (usersResponse.ok) {
+                        const users = await usersResponse.json();
+                        taskAssignedTo.innerHTML = '<option value="">Select User</option>';
+                        users.forEach(user => {
+                            taskAssignedTo.innerHTML += `<option value="${user.id}">${user.name} (${user.role})</option>`;
+                        });
+                    }
+                }
+            }
+        }
+
+        async function updateEditTaskZones() {  // ✅ Outside
+            const locationId = document.getElementById('editTaskLocationId').value;
+            if (locationId) {
+                const response = await fetch(`/zones/location/${locationId}`);
+                const zones = await response.json();
+                const zoneSelect = document.getElementById('editTaskZoneId');
+                zoneSelect.innerHTML = '<option value="">No Zone (Whole Farm)</option>';
+                zones.forEach(zone => {
+                    zoneSelect.innerHTML += `<option value="${zone.id}">${zone.name}</option>`;
+                });
+            } else {
+                document.getElementById('editTaskZoneId').innerHTML = '<option value="">No Zone (Whole Farm)</option>';
+            }
+        }
+        
+        // ✅ KEEP THIS ONE:
+        function showAdminTab(tabName) {
+            // List of all admin tab IDs
+            const tabs = ['addTask', 'addLocation', 'addZone', 'manageZones', 'viewZones', 'addContact', 'viewUsers', 'viewTasks', 'manageTasks', 'addUser'];
+            
+            // Hide all tabs
+            tabs.forEach(tab => {
+                const element = document.getElementById(`${tab}Form`);
+                if (element) {
+                    element.style.display = 'none';
+                }
+            });
+            
+            // Show selected tab
+            const selectedTab = document.getElementById(`${tabName}Form`);
+            if (selectedTab) {
+                selectedTab.style.display = 'block';
+            }
+            
+            // Load data for specific tabs
+            if (tabName === 'viewZones') {
+                loadAllZones();
+            }
+            if (tabName === 'viewUsers') {
+                loadAllUsers();
+            }
+            if (tabName === 'viewTasks') {
+                loadAllTasks();
+            }
+            if (tabName === 'manageZones') {
+                loadLocationsForDropdowns();
+            }
+            if (tabName === 'manageTasks') {
+                loadManageTasks();
+            }
+        }
+        
+        let currentTaskId = null;
+
+        function openCompletionModal(taskId, taskTitle) {
+            currentTaskId = taskId;
+            document.getElementById('completionTaskTitle').textContent = taskTitle;
+            document.getElementById('completionTaskId').value = taskId;
+            document.getElementById('completionNotes').value = '';
+            document.getElementById('completionPhoto').value = '';
+            document.getElementById('completionAudio').value = '';
+            document.getElementById('completionVideo').value = '';
+            document.getElementById('completionModal').style.display = 'block';
+        }
+
+        function closeCompletionModal() {
+            document.getElementById('completionModal').style.display = 'none';
+            currentTaskId = null;
+        }
+
+        async function uploadFile(file, type) {
+            if (!file) return null;
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            try {
+                const response = await fetch(`/upload/${type}`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    return result.url;
+                }
+                return null;
+            } catch (err) {
+                console.error(`Error uploading ${type}:`, err);
+                return null;
+            }
+        }
+
+        async function submitTaskCompletion() {
+            const taskId = document.getElementById('completionTaskId').value;
+            const notes = document.getElementById('completionNotes').value;
+            const photoFile = document.getElementById('completionPhoto').files[0];
+            const audioFile = document.getElementById('completionAudio').files[0];
+            const videoFile = document.getElementById('completionVideo').files[0];
+            
+            if (!taskId) {
+                showMessage("No task selected", "error");
+                return;
+            }
+            
+            let photoUrl = null;
+            let audioUrl = null;
+            let videoUrl = null;
+            
+            // Show uploading message only if there are files
+            if (photoFile || audioFile || videoFile) {
+                showMessage("Uploading media...", "success");
+            }
+            
+            // Upload photo if selected
+            if (photoFile) {
+                const formData = new FormData();
+                formData.append('file', photoFile);
+                const response = await fetch('/upload/photo', {
+                    method: 'POST',
+                    body: formData
+                });
+                if (response.ok) {
+                    const result = await response.json();
+                    photoUrl = result.url;
+                }
+            }
+            
+            // Upload audio if selected
+            if (audioFile) {
+                const formData = new FormData();
+                formData.append('file', audioFile);
+                const response = await fetch('/upload/audio', {
+                    method: 'POST',
+                    body: formData
+                });
+                if (response.ok) {
+                    const result = await response.json();
+                    audioUrl = result.url;
+                }
+            }
+            
+            // Upload video if selected
+            if (videoFile) {
+                const formData = new FormData();
+                formData.append('file', videoFile);
+                const response = await fetch('/upload/video', {
+                    method: 'POST',
+                    body: formData
+                });
+                if (response.ok) {
+                    const result = await response.json();
+                    videoUrl = result.url;
+                }
+            }
+            
+            // Build request data - only include media if uploaded
+            const requestData = {
+                task_id: parseInt(taskId),
+                completed_by: currentUser.user_id,
+                notes: notes || "Task completed"
+            };
+            
+            // Only add media fields if they have values
+            if (photoUrl) requestData.image_url = photoUrl;
+            if (audioUrl) requestData.audio_url = audioUrl;
+            if (videoUrl) requestData.video_url = videoUrl;
+            
+            console.log("Sending data:", requestData);
+            
+            const response = await fetch('/tasks/complete', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(requestData)
+            });
+            
+            if (response.ok) {
+                showMessage('Task completed successfully!');
+                closeCompletionModal();
+                loadTasks();
+                if (typeof loadAllTasks === 'function') loadAllTasks();
+            } else {
+                const error = await response.json();
+                console.error("Error response:", error);
+                showMessage(error.detail || 'Failed to complete task', 'error');
+            }
+        }
+                
+        // ============================================
+        // 👇 ADD NEW ADMIN FUNCTIONS RIGHT HERE 👇
+        // ============================================
+        
+    
+        async function createTask() {
+            const recurring = document.getElementById('taskRecurring').value;
+            const intervalDays = recurring === 'interval' ? document.getElementById('taskIntervalDays').value : null;
+            
+            const taskData = {
+                title: document.getElementById('taskTitle').value,
+                description: document.getElementById('taskDesc').value,
+                task_type: document.getElementById('taskType').value,
+                time_slot: document.getElementById('taskTimeSlot').value,
+                location_id: parseInt(document.getElementById('taskLocationId').value),
+                zone_id: document.getElementById('taskZoneId').value ? parseInt(document.getElementById('taskZoneId').value) : null,
+                created_by: currentUser.user_id,
+                recurring: recurring,
+                recurring_interval: intervalDays
+            };
+            
+            const response = await fetch('/tasks/create', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(taskData)
+            });
+            
+            if (response.ok) {
+                showMessage('Task template created successfully!');
+                document.getElementById('taskTitle').value = '';
+                document.getElementById('taskDesc').value = '';
+                document.getElementById('taskRecurring').value = 'none';
+                document.getElementById('intervalDaysDiv').style.display = 'none';
+                loadAllTasks();
+            } else {
+                const error = await response.json();
+                showMessage(error.detail || 'Failed to create task', 'error');
+            }
+        }
+        
+        async function createLocation() {
+            const locationData = {
+                name: document.getElementById('locationName').value,
+                area_acres: parseFloat(document.getElementById('locationArea').value),
+                region: document.getElementById('locationRegion').value
+            };
+            
+            const response = await fetch('/locations/add', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(locationData)
+            });
+            
+            if (response.ok) {
+                showMessage('Location added successfully!');
+                document.getElementById('locationName').value = '';
+                loadLocations();
+            } else {
+                showMessage('Failed to add location', 'error');
+            }
+        }
+        
+
+        async function createZone() {
+            const locationId = document.getElementById('zoneLocationId').value;
+            const zoneName = document.getElementById('zoneName').value;
+            const zoneArea = document.getElementById('zoneArea').value;
+            
+            if (!locationId) {
+                showMessage('Please select a location', 'error');
+                return;
+            }
+            
+            if (!zoneName) {
+                showMessage('Please enter zone name', 'error');
+                return;
+            }
+            
+            const zoneData = {
+                name: zoneName,
+                area_acres: parseFloat(zoneArea) || 0,
+                location_id: parseInt(locationId)
+            };
+            
+            try {
+                const response = await fetch('/zones/add', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(zoneData)
+                });
+                
+                if (response.ok) {
+                    showMessage('Zone added successfully!');
+                    document.getElementById('zoneName').value = '';
+                    document.getElementById('zoneArea').value = '';
+                } else {
+                    const error = await response.json();
+                    showMessage(error.detail || 'Failed to add zone', 'error');
+                }
+            } catch (err) {
+                showMessage('Network error: ' + err.message, 'error');
+                console.error(err);
+            }
+        }
+
+        async function createContact() {
+            const contactData = {
+                name: document.getElementById('contactName').value,
+                phone: document.getElementById('contactPhone').value,
+                issue_type: document.getElementById('contactIssueType').value,
+                location_id: parseInt(document.getElementById('contactLocationId').value)
+            };
+            
+            const response = await fetch('/contacts/add', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(contactData)
+            });
+            
+            if (response.ok) {
+                showMessage('Contact added successfully!');
+                document.getElementById('contactName').value = '';
+                document.getElementById('contactPhone').value = '';
+            } else {
+                showMessage('Failed to add contact', 'error');
+            }
+        }
+        
+        async function loadAllUsers() {
+            try {
+                const response = await fetch('/users');
+                if (!response.ok) {
+                    console.error("Failed to fetch users");
+                    return;
+                }
+                
+                const users = await response.json();
+                const usersDiv = document.getElementById('allUsersList');  // Changed from 'usersList'
+                
+                if (!usersDiv) {
+                    console.error("allUsersList element not found");
+                    return;
+                }
+                
+                if (users.length === 0) {
+                    usersDiv.innerHTML = '<p style="color: #999;">No users found</p>';
+                    return;
+                }
+                
+                let html = '<table style="width:100%; border-collapse: collapse;">';
+                html += '<tr style="background: #f0f0f0;"><th style="padding: 8px;">Name</th><th style="padding: 8px;">Role</th><th style="padding: 8px;">Username</th><th style="padding: 8px;">Region</th><th style="padding: 8px;">Actions</th></tr>';
+                
+                users.forEach(user => {
+                    html += `
+                        <tr style="border-bottom: 1px solid #ddd;">
+                            <td style="padding: 8px;">${user.name}</td>
+                            <td style="padding: 8px;">${user.role}</td>
+                            <td style="padding: 8px;">${user.username}</td>
+                            <td style="padding: 8px;">${user.region || '-'}</td>
+                            <td style="padding: 8px;">
+                                <button onclick="editUser(${user.id})" style="background: #2196F3; padding: 5px 10px; width: auto; margin-right: 5px;">✏️ Edit</button>
+                                <button onclick="deleteUser(${user.id})" style="background: #f44336; padding: 5px 10px; width: auto;">🗑️ Delete</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                html += '</table>';
+                usersDiv.innerHTML = html;
+                console.log("✅ Users displayed:", users.length);
+            } catch (error) {
+                console.error("Error loading users:", error);
+            }
+        }
+
+        addUser = async function() {
+            const name = document.getElementById('newUserName').value;
+            const username = document.getElementById('userUsername').value;
+            const password = document.getElementById('userPassword').value;
+            const phone = document.getElementById('userPhone').value;
+            const role = document.getElementById('newUserRole').value;  // Changed ID
+            const region = document.getElementById('userRegion').value;
+            const language = document.getElementById('userLanguage').value;
+            
+            const userData = {
+                name: name,
+                username: username,
+                password: password,
+                phone: phone,
+                role: role,
+                region: region,
+                language: language
+            };
+            
+            console.log("Sending data:", JSON.stringify(userData));
+            
+            if (!name || !username || !password || !role) {
+                showMessage('Please fill all fields', 'error');
+                return;
+            }
+            
+            const response = await fetch('/add-user', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(userData)
+            });
+            
+            if (response.ok) {
+                const result = await response.json();
+                showMessage(`User ${name} added successfully!`);
+                document.getElementById('newUserName').value = '';
+                document.getElementById('userUsername').value = '';
+                document.getElementById('userPassword').value = '';
+                document.getElementById('userPhone').value = '';
+                loadAllUsers();
+            } else {
+                const error = await response.json();
+                showMessage(error.detail || 'Failed to add user', 'error');
+            }
+        }
+
+        async function editUser(userId) {
+            editingUserId = userId;
+            
+            // Get user details
+            const response = await fetch(`/user/${userId}`);
+            if (response.ok) {
+                const user = await response.json();
+                
+                // Fill edit form
+                document.getElementById('editUserName').value = user.name;
+                document.getElementById('editUserRole').value = user.role;
+                document.getElementById('editUserRegion').value = user.region || '';
+                document.getElementById('editUserPhone').value = user.phone || '';
+                document.getElementById('editUserPassword').value = '';
+                
+                // Show edit modal/form
+                document.getElementById('editUserModal').style.display = 'block';
+            }
+        }
+
+        function viewMedia(mediaUrl, mediaType) {
+            const imageEl = document.getElementById('viewerImage');
+            const audioEl = document.getElementById('viewerAudio');
+            const videoEl = document.getElementById('viewerVideo');
+            const noMediaEl = document.getElementById('noMediaMessage');
+            
+            // Hide all first
+            imageEl.style.display = 'none';
+            audioEl.style.display = 'none';
+            videoEl.style.display = 'none';
+            noMediaEl.style.display = 'none';
+            
+            if (!mediaUrl) {
+                noMediaEl.style.display = 'block';
+                document.getElementById('mediaViewerModal').style.display = 'flex';
+                return;
+            }
+            
+            if (mediaType === 'image') {
+                imageEl.src = mediaUrl;
+                imageEl.style.display = 'block';
+            } else if (mediaType === 'audio') {
+                audioEl.querySelector('source').src = mediaUrl;
+                audioEl.load();
+                audioEl.style.display = 'block';
+            } else if (mediaType === 'video') {
+                videoEl.querySelector('source').src = mediaUrl;
+                videoEl.load();
+                videoEl.style.display = 'block';
+            }
+            
+            document.getElementById('mediaViewerModal').style.display = 'flex';
+        }
+
+        function closeMediaViewer() {
+            document.getElementById('mediaViewerModal').style.display = 'none';
+            // Pause audio/video when closing
+            const audioEl = document.getElementById('viewerAudio');
+            const videoEl = document.getElementById('viewerVideo');
+            if (audioEl) audioEl.pause();
+            if (videoEl) videoEl.pause();
+        }
+
+        function toggleRecurringOptions() {
+            const recurring = document.getElementById('taskRecurring').value;
+            const intervalDiv = document.getElementById('intervalDaysDiv');
+            
+            if (recurring === 'interval') {
+                intervalDiv.style.display = 'block';
+            } else {
+                intervalDiv.style.display = 'none';
+            }
+        }
+        
+        
+        // Function to get media for a completed task
+        async function viewTaskMedia(completionId) {
+            const response = await fetch(`/task-completions/${completionId}`);
+            if (response.ok) {
+                const data = await response.json();
+                if (data.image_url) {
+                    viewMedia(data.image_url, 'image');
+                } else if (data.audio_url) {
+                    viewMedia(data.audio_url, 'audio');
+                } else if (data.video_url) {
+                    viewMedia(data.video_url, 'video');
+                } else {
+                    viewMedia(null, 'none');
+                }
+            }
+        }
+        
+        
+        async function updateUser() {
+            const userData = {
+                name: document.getElementById('editUserName').value,
+                role: document.getElementById('editUserRole').value,
+                region: document.getElementById('editUserRegion').value,
+                phone: document.getElementById('editUserPhone').value,
+                password: document.getElementById('editUserPassword').value || null
+            };
+            
+            const response = await fetch(`/user/update/${editingUserId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(userData)
+            });
+            
+            if (response.ok) {
+                showMessage('User updated successfully!');
+                document.getElementById('editUserModal').style.display = 'none';
+                loadAllUsers();
+            } else {
+                const error = await response.json();
+                showMessage(error.detail || 'Failed to update user', 'error');
+            }
+        }
+
+        async function deleteUser(userId) {
+            if (confirm('Are you sure you want to delete this user?')) {
+                const response = await fetch(`/user/delete/${userId}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    showMessage('User deleted successfully!');
+                    loadAllUsers();
+                } else {
+                    const error = await response.json();
+                    showMessage(error.detail || 'Failed to delete user', 'error');
+                }
+            }
+        }
+
+        function closeEditModal() {
+            document.getElementById('editUserModal').style.display = 'none';
+        }
+        
+        // ============================================
+        // 👆 END OF NEW ADMIN FUNCTIONS 👆
+        // ============================================
+
+    </script>
+
+    <!-- Edit Task Modal -->
+    <div id="editTaskModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000;">
+        <div style="background: white; margin: 5% auto; max-width: 500px; max-height: 80vh; overflow-y: auto; padding: 20px; border-radius: 16px;">
+            <h3>✏️ Edit Task Template</h3>
+            <input type="hidden" id="editTaskId">
+            
+            <label>Title:</label>
+            <input type="text" id="editTaskTitle" placeholder="Task Title">
+            
+            <label>Description:</label>
+            <textarea id="editTaskDesc" rows="3" style="width: 100%;"></textarea>
+            
+            <label>Task Type:</label>
+            <select id="editTaskType">
+                <option value="daily">Daily</option>
+                <option value="interval">Interval</option>
+                <option value="manual">Manual</option>
+            </select>
+            
+            <label>Time Slot:</label>
+            <select id="editTaskTimeSlot">
+                <option value="morning">🌅 Morning</option>
+                <option value="night">🌙 Night</option>
+                <option value="anytime">🕐 Anytime</option>
+            </select>
+            
+            <label>Location:</label>
+            <select id="editTaskLocationId"></select>
+            
+            <label>Zone:</label>
+            <select id="editTaskZoneId">
+                <option value="">No Zone (Whole Farm)</option>
+            </select>
+            
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button onclick="saveTaskEdit()" style="background: #4CAF50; flex: 1;">💾 Save Changes</button>
+                <button onclick="closeEditTaskModal()" style="background: #999; flex: 1;">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Media Viewer Modal -->
+    <div id="mediaViewerModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 3000;">
+        <div style="position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+            <button onclick="closeMediaViewer()" style="position: absolute; top: 20px; right: 20px; background: red; color: white; border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 20px; cursor: pointer; z-index: 3001;">✕</button>
+            
+            <!-- Image Viewer -->
+            <img id="viewerImage" src="" style="max-width: 90%; max-height: 90%; object-fit: contain; display: none;">
+            
+            <!-- Audio Player -->
+            <audio id="viewerAudio" controls style="width: 80%; display: none;">
+                <source src="" type="audio/mpeg">
+                Your browser does not support audio.
+            </audio>
+            
+            <!-- Video Player -->
+            <video id="viewerVideo" controls style="max-width: 90%; max-height: 90%; display: none;">
+                <source src="" type="video/mp4">
+                Your browser does not support video.
+            </video>
+            
+            <div id="noMediaMessage" style="color: white; text-align: center; display: none;">
+                <p>No media available for this task completion</p>
+            </div>
+        </div>
+    </div>
+
+
+</body>
+</html>

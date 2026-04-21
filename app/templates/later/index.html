@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Farm AI Agent</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌾 Farm AI Agent</h1>
+            <p>Multi-Location Farm Management</p>
+        </div>
+
+        <div id="message" class="message"></div>
+
+        <!-- Login Section -->
+        <div id="loginSection" class="section active">
+            <div class="card">
+                <div class="card-title">🔐 Login</div>
+                <input type="text" id="loginUsername" placeholder="Username" value="arun">
+                <input type="password" id="loginPassword" placeholder="Password" value="1234">
+                <button onclick="login()">Login</button>
+            </div>
+        </div>
+
+        <!-- Main App Section -->
+        <div id="appSection" class="section">
+            <!-- User Info -->
+            <div class="card" id="userInfoCard">
+                <div class="card-title">👤 Welcome, <span id="userName">---</span></div>
+                <p>Role: <span id="userRole">---</span></p>
+            </div>
+
+            <!-- Admin Panel Section -->
+            <div id="adminSection" class="section">
+                <div class="card">
+                    <div class="card-title">👑 Admin Panel</div>
+                    
+                    <div style="display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap;">
+                        <button onclick="showAdminTab('addTask')" style="width: auto; padding: 8px 16px;">📋 Add Task</button>
+                        <button onclick="loadAllTasks(); document.getElementById('viewTasksForm').style.display='block';" style="width: auto; padding: 8px 16px;">📋 View Tasks</button>
+                        <button onclick="showAdminTab('viewZones')" style="width: auto; padding: 8px 16px;">📋 View Zones</button>
+                        <button onclick="showAdminTab('manageZones')" style="width: auto; padding: 8px 16px;">✏️ Manage Zones</button>
+                        <button onclick="showAdminTab('addLocation')" style="width: auto; padding: 8px 16px;">📍 Add Location</button>
+                        <button onclick="showAdminTab('addZone')" style="width: auto; padding: 8px 16px;">🗺️ Add Zone</button>
+                        <button onclick="showAdminTab('addContact')" style="width: auto; padding: 8px 16px;">📞 Add Contact</button>
+                        <button onclick="showAdminTab('addUser')" style="width: auto; padding: 8px 16px;">👤 Add User</button>
+                        <button onclick="showAdminTab('viewUsers')" style="width: auto; padding: 8px 16px;">👥 View Users</button>
+                    </div>
+                    
+                    <div id="addUserForm" class="admin-tab" style="display: none;">
+                        <h3>➕ Add New User</h3>
+                        <input type="text" id="newUserName" placeholder="Full Name" required>
+                        <input type="text" id="userUsername" placeholder="Username" required>
+                        <input type="password" id="userPassword" placeholder="Password" required>
+                        <input type="tel" id="userPhone" placeholder="Phone Number">
+                        <select id="newUserRole">
+                            <option value="admin">Admin</option>
+                            <option value="supervisor">Supervisor</option>
+                            <option value="worker">Worker</option>
+                        </select>
+                        <select id="userRegion">
+                            <option value="">Select Region</option>
+                            <option value="Ramanjapur">Ramanjapur</option>
+                            <option value="Maharashtra">Maharashtra</option>
+                        </select>
+                        <select id="userLanguage">
+                            <option value="english">English</option>
+                            <option value="hindi">Hindi</option>
+                            <option value="telugu">Telugu</option>
+                        </select>
+                        <button onclick="addUser()">Add User</button>
+                    </div>
+
+                    <div id="addTaskForm" class="admin-tab" style="display: none;">
+                        <h3>➕ Add New Task</h3>
+                        <input type="text" id="taskTitle" placeholder="Task Title">
+                        <textarea id="taskDesc" placeholder="Description"></textarea>
+                        <select id="taskType">
+                            <option value="daily">Daily</option>
+                            <option value="interval">Interval</option>
+                            <option value="manual">Manual</option>
+                        </select>
+                        <select id="taskTimeSlot">
+                            <option value="morning">🌅 Morning</option>
+                            <option value="night">🌙 Night</option>
+                            <option value="anytime">🕐 Anytime</option>
+                        </select>
+                        <select id="taskLocationId"></select>
+                        <select id="taskZoneId"><option value="">No Zone (Whole Farm)</option></select>
+                        <select id="taskAssignedTo"></select>
+                        <input type="number" id="intervalDays" placeholder="Interval days" style="display: none;">
+                        <button onclick="createTask()">Create Task</button>
+                    </div>
+                    
+                    <div id="addLocationForm" class="admin-tab" style="display: none;">
+                        <h3>➕ Add New Location</h3>
+                        <input type="text" id="locationName" placeholder="Location Name">
+                        <input type="number" id="locationArea" placeholder="Area in Acres">
+                        <select id="locationRegion">
+                            <option value="Ramanjapur">Ramanjapur</option>
+                            <option value="Maharashtra">Maharashtra</option>
+                        </select>
+                        <button onclick="createLocation()">Add Location</button>
+                    </div>
+                    
+                    <div id="addZoneForm" class="admin-tab" style="display: none;">
+                        <h3>➕ Add New Zone</h3>
+                        <select id="zoneLocationId"></select>
+                        <input type="text" id="zoneName" placeholder="Zone Name">
+                        <input type="number" id="zoneArea" placeholder="Area in Acres">
+                        <button onclick="createZone()">Add Zone</button>
+                    </div>
+                    
+                    <div id="addContactForm" class="admin-tab" style="display: none;">
+                        <h3>➕ Add New Contact</h3>
+                        <input type="text" id="contactName" placeholder="Contact Name">
+                        <input type="tel" id="contactPhone" placeholder="Phone Number">
+                        <select id="contactIssueType">
+                            <option value="Motor Problem">Motor Problem</option>
+                            <option value="Line Problem">Line Problem</option>
+                            <option value="Leakage">Leakage</option>
+                            <option value="Starter Problem">Starter Problem</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <select id="contactLocationId"></select>
+                        <button onclick="createContact()">Add Contact</button>
+                    </div>
+                    
+                    <div id="viewTasksForm" class="admin-tab" style="display: none;">
+                        <h3>📋 All Tasks</h3>
+                        <div id="allTasksList" style="max-height: 400px; overflow-y: auto;"></div>
+                    </div>
+
+                    <div id="viewZonesForm" class="admin-tab" style="display: none;">
+                        <h3>📋 All Zones</h3>
+                        <div id="allZonesList" style="max-height: 400px; overflow-y: auto;"></div>
+                    </div>
+
+                    <div id="viewUsersForm" class="admin-tab" style="display: none;">
+                        <h3>👥 All Users</h3>
+                        <div id="allUsersList" style="max-height: 400px; overflow-y: auto;"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="editUserModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;">
+                <div style="background: white; margin: 20% auto; max-width: 400px; padding: 20px; border-radius: 16px;">
+                    <h3>✏️ Edit User</h3>
+                    <input type="text" id="editUserName" placeholder="Full Name">
+                    <select id="editUserRole">
+                        <option value="admin">Admin</option>
+                        <option value="supervisor">Supervisor</option>
+                        <option value="worker">Worker</option>
+                    </select>
+                    <select id="editUserRegion">
+                        <option value="">Select Region</option>
+                        <option value="Ramanjapur">Ramanjapur</option>
+                        <option value="Maharashtra">Maharashtra</option>
+                    </select>
+                    <input type="tel" id="editUserPhone" placeholder="Phone Number">
+                    <input type="password" id="editUserPassword" placeholder="New Password">
+                    <div style="display: flex; gap: 10px; margin-top: 10px;">
+                        <button onclick="updateUser()" style="background: #2196F3;">💾 Save</button>
+                        <button onclick="closeEditModal()" style="background: #999;">Cancel</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="manageZonesForm" class="admin-tab" style="display: none;">
+                <h3>✏️ Manage Zones</h3>
+                <select id="manageZoneLocationId" onchange="loadZonesForManage()">
+                    <option value="">Select Location</option>
+                </select>
+                <select id="manageZoneSelect" onchange="showZoneDetails()" style="margin-bottom: 12px;">
+                    <option value="">Select Zone</option>
+                </select>
+                <div id="zoneDetails" style="display: none;">
+                    <input type="text" id="editZoneName" placeholder="Zone Name">
+                    <input type="number" id="editZoneArea" placeholder="Area in Acres">
+                    <div style="display: flex; gap: 10px;">
+                        <button onclick="updateZone()" style="background: #2196F3;">💾 Update Zone</button>
+                        <button onclick="deleteZone()" style="background: #f44336;">🗑️ Delete Zone</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="quickActionsCard" class="card" style="display: none;">
+                <div class="card-title">⚡ Quick Actions</div>
+                <button class="secondary" onclick="showSection('tasks')">📋 View Tasks</button>
+                <button onclick="showSection('locations')">📍 View Locations</button>
+                <button class="secondary" onclick="showSection('reportIssue')">🚨 Report Issue</button>
+                <button id="adminBtn" onclick="showSection('admin')" style="background: #9c27b0; color: white; display: none; margin-top: 10px;">👑 Admin Panel</button>
+            </div>
+
+            <div id="tasksSection" class="section">
+                <div class="card">
+                    <div class="card-title">📋 Today's Tasks</div>
+                    <label style="display: flex; align-items: center; margin-bottom: 12px; gap: 8px;">
+                        <input type="checkbox" id="showAllTasks" onchange="loadTasks()">
+                        <span>Show all tasks</span>
+                    </label>
+                    <div id="tasksList"><p style="color: #999;">Loading tasks...</p></div>
+                </div>
+            </div>
+
+            <div id="locationsSection" class="section">
+                <div class="card">
+                    <div class="card-title">📍 Farm Locations</div>
+                    <div id="locationsList" class="location-grid"><p style="color: #999;">Loading...</p></div>
+                </div>
+            </div>
+
+            <div id="reportIssueSection" class="section">
+                <div class="card">
+                    <div class="card-title">🚨 Report Issue</div>
+                    <select id="issueType">
+                        <option value="Motor Problem">Motor Problem</option>
+                        <option value="Line Problem">Line Problem</option>
+                        <option value="Leakage">Leakage</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <select id="issueLocation"><option value="">Select Location</option></select>
+                    <textarea id="issueDescription" rows="3" placeholder="Describe the issue..."></textarea>
+                    <button onclick="reportIssue()">Submit Report</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <button class="danger" onclick="logout()">🚪 Logout</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="completionModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000;">
+        <div style="background: white; margin: 5% auto; max-width: 500px; max-height: 80vh; overflow-y: auto; padding: 20px; border-radius: 16px;">
+            <h3>✅ Complete Task</h3>
+            <p id="completionTaskTitle"></p>
+            <input type="hidden" id="completionTaskId">
+            <label>Notes:</label>
+            <textarea id="completionNotes" rows="3" style="width: 100%; margin-bottom: 12px;"></textarea>
+            <label>📸 Take Photo:</label>
+            <input type="file" id="completionPhoto" accept="image/*" capture="environment" style="margin-bottom: 12px; width: 100%;">
+            <label>🎤 Record Audio:</label>
+            <input type="file" id="completionAudio" accept="audio/*" capture="user" style="margin-bottom: 12px; width: 100%;">
+            <label>🎥 Record Video:</label>
+            <input type="file" id="completionVideo" accept="video/*" capture="environment" style="margin-bottom: 12px; width: 100%;">
+            <div style="display: flex; gap: 10px; position: sticky; bottom: 0; background: white; padding-top: 10px;">
+                <button onclick="submitTaskCompletion()" style="background: #4CAF50; flex: 1; padding: 12px;">✓ Submit Task</button>
+                <button onclick="closeCompletionModal()" style="background: #999; flex: 1; padding: 12px;">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="bottom-nav" id="bottomNav" style="display: none;">
+        <button class="nav-btn" onclick="showSection('tasks')">📋 Tasks</button>
+        <button class="nav-btn" onclick="showSection('locations')">📍 Farms</button>
+        <button class="nav-btn" onclick="showSection('reportIssue')">🚨 Report</button>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
