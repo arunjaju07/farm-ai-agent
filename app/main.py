@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 from app.database.db import engine, Base
-from app.routers import user_router, location_router, auth_router, task_router, zone_router, upload_router
+from app.routers import user_router, location_router, auth_router, task_router, zone_router, upload_router, issue_router
 from app.scheduler import start_scheduler
 import os
 
@@ -17,6 +17,7 @@ app.include_router(auth_router.router)
 app.include_router(task_router.router)
 app.include_router(zone_router.router)  # 👈 NOW zone_router is imported above
 app.include_router(upload_router.router)
+app.include_router(issue_router.router)
 
 start_scheduler()
 

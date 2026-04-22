@@ -4,6 +4,7 @@ from datetime import datetime, date, timedelta
 from app.database.db import SessionLocal
 from app.models.task_model import Task
 from app.models.user_model import User
+from sqlalchemy import func
 
 def generate_recurring_tasks():
     """Check for recurring tasks and generate new instances"""
@@ -63,6 +64,24 @@ def generate_recurring_tasks():
                             next_date = date(today.year, today.month + 1, template.created_at.day)
             
             if should_generate:
+                # Check if task for today already exists (prevent duplicates)
+                existing_task = db.query(Task).filter(
+                    Task.title == template.title,
+                    Task.location_id == template.location_id,
+                    func.date(Task.due_date) == today
+                ).first()
+                
+                if existing_task:
+                    print(f"[Scheduler] Task already exists for today: {template.title}")
+                    continue  # Skip creating duplicate
+                
+                # Determine assigned worker
+                # If it's a daily task, assign to worker1 (ID: 3)
+                # Otherwise keep the template's assigned_to
+                assigned_worker = template.assigned_to
+                if template.recurring == "daily":
+                    assigned_worker = 3  # Worker1 ID
+    
                 # Create a new task instance
                 new_task = Task(
                     title=template.title,
@@ -71,7 +90,7 @@ def generate_recurring_tasks():
                     time_slot=template.time_slot,
                     location_id=template.location_id,
                     zone_id=template.zone_id,
-                    assigned_to=template.assigned_to,
+                    assigned_to=assigned_worker,
                     created_by=template.created_by,
                     status="pending",
                     recurring="none",  # Instance is not recurring
@@ -84,7 +103,7 @@ def generate_recurring_tasks():
                 template.next_generation_date = next_date
                 
                 generated_count += 1
-                print(f"[Scheduler] Generated task: {template.title} for {today}")
+                print(f"[Scheduler] Generated task: {template.title} for {today} assigned to worker ID: {assigned_worker}")
         
         db.commit()
         if generated_count > 0:
