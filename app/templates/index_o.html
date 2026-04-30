@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Farm AI Agent</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌾 Farm AI Agent</h1>
+            <p>Multi-Location Farm Management</p>
+        </div>
+
+        <div id="message" class="message"></div>
+
+        <!-- Login Section -->
+        <div id="loginSection" class="section active">
+            <div class="card">
+                <div class="card-title">🔐 Login</div>
+                <input type="text" id="loginUsername" placeholder="Username" value="arun">
+                <input type="password" id="loginPassword" placeholder="Password" value="1234">
+                <button onclick="login()">Login</button>
+            </div>
+        </div>
+
+        <!-- Main App Section -->
+        <div id="appSection" class="section">
+            <div class="card" id="userInfoCard">
+                <div class="card-title">👤 Welcome, <span id="userName">---</span></div>
+                <p>Role: <span id="userRole">---</span></p>
+            </div>
+
+            <!-- Admin Panel Section -->
+            <div id="adminSection" class="section">
+                <div class="card">
+                    <div class="card-title">👑 Admin Panel</div>
+                    
+                    <div style="display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap;">
+                        <button onclick="showAdminTab('tasks')" style="width: auto; padding: 8px 16px;">📋 Task Status</button>
+                        <button onclick="showAdminTab('addTask')" style="width: auto; padding: 8px 16px;">➕ Add Task</button>
+                        <button onclick="showAdminTab('manageTasks')" style="width: auto; padding: 8px 16px;">✏️ Manage Tasks</button>
+                        <button onclick="showAdminTab('reports')" style="width: auto; padding: 8px 16px;">📊 Reports</button>
+                        <button onclick="showAdminTab('addLocation')" style="width: auto; padding: 8px 16px;">📍 Add Location</button>
+                        <button onclick="showAdminTab('addZone')" style="width: auto; padding: 8px 16px;">🗺️ Add Zone</button>
+                        <button onclick="showAdminTab('viewZones')" style="width: auto; padding: 8px 16px;">📋 View Zones</button>
+                        <button onclick="showAdminTab('manageZones')" style="width: auto; padding: 8px 16px;">✏️ Manage Zones</button>
+                        <button onclick="showAdminTab('addContact')" style="width: auto; padding: 8px 16px;">📞 Add Contact</button>
+                        <button onclick="showAdminTab('viewIssues')" style="width: auto; padding: 8px 16px;">📋 Issues</button>
+                        <button onclick="showAdminTab('addUser')" style="width: auto; padding: 8px 16px;">👤 Add User</button>
+                        <button onclick="showAdminTab('viewUsers')" style="width: auto; padding: 8px 16px;">👥 View Users</button>
+                    </div>
+                    
+                    <!-- Task Status Tab -->
+                    <div id="tasksForm" class="admin-tab" style="display: none;">
+                        <h3>📊 Task Status</h3>
+                        <div class="filters">
+                            <select id="taskLocationFilter" onchange="loadAllTasks()">
+                                <option value="all">All Locations</option>
+                            </select>
+                            <select id="taskTypeFilter" onchange="loadAllTasks()">
+                                <option value="all">All Tasks</option>
+                                <option value="water_release">💧 Water Release</option>
+                                <option value="fertilizer">🌱 Fertilizer</option>
+                                <option value="grass_cutting">✂️ Grass Cutting</option>
+                            </select>
+                            <input type="date" id="adminTaskDatePicker" onchange="loadAllTasks()">
+                            <button onclick="loadAllTasks()" style="background: #2196F3; width: auto;">🔍 Filter</button>
+                        </div>
+                        <div id="allTasksList" style="max-height: 500px; overflow-y: auto;"></div>
+                    </div>
+                    
+                    <!-- Add Task Tab -->
+                    <div id="addTaskForm" class="admin-tab" style="display: none;">
+                        <h3>➕ Add New Task</h3>
+                        <input type="text" id="taskTitle" placeholder="Task Title">
+                        <textarea id="taskDesc" placeholder="Description"></textarea>
+                        <select id="taskCategory">
+                            <option value="water_release">💧 Water Release</option>
+                            <option value="fertilizer">🌱 Fertilizer</option>
+                            <option value="grass_cutting">✂️ Grass Cutting</option>
+                            <option value="general">📋 General</option>
+                        </select>
+                        <select id="taskType">
+                            <option value="daily">Daily</option>
+                            <option value="interval">Interval</option>
+                            <option value="manual">Manual</option>
+                        </select>
+                        <select id="taskTimeSlot">
+                            <option value="anytime">🕐 Anytime</option>
+                            <option value="morning">🌅 Morning</option>
+                            <option value="night">🌙 Night</option>
+                        </select>
+                        <select id="taskLocationId"></select>
+                        <select id="taskZoneId">
+                            <option value="">No Zone (Whole Farm)</option>
+                        </select>
+                        <select id="taskRecurring" onchange="toggleRecurringOptions()">
+                            <option value="none">None</option>
+                            <option value="daily">Daily</option>
+                            <option value="interval">Interval (Every X days)</option>
+                        </select>
+                        <div id="intervalDaysDiv" style="display: none;">
+                            <input type="number" id="taskIntervalDays" placeholder="Interval days">
+                        </div>
+                        <button onclick="createTask()">➕ Create Task</button>
+                    </div>
+                    
+                    <!-- Manage Tasks Tab -->
+                    <div id="manageTasksForm" class="admin-tab" style="display: none;">
+                        <h3>✏️ Manage Tasks</h3>
+                        <div id="manageTasksList"></div>
+                    </div>
+                    
+                    <!-- Reports Tab -->
+                    <div id="reportsForm" class="admin-tab" style="display: none;">
+                        <h3>📊 Water Release Reports</h3>
+                        <div class="filters">
+                            <select id="reportLocationId">
+                                <option value="">Select Location</option>
+                            </select>
+                            <input type="date" id="reportStartDate">
+                            <input type="date" id="reportEndDate">
+                            <button onclick="generateWaterReport()" style="background: #4CAF50;">Generate Report</button>
+                            <button onclick="exportReportToCSV()" style="background: #2196F3;">📥 Export CSV</button>
+                        </div>
+                        <div id="reportResults"></div>
+                    </div>
+                    
+                    <!-- Other admin tabs (locations, zones, users, issues) remain similar -->
+                    <div id="addLocationForm" class="admin-tab" style="display: none;"><!-- Same as before --></div>
+                    <div id="addZoneForm" class="admin-tab" style="display: none;"><!-- Same as before --></div>
+                    <div id="viewZonesForm" class="admin-tab" style="display: none;"><!-- Same as before --></div>
+                    <div id="manageZonesForm" class="admin-tab" style="display: none;"><!-- Same as before --></div>
+                    <div id="addContactForm" class="admin-tab" style="display: none;"><!-- Same as before --></div>
+                    <div id="viewIssuesForm" class="admin-tab" style="display: none;"><!-- Same as before --></div>
+                    <div id="addUserForm" class="admin-tab" style="display: none;"><!-- Same as before --></div>
+                    <div id="viewUsersForm" class="admin-tab" style="display: none;"><!-- Same as before --></div>
+                </div>
+            </div>
+
+            <!-- Worker Sections -->
+            <div id="tasksSection" class="section">
+                <div class="card">
+                    <div class="card-title">📋 My Tasks</div>
+                    <select id="workerTaskTypeFilter" onchange="loadWorkerTasks()">
+                        <option value="all">All Tasks</option>
+                        <option value="water_release">💧 Water Release</option>
+                        <option value="fertilizer">🌱 Fertilizer</option>
+                        <option value="grass_cutting">✂️ Grass Cutting</option>
+                    </select>
+                    <div id="workerTasksList"></div>
+                </div>
+            </div>
+
+            <div id="locationsSection" class="section"><!-- Same as before --></div>
+            <div id="reportIssueSection" class="section"><!-- Same as before --></div>
+
+            <div class="card">
+                <button class="danger" onclick="logout()">🚪 Logout</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div id="progressModal" class="modal"><!-- Progress update modal --></div>
+    <div id="mediaViewerModal" class="modal"><!-- Media viewer --></div>
+    <div id="editTaskModal" class="modal"><!-- Edit task modal --></div>
+    <div id="editUserModal" class="modal"><!-- Edit user modal --></div>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav" id="bottomNav" style="display: none;">
+        <button class="nav-btn" onclick="showSection('tasks')">📋 Tasks</button>
+        <button class="nav-btn" onclick="showSection('locations')">📍 Farms</button>
+        <button class="nav-btn" onclick="showSection('reportIssue')">🚨 Report</button>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        let currentUser = null;
+        const API_URL = "";
+        
+        function showMessage(msg, type = "success") {
+            const msgDiv = document.getElementById("message");
+            msgDiv.textContent = msg;
+            msgDiv.className = `message ${type}`;
+            setTimeout(() => {
+                msgDiv.className = "message";
+            }, 3000);
+        }
+        
+        // Global variables - declared ONCE
+        let currentUser = null;
+        const API_URL = "";
+        
+        // Only keep showMessage and getCurrentTimeSlot here
+        function showMessage(msg, type = "success") {
+            const msgDiv = document.getElementById("message");
+            msgDiv.textContent = msg;
+            msgDiv.className = `message ${type}`;
+            setTimeout(() => {
+                msgDiv.className = "message";
+            }, 3000);
+        }
+        
+        function getCurrentTimeSlot() {
+            const hour = new Date().getHours();
+            if (hour >= 6 && hour < 12) return "morning";
+            if (hour >= 18 && hour < 22) return "night";
+            return "anytime";
+        }
+    </script>
+    <script src="/static/task-manager.js"></script>
+    <script src="/static/task-ui.js"></script>
+    <script src="/static/task-reports.js"></script>
+    <script src="/static/user-manager.js"></script>
+    <script src="/static/issue-manager.js"></script>
+    <script src="/static/location-manager.js"></script>
+    <script src="/static/auth.js"></script>
+    <script src="/static/task-manager.js"></script>
+    <script src="/static/media-viewer.js"></script>
+
+</body>
+</html>
