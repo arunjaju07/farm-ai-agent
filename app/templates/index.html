@@ -1148,6 +1148,11 @@
                     
                     // Filter by selected date
                     tasks = tasks.filter(task => {
+                        // Water release tasks always show (no date filter needed)
+                        if (task.task_category === 'water_release') {
+                            return true;
+                        }
+                        // Other tasks filter by due date or creation date
                         const taskDate = task.due_date ? task.due_date.split('T')[0] : task.created_at.split('T')[0];
                         return taskDate === selectedDate;
                     });
@@ -1456,6 +1461,11 @@
                 let filteredTasks = tasks;
                 if (selectedDate) {
                     filteredTasks = tasks.filter(task => {
+                        // Water release tasks always show (no date filter needed)
+                        if (task.task_category === 'water_release') {
+                            return true;
+                        }
+                        // Other tasks filter by due date or creation date
                         const taskDate = task.due_date ? task.due_date.split('T')[0] : task.created_at.split('T')[0];
                         return taskDate === selectedDate;
                     });
