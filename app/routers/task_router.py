@@ -323,6 +323,7 @@ def update_task_progress(task_id: int, update: dict):
         if water_released:
             task.last_water_release_date = datetime.now()
         
+                   
         # Check if task reached 100%
         auto_reset_info = None
         if new_progress == 100 and old_progress < 100:
@@ -341,28 +342,7 @@ def update_task_progress(task_id: int, update: dict):
             task.total_cycles_completed = (task.total_cycles_completed or 0) + 1
             task.current_cycle = current_cycle + 1
             task.progress_percentage = 0
-            task.cycle_start_date = datetime.now()
-            task.cycle_completion_date = None
-            
-        # Check if task reached 100%
-        auto_reset_info = None
-        if new_progress == 100 and old_progress < 100:
-            # Record cycle completion
-            cycle_history = TaskCyclesHistory(
-                task_id=task_id,
-                cycle_number=current_cycle,
-                start_date=cycle_start,
-                end_date=datetime.now(),
-                days_taken=(datetime.now() - cycle_start).days,
-                final_progress=100
-            )
-            db.add(cycle_history)
-            
-            # Auto-reset for next cycle
-            task.total_cycles_completed = (task.total_cycles_completed or 0) + 1
-            task.current_cycle = current_cycle + 1
-            task.progress_percentage = 0
-            task.cycle_start_date = datetime.now()
+            task.cycle_start_date = datetime.now(timezone.utc)
             task.cycle_completion_date = None
             
             auto_reset_info = {
@@ -384,7 +364,7 @@ def update_task_progress(task_id: int, update: dict):
             "old_progress": old_progress,
             "new_progress": new_progress,
             "current_cycle": task.current_cycle if task.current_cycle is not None else 1,
-            "days_in_cycle": (datetime.now() - (task.cycle_start_date or datetime.now())).days,
+            "days_in_cycle": (datetime.now(timezone.utc) - (task.cycle_start_date or datetime.now(timezone.utc))).days,
             "last_water_release": task.last_water_release_date.isoformat() if task.last_water_release_date else None,
             "auto_reset": auto_reset_info
         }
@@ -488,7 +468,7 @@ def batch_update_progress(updates: List[dict]):
             
             task.progress_percentage = new_progress
             if water_released:
-                task.last_water_release_date = datetime.now()
+                task.last_water_release_date = datetime.now(timezone.utc)
             
             results.append({"task_id": task_id, "success": True, "old_progress": task.progress_percentage, "new_progress": new_progress})
         

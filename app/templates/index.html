@@ -2377,34 +2377,46 @@
         }
 
         function viewMedia(mediaUrl, mediaType) {
+            // Close the history modal first
+            closeMediaHistoryModal();
+            
+            // Now open the media viewer
             const imageEl = document.getElementById('viewerImage');
             const audioEl = document.getElementById('viewerAudio');
             const videoEl = document.getElementById('viewerVideo');
             const noMediaEl = document.getElementById('noMediaMessage');
             
             // Hide all first
-            imageEl.style.display = 'none';
-            audioEl.style.display = 'none';
-            videoEl.style.display = 'none';
-            noMediaEl.style.display = 'none';
+            if (imageEl) imageEl.style.display = 'none';
+            if (audioEl) audioEl.style.display = 'none';
+            if (videoEl) videoEl.style.display = 'none';
+            if (noMediaEl) noMediaEl.style.display = 'none';
             
             if (!mediaUrl) {
-                noMediaEl.style.display = 'block';
+                if (noMediaEl) noMediaEl.style.display = 'block';
                 document.getElementById('mediaViewerModal').style.display = 'flex';
                 return;
             }
             
             if (mediaType === 'image') {
-                imageEl.src = mediaUrl;
-                imageEl.style.display = 'block';
+                if (imageEl) {
+                    imageEl.src = mediaUrl;
+                    imageEl.style.display = 'block';
+                }
             } else if (mediaType === 'audio') {
-                audioEl.querySelector('source').src = mediaUrl;
-                audioEl.load();
-                audioEl.style.display = 'block';
+                if (audioEl) {
+                    const source = audioEl.querySelector('source');
+                    if (source) source.src = mediaUrl;
+                    audioEl.load();
+                    audioEl.style.display = 'block';
+                }
             } else if (mediaType === 'video') {
-                videoEl.querySelector('source').src = mediaUrl;
-                videoEl.load();
-                videoEl.style.display = 'block';
+                if (videoEl) {
+                    const source = videoEl.querySelector('source');
+                    if (source) source.src = mediaUrl;
+                    videoEl.load();
+                    videoEl.style.display = 'block';
+                }
             }
             
             document.getElementById('mediaViewerModal').style.display = 'flex';
@@ -2412,12 +2424,12 @@
 
         function closeMediaViewer() {
             document.getElementById('mediaViewerModal').style.display = 'none';
-            // Pause audio/video when closing
             const audioEl = document.getElementById('viewerAudio');
             const videoEl = document.getElementById('viewerVideo');
             if (audioEl) audioEl.pause();
             if (videoEl) videoEl.pause();
         }
+
 
         function toggleRecurringOptions() {
             const recurring = document.getElementById('taskRecurring').value;
@@ -2450,8 +2462,10 @@
                     return;
                 }
                 
-                // Filter only records that have photo or audio
-                const mediaRecords = history.filter(record => record.photo_url || record.audio_url);
+                // Filter records that have media (photo or audio)
+                const mediaRecords = history.filter(record => 
+                    (record.media && (record.media.photo || record.media.audio))
+                );
                 
                 if (mediaRecords.length === 0) {
                     showMessage("No photos or audio found for this task", "info");
@@ -2459,7 +2473,7 @@
                 }
                 
                 let html = `
-                    <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 7000; display: flex; align-items: center; justify-content: center;">
+                    <div id="mediaHistoryModal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000; display: flex; align-items: center; justify-content: center;">
                         <div style="background: white; margin: 5% auto; max-width: 500px; max-height: 80vh; overflow-y: auto; padding: 20px; border-radius: 16px; width: 90%;">
                             <h3 style="margin-bottom: 16px;">📸 Media History</h3>
                 `;
@@ -2477,11 +2491,11 @@
                             <div style="margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap;">
                     `;
                     
-                    if (record.photo_url) {
-                        html += `<button onclick="viewMedia('${record.photo_url}', 'image')" style="background: #2196F3; padding: 6px 12px; width: auto; font-size: 12px; border: none; border-radius: 8px; cursor: pointer;">📷 View Photo</button>`;
+                    if (record.media && record.media.photo) {
+                        html += `<button onclick="viewMedia('${record.media.photo}', 'image')" style="background: #2196F3; padding: 6px 12px; width: auto; font-size: 12px; border: none; border-radius: 8px; cursor: pointer;">📷 View Photo</button>`;
                     }
-                    if (record.audio_url) {
-                        html += `<button onclick="viewMedia('${record.audio_url}', 'audio')" style="background: #9c27b0; padding: 6px 12px; width: auto; font-size: 12px; border: none; border-radius: 8px; cursor: pointer;">🎧 Listen Audio</button>`;
+                    if (record.media && record.media.audio) {
+                        html += `<button onclick="viewMedia('${record.media.audio}', 'audio')" style="background: #9c27b0; padding: 6px 12px; width: auto; font-size: 12px; border: none; border-radius: 8px; cursor: pointer;">🎧 Listen Audio</button>`;
                     }
                     
                     html += `
@@ -2496,13 +2510,11 @@
                     </div>
                 `;
                 
-                // Remove existing modal if any
                 const existingModal = document.getElementById('mediaHistoryModal');
                 if (existingModal) {
                     existingModal.remove();
                 }
                 
-                // Create new modal
                 const modalDiv = document.createElement('div');
                 modalDiv.id = 'mediaHistoryModal';
                 modalDiv.innerHTML = html;
@@ -2520,6 +2532,7 @@
                 modal.remove();
             }
         }
+
         
         
         
@@ -2575,6 +2588,9 @@
                 if (response.ok) {
                     const result = await response.json();
                     photoUrl = result.url;
+                    console.log("📸 Photo uploaded, URL:", photoUrl);  // ← ADD THIS LINE
+                } else {
+                    console.log("Photo upload failed");  // ← ADD THIS LINE
                 }
             }
             
@@ -2586,11 +2602,22 @@
                 if (response.ok) {
                     const result = await response.json();
                     audioUrl = result.url;
+                    console.log("🎤 Audio uploaded, URL:", audioUrl);  // ← ADD THIS LINE
+                } else {
+                    console.log("Audio upload failed");  // ← ADD THIS LINE
                 }
             }
             
-            // Create simple comment (since workers don't type)
+            // Create simple comment
             const comment = audioFile ? `Voice note recorded - Progress: ${newProgress}%` : `Progress updated to ${newProgress}%`;
+            
+            console.log("📦 Sending to backend:", {  // ← ADD THIS WHOLE BLOCK
+                new_progress: newProgress,
+                comment: comment,
+                water_released: waterReleased,
+                photo_url: photoUrl,
+                audio_url: audioUrl
+            });
             
             try {
                 const response = await fetch(`/tasks/${taskId}/progress`, {
@@ -2605,6 +2632,8 @@
                     })
                 });
                 
+                console.log("📡 Backend response status:", response.status);  // ← ADD THIS LINE
+                
                 if (response.ok) {
                     const result = await response.json();
                     if (result.auto_reset) {
@@ -2613,10 +2642,11 @@
                         showMessage(`Progress updated to ${newProgress}%!`, 'success');
                     }
                     closeProgressModal();
-                    loadAllTasks();  // Refresh admin view
-                    loadTasks();     // Refresh worker view
+                    if (typeof loadAllTasks === 'function') loadAllTasks();
+                    if (typeof loadTasks === 'function') loadTasks();
                 } else {
                     const error = await response.json();
+                    console.log("❌ Backend error:", error);  // ← ADD THIS LINE
                     showMessage(error.detail || 'Failed to update progress', 'error');
                 }
             } catch (err) {
@@ -2756,10 +2786,16 @@
             <!-- Media Section -->
             <label style="font-weight: bold; display: block; margin-bottom: 8px;">📸 Photo (Recommended)</label>
             <input type="file" id="progressPhoto" accept="image/*" capture="environment" style="margin-bottom: 16px; width: 100%;">
+            <label style="font-size: 12px; color: #666;">📸 Take photo OR choose from gallery</label>
             
             <label style="font-weight: bold; display: block; margin-bottom: 8px;">🎤 Audio (Voice Note)</label>
             <input type="file" id="progressAudio" accept="audio/*" capture="user" style="margin-bottom: 16px; width: 100%;">
-            
+            <label style="font-size: 12px; color: #666;">🎤 Record voice OR choose audio file</label>
+            <label style="font-weight: bold; display: block; margin-bottom: 8px;">📹 Video (Optional)</label>
+            <input type="file" id="progressVideo" accept="video/*" capture="environment" style="margin-bottom: 16px; width: 100%;">
+            <label style="font-size: 12px; color: #666;">🎥 Record video OR choose from gallery</label>
+
+
             <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
                 <input type="checkbox" id="waterReleasedCheckbox"> 
                 <span>💧 Water released today</span>
