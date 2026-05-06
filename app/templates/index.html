@@ -1098,9 +1098,14 @@
             try {
                 const response = await fetch(`${API_URL}/locations/all`);
                 if (response.ok) {
-                    const locations = await response.json();
+                    let locations = await response.json();
                     const locationsDiv = document.getElementById("locationsList");
                     const issueLocationSelect = document.getElementById("issueLocation");
+                    
+                    // Filter locations by worker's region (if worker is logged in)
+                    if (currentUser && currentUser.role === 'worker' && currentUser.region) {
+                        locations = locations.filter(loc => loc.region === currentUser.region);
+                    }
                     
                     locationsDiv.innerHTML = "";
                     issueLocationSelect.innerHTML = '<option value="">Select Location</option>';
@@ -2642,18 +2647,32 @@
                         showMessage(`Progress updated to ${newProgress}%!`, 'success');
                     }
                     closeProgressModal();
+                    
+                    // Refresh both views (without await)
                     if (typeof loadAllTasks === 'function') loadAllTasks();
                     if (typeof loadTasks === 'function') loadTasks();
+                    
+                    // Force refresh for current active view after short delay
+                    setTimeout(function() {
+                        if (document.getElementById('tasksSection') && document.getElementById('tasksSection').classList.contains('active')) {
+                            loadTasks();
+                        }
+                        if (document.getElementById('adminSection') && document.getElementById('adminSection').classList.contains('active')) {
+                            loadAllTasks();
+                        }
+                    }, 300);
                 } else {
                     const error = await response.json();
-                    console.log("❌ Backend error:", error);  // ← ADD THIS LINE
+                    console.log("❌ Backend error:", error);
                     showMessage(error.detail || 'Failed to update progress', 'error');
                 }
             } catch (err) {
                 console.error("Progress update error:", err);
                 showMessage('Network error', 'error');
             }
-        }
+        }  // ← Close async function
+
+
         
         
         // Function to get media for a completed task

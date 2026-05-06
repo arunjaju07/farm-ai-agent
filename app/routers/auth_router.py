@@ -18,6 +18,7 @@ class LoginResponse(BaseModel):
     user_id: int
     name: str
     role: str
+    region: str = None
     success: bool
 
 @router.post("/login")
@@ -37,6 +38,7 @@ def login_user(login: LoginRequest):
         "user_id": user.id,
         "name": user.name,
         "role": user.role,
+        "region": user.region,
         "success": True
     }
 
@@ -55,5 +57,6 @@ def get_user_info(user_id: int):
         "role": user.role,
         "phone": user.phone,
         "username": user.username,
-        "language": user.language
+        "language": user.language,
+        "region": user.region
     }
