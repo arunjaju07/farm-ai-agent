@@ -287,21 +287,17 @@ def update_task_progress(task_id: int, update: dict):
         photo_url = update.get("photo_url")
         audio_url = update.get("audio_url")
         
-        # Validate progress value
         if new_progress not in [0, 25, 50, 75, 100]:
             db.close()
             raise HTTPException(status_code=400, detail="Progress must be 0, 25, 50, 75, or 100")
         
-        # Don't allow going backwards
         if new_progress < task.progress_percentage:
             db.close()
             raise HTTPException(status_code=400, detail="Cannot decrease progress")
         
         old_progress = task.progress_percentage
-        
-        # Get current cycle values (with defaults if None)
         current_cycle = task.current_cycle if task.current_cycle is not None else 1
-        cycle_start = task.cycle_start_date if task.cycle_start_date is not None else datetime.now()
+        cycle_start = task.cycle_start_date if task.cycle_start_date is not None else datetime.now(timezone.utc)
         
         # Record progress history
         history = TaskProgressHistory(
@@ -319,26 +315,22 @@ def update_task_progress(task_id: int, update: dict):
         # Update task progress
         task.progress_percentage = new_progress
         
-        # Update water release date if water released
         if water_released:
-            task.last_water_release_date = datetime.now()
+            task.last_water_release_date = datetime.now(timezone.utc)
         
-                   
         # Check if task reached 100%
         auto_reset_info = None
         if new_progress == 100 and old_progress < 100:
-            # Record cycle completion
             cycle_history = TaskCyclesHistory(
                 task_id=task_id,
                 cycle_number=current_cycle,
                 start_date=cycle_start,
-                end_date=datetime.now(),
-                days_taken=(datetime.now() - cycle_start).days,
+                end_date=datetime.now(timezone.utc),
+                days_taken=(datetime.now(timezone.utc) - cycle_start).days,
                 final_progress=100
             )
             db.add(cycle_history)
             
-            # Auto-reset for next cycle
             task.total_cycles_completed = (task.total_cycles_completed or 0) + 1
             task.current_cycle = current_cycle + 1
             task.progress_percentage = 0
@@ -350,14 +342,10 @@ def update_task_progress(task_id: int, update: dict):
                 "message": f"🎉 Cycle {current_cycle} completed! Starting Cycle {task.current_cycle}"
             }
         
-        # Update last activity date (MOVE THIS OUTSIDE THE IF BLOCK)
         task.last_activity_date = datetime.now(timezone.utc)
         
         db.commit()
         
-        db.commit()
-        
-        # Store values before closing session (to avoid detached instance error)
         response_data = {
             "success": True,
             "task_id": task_id,

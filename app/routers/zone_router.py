@@ -1,129 +1,102 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from typing import Optional, List
-import sqlite3
-import os
+from typing import Optional
+from datetime import datetime
+
+from app.database.db import SessionLocal
+from app.models.zone_model import Zone
 
 router = APIRouter(prefix="/zones", tags=["Zones"])
 
 class ZoneCreate(BaseModel):
     name: str
-    area_acres: Optional[float] = None
+    area_acres: float = 0
     location_id: int
 
-# Add a new zone
 @router.post("/add")
 def add_zone(zone: ZoneCreate):
-    # Get database path
-    db_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "farm.db")
-    
-    conn = sqlite3.connect(db_path)
-    cursor = conn.cursor()
+    db = SessionLocal()
     
     try:
-        # Check if location exists
-        cursor.execute("SELECT id FROM locations WHERE id = ?", (zone.location_id,))
-        if not cursor.fetchone():
-            conn.close()
-            raise HTTPException(status_code=404, detail="Location not found")
-        
-        # Insert zone
-        cursor.execute(
-            "INSERT INTO zones (name, area_acres, location_id) VALUES (?, ?, ?)",
-            (zone.name, zone.area_acres, zone.location_id)
+        new_zone = Zone(
+            name=zone.name,
+            area_acres=zone.area_acres,
+            location_id=zone.location_id
         )
-        conn.commit()
-        zone_id = cursor.lastrowid
-        conn.close()
+        db.add(new_zone)
+        db.commit()
+        db.refresh(new_zone)
+        db.close()
         
-        return {"message": "Zone added successfully", "zone_id": zone_id}
+        return {"message": "Zone added successfully", "zone_id": new_zone.id}
     
     except Exception as e:
-        conn.close()
+        db.close()
         raise HTTPException(status_code=500, detail=str(e))
 
-# Get all zones
 @router.get("/all")
 def get_all_zones():
-    db_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "farm.db")
-    
-    conn = sqlite3.connect(db_path)
-    cursor = conn.cursor()
-    cursor.execute("SELECT id, name, area_acres, location_id, created_at FROM zones")
-    zones = cursor.fetchall()
-    conn.close()
+    db = SessionLocal()
+    zones = db.query(Zone).all()
+    db.close()
     
     return [
         {
-            "id": z[0],
-            "name": z[1],
-            "area_acres": z[2],
-            "location_id": z[3],
-            "created_at": z[4]
+            "id": z.id,
+            "name": z.name,
+            "area_acres": z.area_acres,
+            "location_id": z.location_id,
+            "created_at": z.created_at
         }
         for z in zones
     ]
 
-# Update zone
-@router.put("/update/{zone_id}")
-def update_zone(zone_id: int, zone: ZoneCreate):
-    db_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "farm.db")
-    conn = sqlite3.connect(db_path)
-    cursor = conn.cursor()
-    
-    cursor.execute(
-        "UPDATE zones SET name = ?, area_acres = ?, location_id = ? WHERE id = ?",
-        (zone.name, zone.area_acres, zone.location_id, zone_id)
-    )
-    conn.commit()
-    affected = cursor.rowcount
-    conn.close()
-    
-    if affected == 0:
-        raise HTTPException(status_code=404, detail="Zone not found")
-    return {"message": "Zone updated successfully"}
-
-# Delete zone
-@router.delete("/delete/{zone_id}")
-def delete_zone(zone_id: int):
-    db_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "farm.db")
-    conn = sqlite3.connect(db_path)
-    cursor = conn.cursor()
-    
-    # Check if zone exists
-    cursor.execute("SELECT id FROM zones WHERE id = ?", (zone_id,))
-    if not cursor.fetchone():
-        conn.close()
-        raise HTTPException(status_code=404, detail="Zone not found")
-    
-    # Delete zone
-    cursor.execute("DELETE FROM zones WHERE id = ?", (zone_id,))
-    conn.commit()
-    conn.close()
-    
-    return {"message": "Zone deleted successfully"}
-
-# Get zones by location
 @router.get("/location/{location_id}")
 def get_zones_by_location(location_id: int):
-    db_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "farm.db")
+    db = SessionLocal()
+    zones = db.query(Zone).filter(Zone.location_id == location_id).all()
+    db.close()
+    return zones
+
+@router.put("/update/{zone_id}")
+def update_zone(zone_id: int, zone: ZoneCreate):
+    db = SessionLocal()
     
-    conn = sqlite3.connect(db_path)
-    cursor = conn.cursor()
-    cursor.execute(
-        "SELECT id, name, area_acres, location_id, created_at FROM zones WHERE location_id = ?",
-        (location_id,)
-    )
-    zones = cursor.fetchall()
-    conn.close()
+    try:
+        existing_zone = db.query(Zone).filter(Zone.id == zone_id).first()
+        if not existing_zone:
+            db.close()
+            raise HTTPException(status_code=404, detail="Zone not found")
+        
+        existing_zone.name = zone.name
+        existing_zone.area_acres = zone.area_acres
+        existing_zone.location_id = zone.location_id
+        
+        db.commit()
+        db.close()
+        
+        return {"message": "Zone updated successfully"}
     
-    return [
-        {
-            "id": z[0],
-            "name": z[1],
-            "area_acres": z[2],
-            "location_id": z[3],
-            "created_at": z[4]
-        }
-        for z in zones
-    ]
+    except Exception as e:
+        db.close()
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.delete("/delete/{zone_id}")
+def delete_zone(zone_id: int):
+    db = SessionLocal()
+    
+    try:
+        zone = db.query(Zone).filter(Zone.id == zone_id).first()
+        if not zone:
+            db.close()
+            raise HTTPException(status_code=404, detail="Zone not found")
+        
+        db.delete(zone)
+        db.commit()
+        db.close()
+        
+        return {"message": "Zone deleted successfully"}
+    
+    except Exception as e:
+        db.close()
+        raise HTTPException(status_code=500, detail=str(e))

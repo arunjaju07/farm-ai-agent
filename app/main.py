@@ -3,6 +3,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
+from app.routers import contact_router
 from pathlib import Path
 
 from app.routers import (
@@ -39,6 +40,7 @@ app.include_router(task_router.router)
 app.include_router(zone_router.router)
 app.include_router(upload_router.router)
 app.include_router(issue_router.router)
+app.include_router(contact_router.router)
 
 # Root endpoint
 @app.get("/", response_class=HTMLResponse)

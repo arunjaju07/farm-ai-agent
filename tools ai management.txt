@@ -1,0 +1,21 @@
+Corrected Tools List for AI Camera Monitoring System (No Sensors)
+#	Tool	Why You Need It
+1	Raspberry Pi Zero 2 W	The brain of your AI camera. Runs the AI analysis on the device itself (edge computing)
+2	Camera Module 3 (Wide Angle)	The eye of your system. Captures clear images of elephant grass leaves. Autofocus is critical for sharp images at different distances
+3	4G HAT Module (SIM7600G-H)	Sends alerts and photos to your phone via WhatsApp without WiFi. Your farm has mobile network, so this works perfectly
+4	4G SIM Card	Provides mobile network connection for the 4G HAT. Use any Jio or Airtel SIM with data plan
+5	MicroSD Card (32GB or 64GB)	Stores the operating system, AI software, and captured images
+6	Camera Ribbon Cable	Connects the Camera Module to the Raspberry Pi. Usually included with the camera
+7	5V Power Supply (3A)	Powers the system during testing on your desk or near farmhouse
+
+Name			 				Price
+Raspberry Pi Zero 2 W:   				2000-3000
+Camera Module 3:					4000
+SIM7600G-H 4G HAT:					6600-7500
+SanDisk UHS-I A1 98Mbps 32GB Ultra MicroSD Memory Card:  1000
+5V Micro USB (3A or official 2.5A):			500
+
+Power connection:					
+
+Raspberry Pi Zero 2 W	Zero 2 W (NEW)	BCM2710A1
+Camera Module 3	Sensor: Sony IMX708 (12 Megapixels) 	Autofocus: Yes (Powered voice-coil actuator) 	HDR Support: Yes (High Dynamic Range) 
