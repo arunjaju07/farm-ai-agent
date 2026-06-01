@@ -314,6 +314,7 @@
                         <button onclick="showAdminTab('addZone')" id="tabAddZone" style="width: auto; padding: 8px 16px;">🗺️ Add Zone</button>
                         <button onclick="showAdminTab('addContact')" id="tabAddContact" style="width: auto; padding: 8px 16px;">📞 Add Contact</button>
                         <button onclick="showAdminTab('viewContacts')" style="width: auto; padding: 8px 16px;">📞 View Contacts</button>
+                        <button onclick="showAdminTab('grassHealth')" style="width: auto; padding: 8px 16px;">🌿 Grass Health</button>
                         <button onclick="showAdminTab('viewIssues')" style="width: auto; padding: 8px 16px;">📋 Issues</button>
                         <button onclick="showAdminTab('addUser')" style="width: auto; padding: 8px 16px;">👤 Add User</button>
                         <button onclick="showAdminTab('viewUsers')" style="width: auto; padding: 8px 16px;">👥 View Users</button>
@@ -454,6 +455,107 @@
                     <div id="viewContactsForm" class="admin-tab" style="display: none;">
                         <h3>📞 Contact List</h3>
                         <div id="allContactsList" style="max-height: 400px; overflow-y: auto;"></div>
+                    </div>
+                    
+                    
+                    <!-- Grass Health Tab -->
+                    <div id="grassHealthForm" class="admin-tab" style="display: none;">
+                        <h3>🌿 Grass Health Issue Tracking</h3>
+                        
+                        <!-- Tab buttons inside Grass Health -->
+                        <div style="display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap;">
+                            <button onclick="showGrassHealthSubTab('active')" style="width: auto; padding: 8px 16px; background: #2196F3;">📋 Active Issues</button>
+                            <button onclick="openGrassReportForm()" style="width: auto; padding: 8px 16px; background: #4CAF50;">➕ New Report</button>
+                            <button onclick="showGrassHealthSubTab('resolved')" style="width: auto; padding: 8px 16px; background: #ff9800;">✅ Resolved Issues</button>
+                        </div>
+                        
+                        <!-- Filters -->
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; padding: 12px; background: #f5f5f5; border-radius: 8px;">
+                            <select id="reportLocationFilter" onchange="applyGrassFilters()" style="width: auto; padding: 8px;">
+                                <option value="">All Locations</option>
+                            </select>
+                            <select id="reportZoneFilter" onchange="applyGrassFilters()" style="width: auto; padding: 8px;">
+                                <option value="">All Zones</option>
+                            </select>
+                            <input type="date" id="reportStartDate" onchange="applyGrassFilters()" style="width: auto; padding: 8px;">
+                            <input type="date" id="reportEndDate" onchange="applyGrassFilters()" style="width: auto; padding: 8px;">
+                            <button onclick="applyGrassFilters()" style="width: auto; padding: 8px 16px; background: #2196F3;">🔍 Filter</button>
+                            <button onclick="exportGrassReport()" style="width: auto; padding: 8px 16px; background: #4CAF50;">📥 Export CSV</button>
+                        </div>
+                        
+                        <!-- Active Issues View -->
+                        <div id="grassActiveView" style="display: block;">
+                            <div id="grassActiveIssuesList" style="max-height: 400px; overflow-y: auto;"></div>
+                        </div>
+                        
+                        <!-- Resolved Issues View -->
+                        <div id="grassResolvedView" style="display: none;">
+                            <div id="grassResolvedIssuesList" style="max-height: 400px; overflow-y: auto;"></div>
+                        </div>
+                    </div>
+
+                    <!-- New Report Modal -->
+                    <div id="grassReportModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 6000;">
+                        <div style="background: white; margin: 5% auto; max-width: 500px; max-height: 80vh; overflow-y: auto; padding: 20px; border-radius: 16px;">
+                            <h3>📝 Report Grass Health Issue</h3>
+                            
+                            <label>Location:</label>
+                            <select id="grassLocationId" onchange="loadGrassZones()">
+                                <option value="">Select Location</option>
+                            </select>
+                            
+                            <label>Zone:</label>
+                            <select id="grassZoneId">
+                                <option value="">Select Zone (Optional)</option>
+                            </select>
+                            
+                            <label>📸 Upload Photos (Required):</label>
+                            <input type="file" id="grassPhotos" accept="image/*" multiple style="margin-bottom: 12px;">
+                            
+                            <button onclick="analyzeGrassPhoto()" style="background: #9c27b0; margin-bottom: 12px;">🔬 Analyze with AI</button>
+                            
+                            <div id="grassAnalysisResult" style="display: none; background: #f0f0f0; padding: 12px; border-radius: 8px; margin-bottom: 12px;">
+                                <h4>🤖 AI Analysis Result</h4>
+                                <div id="grassAnalysisContent"></div>
+                            </div>
+                            
+                            <label>Worker Notes (Optional):</label>
+                            <textarea id="grassWorkerNotes" rows="3" style="width: 100%;"></textarea>
+                            
+                            <label>🎤 Audio Note (Optional):</label>
+                            <input type="file" id="grassAudio" accept="audio/*">
+                            
+                            <label>📹 Video Note (Optional):</label>
+                            <input type="file" id="grassVideo" accept="video/*">
+                            
+                            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                                <button onclick="submitGrassReport()" style="background: #4CAF50; flex: 1;">✓ Submit Report</button>
+                                <button onclick="closeGrassReportModal()" style="background: #999; flex: 1;">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Issue Detail Modal -->
+                    <div id="grassDetailModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 6000;">
+                        <div style="background: white; margin: 5% auto; max-width: 500px; max-height: 80vh; overflow-y: auto; padding: 20px; border-radius: 16px;">
+                            <h3>📋 Issue Details</h3>
+                            <div id="grassDetailContent"></div>
+                            <button onclick="closeGrassDetailModal()" style="background: #4CAF50; margin-top: 15px;">Close</button>
+                        </div>
+                    </div>
+
+                    <!-- Resolve Modal -->
+                    <div id="grassResolveModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 6000;">
+                        <div style="background: white; margin: 20% auto; max-width: 400px; padding: 20px; border-radius: 16px;">
+                            <h3>✅ Resolve Issue</h3>
+                            <input type="hidden" id="resolveIssueId">
+                            <label>Resolution Notes:</label>
+                            <textarea id="resolutionNotes" rows="3" style="width: 100%;"></textarea>
+                            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                                <button onclick="confirmResolve()" style="background: #4CAF50; flex: 1;">Confirm Resolve</button>
+                                <button onclick="closeGrassResolveModal()" style="background: #999; flex: 1;">Cancel</button>
+                            </div>
+                        </div>
                     </div>
                     
                     
@@ -613,10 +715,65 @@
             </div>
 
     
+            <!-- Grass Health Worker Section -->
+            <div id="grassHealthWorkerSection" class="section">
+                <div class="card">
+                    <div class="card-title">🌿 Grass Health</div>
+                    
+                    <button onclick="openWorkerGrassReportForm()" style="background: #4CAF50; margin-bottom: 16px;">➕ Report Grass Health</button>
+                    
+                    <div id="workerGrassIssuesList">
+                        <p style="color: #999;">Loading your reports...</p>
+                    </div>
+                </div>
+            </div>
+            
+            
             <div class="card">
                 <button class="danger" onclick="logout()">🚪 Logout</button>
             </div>
             
+            <!-- Worker Grass Health Report Modal -->
+            <div id="workerGrassReportModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 6000;">
+                <div style="background: white; margin: 5% auto; max-width: 500px; max-height: 80vh; overflow-y: auto; padding: 20px; border-radius: 16px;">
+                    <h3>📝 Report Grass Health</h3>
+                    
+                    <label>Location:</label>
+                    <select id="workerGrassLocationId" onchange="loadWorkerGrassZones()">
+                        <option value="">Select Location</option>
+                    </select>
+                    
+                    <label>Zone:</label>
+                    <select id="workerGrassZoneId">
+                        <option value="">Select Zone (Optional)</option>
+                    </select>
+                    
+                    <label>📸 Photos (Select multiple):</label>
+                    <input type="file" id="workerGrassPhotos" accept="image/*" multiple style="margin-bottom: 12px;">
+                    
+                    <label>🎤 Audio Note (Optional):</label>
+                    <input type="file" id="workerGrassAudio" accept="audio/*" style="margin-bottom: 12px;">
+                    
+                    <label>📹 Video Note (Optional):</label>
+                    <input type="file" id="workerGrassVideo" accept="video/*" style="margin-bottom: 12px;">
+                    
+                    <button onclick="analyzeWorkerGrassPhoto()" style="background: #9c27b0; margin-bottom: 12px;">🔬 Analyze with AI</button>
+                    
+                    <div id="workerGrassAnalysisResult" style="display: none; background: #f0f0f0; padding: 12px; border-radius: 8px; margin-bottom: 12px;">
+                        <h4>🤖 AI Analysis Result</h4>
+                        <div id="workerGrassAnalysisContent"></div>
+                    </div>
+                    
+                    <label>Notes (Optional):</label>
+                    <textarea id="workerGrassNotes" rows="3" style="width: 100%;" placeholder="Any additional notes..."></textarea>
+                    
+                    <div style="display: flex; gap: 10px; margin-top: 20px;">
+                        <button onclick="submitWorkerGrassReport()" style="background: #4CAF50; flex: 1;">✓ Submit Report</button>
+                        <button onclick="closeWorkerGrassReportModal()" style="background: #999; flex: 1;">Cancel</button>
+                    </div>
+                </div>
+            </div>
+
             
             <!-- Task Completion Modal -->
             <div id="completionModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000;">
@@ -649,6 +806,7 @@
         <button class="nav-btn" onclick="showSection('tasks')">📋 Tasks</button>
         <button class="nav-btn" onclick="showSection('locations')">📍 Farms</button>
         <button class="nav-btn" onclick="showSection('reportIssue')">🚨 Report</button>
+        <button class="nav-btn" onclick="showSection('grassHealthWorker')">🌿 Health</button>
     </div>
 
     <script>
@@ -724,6 +882,7 @@
             document.getElementById("locationsSection").classList.remove("active");
             document.getElementById("reportIssueSection").classList.remove("active");
             document.getElementById("adminSection").classList.remove("active");  // 👈 ADD THIS
+            document.getElementById("grassHealthWorkerSection").classList.remove("active"); // Add this
 
             // Show selected section
             document.getElementById(`${sectionName}Section`).classList.add("active");
@@ -737,6 +896,9 @@
             }
             if (sectionName === "tasks") {
                 loadTasks();
+            }
+            if (sectionName === "grassHealthWorker") {
+                loadWorkerGrassIssues();  // ← ADD THIS
             }
 
             if (sectionName === "admin") {
@@ -1452,6 +1614,1076 @@
         }
 
         // ============================================
+        // GRASS HEALTH FUNCTIONS
+        // ============================================
+
+        let currentGrassAnalysis = null;
+        let currentGrassPhotos = [];
+
+        function showGrassHealthSubTab(tab) {
+            if (tab === 'active') {
+                document.getElementById('grassActiveView').style.display = 'block';
+                document.getElementById('grassResolvedView').style.display = 'none';
+                loadActiveGrassIssues();
+            } else {
+                document.getElementById('grassActiveView').style.display = 'none';
+                document.getElementById('grassResolvedView').style.display = 'block';
+                loadResolvedGrassIssues();
+            }
+        }
+
+        async function loadActiveGrassIssues() {
+            try {
+                const response = await fetch('/grass-health/issues/active?role=' + currentUser.role + '&region=' + (currentUser.region || '') + '&user_id=' + currentUser.user_id);
+                const issues = await response.json();
+                const container = document.getElementById('grassActiveIssuesList');
+                
+                if (issues.length === 0) {
+                    container.innerHTML = '<p style="color: #999;">No active grass health issues</p>';
+                    return;
+                }
+                
+                let html = '<div class="table-container"><table style="width:100%; border-collapse: collapse;">';
+                html += '<tr style="background: #f0f0f0;"><th>Location</th><th>Zone</th><th>Disease</th><th>Health Score</th><th>Date Reported</th><th>Actions</th></tr>';
+                
+                for (const issue of issues) {
+                    const locRes = await fetch('/locations/all');
+                    const locations = await locRes.json();
+                    const location = locations.find(l => l.id === issue.location_id);
+                    const locationName = location ? location.name : 'Unknown';
+                    
+                    const zoneName = issue.zone_id ? 'Zone ' + issue.zone_id : 'All';
+                    
+                    const healthColor = issue.ai_health_score >= 70 ? '#4CAF50' : (issue.ai_health_score >= 40 ? '#ff9800' : '#f44336');
+                    
+                    html += `
+                        <tr>
+                            <td>${locationName}</td>
+                            <td>${zoneName}</td>
+                            <td>${issue.ai_disease || 'Unknown'}${issue.ai_confidence ? ` (${Math.round(issue.ai_confidence * 100)}%)` : ''}</td>
+                            <td><span style="background: ${healthColor}; color: white; padding: 4px 8px; border-radius: 10px;">${issue.ai_health_score || 'N/A'}</span></td>
+                            <td>${new Date(issue.detected_at).toLocaleDateString()}</td>
+                            <td>
+                                <button onclick="viewGrassIssueDetail(${issue.id})" style="background: #2196F3; padding: 5px 10px; width: auto;">📋 View</button>
+                                ${(currentUser.role === 'admin' || currentUser.role === 'supervisor') ? 
+                                    `<button onclick="openGrassResolveModal(${issue.id})" style="background: #4CAF50; padding: 5px 10px; width: auto;">✅ Resolve</button>` : ''}
+                            </td>
+                        </tr>
+                    `;
+                }
+                html += '</table></div>';
+                container.innerHTML = html;
+            } catch (err) {
+                console.error("Error loading active issues:", err);
+            }
+        }
+
+        async function loadResolvedGrassIssues() {
+            try {
+                const response = await fetch('/grass-health/issues/resolved?role=' + currentUser.role + '&region=' + (currentUser.region || '') + '&user_id=' + currentUser.user_id);
+                const issues = await response.json();
+                const container = document.getElementById('grassResolvedIssuesList');
+                
+                if (issues.length === 0) {
+                    container.innerHTML = '<p style="color: #999;">No resolved grass health issues</p>';
+                    return;
+                }
+                
+                let html = '<div class="table-container"><table style="width:100%; border-collapse: collapse;">';
+                html += '<tr style="background: #f0f0f0;"><th>Location</th><th>Zone</th><th>Disease</th><th>Resolved By</th><th>Resolved At</th><th>Actions</th></tr>';
+                
+                for (const issue of issues) {
+                    const locRes = await fetch('/locations/all');
+                    const locations = await locRes.json();
+                    const location = locations.find(l => l.id === issue.location_id);
+                    const locationName = location ? location.name : 'Unknown';
+                    
+                    const zoneName = issue.zone_id ? 'Zone ' + issue.zone_id : 'All';
+                    
+                    html += `
+                        <tr>
+                            <td>${locationName}</td>
+                            <td>${zoneName}</td>
+                            <td>${issue.ai_disease || 'Unknown'}</td>
+                            <td>${issue.resolved_by || 'Admin'}</td>
+                            <td>${new Date(issue.resolved_at).toLocaleDateString()}</td>
+                            <td>
+                                <button onclick="viewGrassIssueDetail(${issue.id})" style="background: #2196F3; padding: 5px 10px; width: auto;">📋 View</button>
+                            </td>
+                        </tr>
+                    `;
+                }
+                html += '<td></div>';
+                container.innerHTML = html;
+            } catch (err) {
+                console.error("Error loading resolved issues:", err);
+            }
+        }
+
+        async function loadGrassLocations() {
+            const response = await fetch('/locations/all');
+            const locations = await response.json();
+            const select = document.getElementById('grassLocationId');
+            select.innerHTML = '<option value="">Select Location</option>';
+            locations.forEach(loc => {
+                select.innerHTML += `<option value="${loc.id}">${loc.name} (${loc.region})</option>`;
+            });
+        }
+
+        async function loadGrassZones() {
+            const locationId = document.getElementById('grassLocationId').value;
+            const zoneSelect = document.getElementById('grassZoneId');
+            
+            if (!locationId) {
+                zoneSelect.innerHTML = '<option value="">Select Zone (Optional)</option>';
+                return;
+            }
+            
+            const response = await fetch(`/grass-health/zones/${locationId}`);
+            const zones = await response.json();
+            zoneSelect.innerHTML = '<option value="">Select Zone (Optional)</option>';
+            zones.forEach(zone => {
+                zoneSelect.innerHTML += `<option value="${zone.id}">${zone.name}</option>`;
+            });
+        }
+
+        function openGrassReportForm() {
+            loadGrassLocations();
+            document.getElementById('grassReportModal').style.display = 'block';
+            currentGrassPhotos = [];
+            currentGrassAnalysis = null;
+            document.getElementById('grassAnalysisResult').style.display = 'none';
+        }
+
+        function closeGrassReportModal() {
+            document.getElementById('grassReportModal').style.display = 'none';
+        }
+
+        async function analyzeGrassPhoto() {
+            const photoFiles = document.getElementById('grassPhotos').files;
+            
+            if (photoFiles.length === 0) {
+                showMessage("Please select a photo to analyze", "error");
+                return;
+            }
+            
+            showMessage("Analyzing with Gemini AI...", "success");
+            document.getElementById('grassAnalysisResult').style.display = 'none';
+            
+            const file = photoFiles[0];
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            try {
+                const response = await fetch('/grass-health/analyze', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    currentGrassAnalysis = result.analysis;
+                    displayGrassAnalysis(result.analysis);
+                    showMessage("AI analysis complete!", "success");
+                } else {
+                    showMessage("Analysis failed", "error");
+                }
+            } catch (err) {
+                console.error("Analysis error:", err);
+                showMessage("Error analyzing photo", "error");
+            }
+        }
+
+        function displayGrassAnalysis(analysis) {
+            const healthScore = analysis.health_score || 0;
+            const scoreColor = healthScore >= 70 ? '#4CAF50' : (healthScore >= 40 ? '#ff9800' : '#f44336');
+            
+            document.getElementById('grassAnalysisContent').innerHTML = `
+                <p><strong>🦠 Disease:</strong> ${analysis.disease_name} (${Math.round(analysis.confidence * 100)}% confidence)</p>
+                <p><strong>🌱 Growth Stage:</strong> ${analysis.growth_stage}</p>
+                <p><strong>📏 Height Estimate:</strong> ${analysis.plant_height_estimate}</p>
+                <p><strong>🐛 Pest Damage:</strong> ${analysis.pest_damage_present ? '✅ Yes - ' + analysis.pest_type : '❌ No'}</p>
+                <p><strong>💚 Health Score:</strong> <span style="background: ${scoreColor}; color: white; padding: 4px 8px; border-radius: 10px;">${healthScore}/100</span></p>
+                <p><strong>🌾 Harvest Ready:</strong> ${analysis.harvest_ready ? '✅ Yes' : '❌ No'}</p>
+                <p><strong>💡 Recommendation:</strong> ${analysis.recommended_action}</p>
+            `;
+            document.getElementById('grassAnalysisResult').style.display = 'block';
+        }
+
+        async function submitGrassReport() {
+            const locationId = document.getElementById('grassLocationId').value;
+            const zoneId = document.getElementById('grassZoneId').value;
+            const photoFiles = document.getElementById('grassPhotos').files;
+            const workerNotes = document.getElementById('grassWorkerNotes').value;
+            const audioFile = document.getElementById('grassAudio').files[0];
+            const videoFile = document.getElementById('grassVideo').files[0];
+            
+            if (!locationId) {
+                showMessage("Please select a location", "error");
+                return;
+            }
+            
+            if (photoFiles.length === 0) {
+                showMessage("Please upload at least one photo", "error");
+                return;
+            }
+            
+            showMessage("Uploading files...", "success");
+            
+            // Upload photos
+            let photoUrls = [];
+            for (const file of photoFiles) {
+                const formData = new FormData();
+                formData.append('file', file);
+                const response = await fetch('/upload/photo', { method: 'POST', body: formData });
+                if (response.ok) {
+                    const result = await response.json();
+                    photoUrls.push(result.url);
+                }
+            }
+            
+            // Upload audio if any
+            let audioUrl = null;
+            if (audioFile) {
+                const formData = new FormData();
+                formData.append('file', audioFile);
+                const response = await fetch('/upload/audio', { method: 'POST', body: formData });
+                if (response.ok) {
+                    const result = await response.json();
+                    audioUrl = result.url;
+                }
+            }
+            
+            // Upload video if any
+            let videoUrl = null;
+            if (videoFile) {
+                const formData = new FormData();
+                formData.append('file', videoFile);
+                const response = await fetch('/upload/video', { method: 'POST', body: formData });
+                if (response.ok) {
+                    const result = await response.json();
+                    videoUrl = result.url;
+                }
+            }
+            
+            const reportData = {
+                location_id: parseInt(locationId),
+                zone_id: zoneId ? parseInt(zoneId) : null,
+                detected_by: currentUser.user_id,  // ← THIS MUST BE PRESENT
+                photo_urls: photoUrls,
+                ai_disease: currentGrassAnalysis ? currentGrassAnalysis.disease_name : null,
+                ai_confidence: currentGrassAnalysis ? currentGrassAnalysis.confidence : null,
+                ai_growth_stage: currentGrassAnalysis ? currentGrassAnalysis.growth_stage : null,
+                ai_plant_height: currentGrassAnalysis ? currentGrassAnalysis.plant_height_estimate : null,
+                ai_harvest_ready: currentGrassAnalysis ? currentGrassAnalysis.harvest_ready : null,
+                ai_pest_damage: currentGrassAnalysis ? currentGrassAnalysis.pest_damage_present : null,
+                ai_pest_type: currentGrassAnalysis ? currentGrassAnalysis.pest_type : null,
+                ai_health_score: currentGrassAnalysis ? currentGrassAnalysis.health_score : null,
+                ai_recommendation: currentGrassAnalysis ? currentGrassAnalysis.recommended_action : null,
+                ai_full_response: currentGrassAnalysis,
+                worker_notes: workerNotes,
+                media_audio_url: audioUrl,
+                media_video_url: videoUrl
+            };
+            
+            const response = await fetch('/grass-health/report', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(reportData)
+            });
+            
+            if (response.ok) {
+                showMessage("Grass health issue reported successfully!", "success");
+                closeGrassReportModal();
+                loadActiveGrassIssues();
+                // Reset form
+                document.getElementById('grassPhotos').value = '';
+                document.getElementById('grassWorkerNotes').value = '';
+                document.getElementById('grassAudio').value = '';
+                document.getElementById('grassVideo').value = '';
+                currentGrassAnalysis = null;
+            } else {
+                const error = await response.json();
+                showMessage(error.detail || "Failed to submit report", "error");
+            }
+        }
+
+        async function viewGrassIssueDetail(issueId) {
+            const response = await fetch(`/grass-health/issues/${issueId}`);
+            const issue = await response.json();
+            
+            const locRes = await fetch('/locations/all');
+            const locations = await locRes.json();
+            const location = locations.find(l => l.id === issue.location_id);
+            
+            // Load comments with error handling
+            let comments = [];
+            try {
+                const commentsRes = await fetch(`/grass-health/comments/${issueId}`);
+                if (commentsRes.ok) {
+                    comments = await commentsRes.json();
+                } else {
+                    console.log("Comments not available yet");
+                }
+            } catch (err) {
+                console.log("Error loading comments:", err);
+            }
+            
+            let photosHtml = '';
+            if (issue.photo_urls && issue.photo_urls.length > 0) {
+                photosHtml = '<p><strong>📸 Original Photos:</strong></p>';
+                for (const url of issue.photo_urls) {
+                    photosHtml += `<button onclick="viewMedia('${url}', 'image')" style="background: #2196F3; padding: 5px 10px; width: auto; margin: 5px;">📷 View Photo</button>`;
+                }
+            }
+            
+            // Build comments HTML
+            let commentsHtml = '<h4>💬 Conversation</h4>';
+            if (comments.length === 0) {
+                commentsHtml += '<p style="color: #999;">No comments yet</p>';
+            } else {
+                for (const comment of comments) {
+                    const userIcon = comment.user_role === 'admin' ? '👑' : (comment.user_role === 'supervisor' ? '👔' : '👷');
+                    const date = new Date(comment.created_at).toLocaleString();
+                    
+                    commentsHtml += `
+                        <div style="background: #f9f9f9; padding: 10px; margin-bottom: 10px; border-radius: 8px; border-left: 3px solid ${comment.user_role === 'admin' ? '#f44336' : (comment.user_role === 'supervisor' ? '#ff9800' : '#4CAF50')}">
+                            <p><strong>${userIcon} ${comment.user_role}:</strong> <small>${date}</small></p>
+                            <p>${comment.comment_text || ''}</p>
+                    `;
+                    
+                    if (comment.photo_urls && comment.photo_urls.length > 0) {
+                        for (const url of comment.photo_urls) {
+                            commentsHtml += `<button onclick="viewMedia('${url}', 'image')" style="background: #2196F3; padding: 3px 8px; width: auto; font-size: 11px; margin-right: 5px;">📷 View Photo</button>`;
+                        }
+                    }
+                    if (comment.audio_url) {
+                        commentsHtml += `<button onclick="viewMedia('${comment.audio_url}', 'audio')" style="background: #9c27b0; padding: 3px 8px; width: auto; font-size: 11px;">🎧 Listen Audio</button>`;
+                    }
+                    if (comment.video_url) {
+                        commentsHtml += `<button onclick="viewMedia('${comment.video_url}', 'video')" style="background: #e91e63; padding: 3px 8px; width: auto; font-size: 11px;">📹 Watch Video</button>`;
+                    }
+                    commentsHtml += `</div>`;
+                }
+            }
+            
+            // Add comment form
+            let commentFormHtml = '';
+            if (currentUser.role === 'admin' || currentUser.role === 'supervisor') {
+                commentFormHtml = `
+                    <div style="margin-top: 15px; border-top: 1px solid #ddd; padding-top: 15px;">
+                        <h4>✏️ Add Instruction/Comment</h4>
+                        <textarea id="newCommentText" rows="2" style="width: 100%; margin-bottom: 10px;" placeholder="Add your instruction or comment..."></textarea>
+                        <div style="display: flex; gap: 10px;">
+                            <button onclick="addGrassIssueComment(${issueId}, 'instruction')" style="background: #ff9800; flex: 1;">📋 Send Instruction</button>
+                            <button onclick="addGrassIssueComment(${issueId}, 'comment')" style="background: #2196F3; flex: 1;">💬 Add Comment</button>
+                        </div>
+                    </div>
+                `;
+            } else if (currentUser.role === 'worker') {
+                commentFormHtml = `
+                    <div style="margin-top: 15px; border-top: 1px solid #ddd; padding-top: 15px;">
+                        <h4>📤 Update Report</h4>
+                        <input type="file" id="updatePhotos" accept="image/*" multiple style="margin-bottom: 10px; width: 100%;">
+                        <input type="file" id="updateAudio" accept="audio/*" style="margin-bottom: 10px; width: 100%;">
+                        <input type="file" id="updateVideo" accept="video/*" style="margin-bottom: 10px; width: 100%;">
+                        <textarea id="updateCommentText" rows="2" style="width: 100%; margin-bottom: 10px;" placeholder="Describe your action..."></textarea>
+                        <button onclick="addGrassIssueUpdate(${issueId})" style="background: #4CAF50; width: 100%;">📤 Submit Update</button>
+                    </div>
+                `;
+            }
+            
+            const healthColor = issue.ai_health_score >= 70 ? '#4CAF50' : (issue.ai_health_score >= 40 ? '#ff9800' : '#f44336');
+            
+            const modalHtml = `
+                <div id="grassDetailModal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 7000; display: flex; align-items: center; justify-content: center;">
+                    <div style="background: white; margin: 5% auto; max-width: 500px; max-height: 80vh; overflow-y: auto; padding: 20px; border-radius: 16px; width: 90%;">
+                        <h3>📋 Grass Health Report</h3>
+                        <p><strong>📍 Location:</strong> ${location ? location.name : 'Unknown'}</p>
+                        <p><strong>🗺️ Zone:</strong> ${issue.zone_id || 'All'}</p>
+                        <p><strong>📅 Date:</strong> ${new Date(issue.detected_at).toLocaleString()}</p>
+                        <p><strong>📊 Status:</strong> ${issue.status === 'active' ? '🟡 Active' : (issue.status === 'in_progress' ? '🟠 In Progress' : '✅ Resolved')}</p>
+                        <hr>
+                        <h4>🤖 AI Analysis:</h4>
+                        <p><strong>🦠 Disease:</strong> ${issue.ai_disease || 'Unknown'} (${Math.round((issue.ai_confidence || 0) * 100)}%)${issue.ai_disease_details ? ` - ${issue.ai_disease_details}` : ''}</p>
+                        <p><strong>🌱 Growth Stage:</strong> ${issue.ai_growth_stage || 'Unknown'}</p>
+                        <p><strong>💚 Health Score:</strong> <span style="background: ${healthColor}; color: white; padding: 4px 8px; border-radius: 10px;">${issue.ai_health_score || 'N/A'}/100</span></p>
+                        <p><strong>🌾 Harvest Ready:</strong> ${issue.ai_harvest_ready ? '✅ Yes' : '❌ No'}${issue.ai_harvest_ready_text ? ` - ${issue.ai_harvest_ready_text}` : ''}</p>
+                        <p><strong>📏 Height Estimate:</strong> ${issue.ai_plant_height || 'Unknown'}</p>
+                        ${issue.ai_environmental_stress ? `<p><strong>⚠️ Environmental Stress:</strong> ${issue.ai_environmental_stress}</p>` : ''}
+                        <p><strong>💡 Recommendation:</strong> ${issue.ai_recommendation || 'No recommendation'}</p>
+                        ${issue.ai_worker_notes_guidance ? `<p><strong>📝 Worker Guidance:</strong> ${issue.ai_worker_notes_guidance}</p>` : ''}
+                        <hr>
+                        <h4>📝 Worker Notes:</h4>
+                        <p>${issue.worker_notes || 'No notes'}</p>
+                        ${photosHtml}
+                        ${issue.media_audio_url ? `<button onclick="viewMedia('${issue.media_audio_url}', 'audio')" style="background: #9c27b0; padding: 5px 10px; width: auto; margin: 5px;">🎧 Listen Audio</button>` : ''}
+                        ${issue.media_video_url ? `<button onclick="viewMedia('${issue.media_video_url}', 'video')" style="background: #e91e63; padding: 5px 10px; width: auto; margin: 5px;">📹 Watch Video</button>` : ''}
+                        <hr>
+                        ${commentsHtml}
+                        ${commentFormHtml}
+                        <button onclick="closeGrassDetailModal()" style="background: #4CAF50; padding: 10px; margin-top: 20px;">Close</button>
+                    </div>
+                </div>
+            `;
+            
+            const existingModal = document.getElementById('grassDetailModal');
+            if (existingModal) existingModal.remove();
+            
+            const modalDiv = document.createElement('div');
+            modalDiv.innerHTML = modalHtml;
+            document.body.appendChild(modalDiv);
+        }
+        
+        // Add this function to load comments
+        async function loadGrassIssueComments(issueId) {
+            try {
+                const response = await fetch(`/grass-health/comments/${issueId}`);
+                const comments = await response.json();
+                
+                if (comments.length === 0) {
+                    return '<p style="color: #999;">No comments yet</p>';
+                }
+                
+                let commentsHtml = '<div style="margin-top: 15px;"><h4>💬 Conversation</h4>';
+                
+                for (const comment of comments) {
+                    const userIcon = comment.user_role === 'admin' ? '👑' : (comment.user_role === 'supervisor' ? '👔' : '👷');
+                    const date = new Date(comment.created_at).toLocaleString();
+                    
+                    commentsHtml += `
+                        <div style="background: #f9f9f9; padding: 10px; margin-bottom: 10px; border-radius: 8px; border-left: 3px solid ${comment.user_role === 'admin' ? '#f44336' : (comment.user_role === 'supervisor' ? '#ff9800' : '#4CAF50')}">
+                            <p><strong>${userIcon} ${comment.user_role}:</strong> <small>${date}</small></p>
+                            <p>${comment.comment_text || ''}</p>
+                    `;
+                    
+                    // Show photos in comment
+                    if (comment.photo_urls && comment.photo_urls.length > 0) {
+                        commentsHtml += `<div style="margin-top: 8px;">`;
+                        for (const url of comment.photo_urls) {
+                            commentsHtml += `<button onclick="viewMedia('${url}', 'image')" style="background: #2196F3; padding: 3px 8px; width: auto; font-size: 11px; margin-right: 5px;">📷 View Photo</button>`;
+                        }
+                        commentsHtml += `</div>`;
+                    }
+                    
+                    // Show audio in comment
+                    if (comment.audio_url) {
+                        commentsHtml += `<button onclick="viewMedia('${comment.audio_url}', 'audio')" style="background: #9c27b0; padding: 3px 8px; width: auto; font-size: 11px; margin-top: 8px;">🎧 Listen Audio</button>`;
+                    }
+                    
+                    // Show video in comment
+                    if (comment.video_url) {
+                        commentsHtml += `<button onclick="viewMedia('${comment.video_url}', 'video')" style="background: #e91e63; padding: 3px 8px; width: auto; font-size: 11px; margin-top: 8px;">📹 Watch Video</button>`;
+                    }
+                    
+                    commentsHtml += `</div>`;
+                }
+                
+                commentsHtml += '</div>';
+                return commentsHtml;
+            } catch (err) {
+                console.error("Error loading comments:", err);
+                return '<p style="color: #999;">Error loading comments</p>';
+            }
+        }
+
+        function openGrassResolveModal(issueId) {
+            document.getElementById('resolveIssueId').value = issueId;
+            document.getElementById('resolutionNotes').value = '';
+            document.getElementById('grassResolveModal').style.display = 'block';
+        }
+
+        function closeGrassResolveModal() {
+            document.getElementById('grassResolveModal').style.display = 'none';
+        }
+
+        async function confirmResolve() {
+            const issueId = document.getElementById('resolveIssueId').value;
+            const resolutionNotes = document.getElementById('resolutionNotes').value;
+            
+            if (!resolutionNotes) {
+                showMessage("Please enter resolution notes", "error");
+                return;
+            }
+            
+            const response = await fetch(`/grass-health/issues/${issueId}/resolve?resolution_notes=${encodeURIComponent(resolutionNotes)}&resolved_by=${currentUser.user_id}`, {
+                method: 'PUT'
+            });
+            
+            if (response.ok) {
+                showMessage("Issue resolved successfully!", "success");
+                closeGrassResolveModal();
+                loadActiveGrassIssues();
+                loadResolvedGrassIssues();
+            } else {
+                const error = await response.json();
+                showMessage(error.detail || "Failed to resolve issue", "error");
+            }
+        }
+
+
+
+        // ============================================
+        // GRASS HEALTH COMMENT FUNCTIONS
+        // ============================================
+
+        async function addGrassIssueComment(issueId, commentType) {
+            const commentText = document.getElementById('newCommentText').value;
+            
+            if (!commentText) {
+                showMessage("Please enter a comment", "error");
+                return;
+            }
+            
+            const commentData = {
+                issue_id: issueId,
+                user_role: currentUser.role,  // ← ADD THIS LINE
+                comment_type: commentType,
+                comment_text: commentText,
+                photo_urls: [],
+                audio_url: null,
+                video_url: null
+            };
+            
+            const response = await fetch('/grass-health/comments/add', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(commentData)
+            });
+            
+            if (response.ok) {
+                showMessage(commentType === 'instruction' ? "Instruction sent to worker!" : "Comment added!", "success");
+                // Refresh the detail view
+                viewGrassIssueDetail(issueId);
+            } else {
+                const error = await response.json();
+                showMessage(error.detail || "Failed to add comment", "error");
+            }
+        }
+
+        async function addGrassIssueUpdate(issueId) {
+            const photoFiles = document.getElementById('updatePhotos').files;
+            const audioFile = document.getElementById('updateAudio').files[0];
+            const videoFile = document.getElementById('updateVideo').files[0];
+            const commentText = document.getElementById('updateCommentText').value;
+            
+            showMessage("Uploading update...", "success");
+            
+            // Upload photos
+            let photoUrls = [];
+            for (const file of photoFiles) {
+                const formData = new FormData();
+                formData.append('file', file);
+                const response = await fetch('/upload/photo', { method: 'POST', body: formData });
+                if (response.ok) {
+                    const result = await response.json();
+                    photoUrls.push(result.url);
+                }
+            }
+            
+            // Upload audio
+            let audioUrl = null;
+            if (audioFile) {
+                const formData = new FormData();
+                formData.append('file', audioFile);
+                const response = await fetch('/upload/audio', { method: 'POST', body: formData });
+                if (response.ok) {
+                    const result = await response.json();
+                    audioUrl = result.url;
+                }
+            }
+            
+            // Upload video
+            let videoUrl = null;
+            if (videoFile) {
+                const formData = new FormData();
+                formData.append('file', videoFile);
+                const response = await fetch('/upload/video', { method: 'POST', body: formData });
+                if (response.ok) {
+                    const result = await response.json();
+                    videoUrl = result.url;
+                }
+            }
+            
+            const commentData = {
+                issue_id: issueId,
+                user_role: currentUser.role,  // ← ADD THIS LINE
+                comment_type: "update",
+                comment_text: commentText || "Worker submitted update",
+                photo_urls: photoUrls,
+                audio_url: audioUrl,
+                video_url: videoUrl
+            };
+            
+            const response = await fetch('/grass-health/comments/add', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(commentData)
+            });
+            
+            if (response.ok) {
+                showMessage("Update submitted! Admin will review.", "success");
+                // Refresh the detail view
+                viewGrassIssueDetail(issueId);
+                // Also refresh active issues list
+                if (typeof loadActiveGrassIssues === 'function') {
+                    loadActiveGrassIssues();
+                }
+            } else {
+                const error = await response.json();
+                showMessage(error.detail || "Failed to submit update", "error");
+            }
+        }
+
+        function closeGrassDetailModal() {
+            const modal = document.getElementById('grassDetailModal');
+            if (modal) {
+                modal.remove();
+            }
+        }
+        
+        
+        // ============================================
+        // WORKER GRASS HEALTH FUNCTIONS
+        // ============================================
+
+        async function loadWorkerGrassIssues() {
+            console.log("loadWorkerGrassIssues called");
+            console.log("currentUser:", currentUser);
+            try {
+                const url = `/grass-health/issues/active?role=worker&user_id=${currentUser.user_id}`;
+                console.log("Fetching URL:", url);
+                const response = await fetch(url);
+                console.log("Response status:", response.status);
+                const issues = await response.json();
+                console.log("Issues received:", issues);
+                
+                const container = document.getElementById('workerGrassIssuesList');
+                
+                if (issues.length === 0) {
+                    container.innerHTML = '<p style="color: #999;">No grass health reports submitted yet</p>';
+                    return;
+                }
+                
+                let html = '';
+                for (const issue of issues) {
+                    const locRes = await fetch('/locations/all');
+                    const locations = await locRes.json();
+                    const location = locations.find(l => l.id === issue.location_id);
+                    const locationName = location ? location.name : 'Unknown';
+                    
+                    const zoneName = issue.zone_id ? 'Zone ' + issue.zone_id : 'All';
+                    
+                    const healthColor = issue.ai_health_score >= 70 ? '#4CAF50' : (issue.ai_health_score >= 40 ? '#ff9800' : '#f44336');
+                    
+                    html += `
+                        <div class="task-item" style="margin-bottom: 12px; border-left-color: ${healthColor};">
+                            <strong>📍 ${locationName} - ${zoneName}</strong>
+                            <p><strong>🦠 Disease:</strong> ${issue.ai_disease || 'Unknown'} (${issue.ai_confidence ? Math.round(issue.ai_confidence * 100) : 0}%)</p>
+                            <p><strong>💚 Health Score:</strong> <span style="background: ${healthColor}; color: white; padding: 2px 8px; border-radius: 10px;">${issue.ai_health_score || 'N/A'}/100</span></p>
+                            <p><strong>📅 Reported:</strong> ${new Date(issue.detected_at).toLocaleString()}</p>
+                            <p><strong>📊 Status:</strong> ${
+                                issue.status === 'active' ? '🟡 Active - Pending Review' : 
+                                issue.status === 'in_progress' ? '🟠 In Progress - Action Required' : 
+                                '✅ Resolved'
+                            }</p>
+                            <button onclick="viewWorkerGrassIssueDetail(${issue.id})" style="background: #2196F3; padding: 8px; margin-top: 8px;">📋 View Details</button>
+                        </div>
+                    `;
+                }
+                container.innerHTML = html;
+            } catch (err) {
+                console.error("Error loading worker grass issues:", err);
+            }
+        }
+
+        async function loadWorkerGrassLocations() {
+            const response = await fetch('/locations/all');
+            const locations = await response.json();
+            const select = document.getElementById('workerGrassLocationId');
+            select.innerHTML = '<option value="">Select Location</option>';
+            locations.forEach(loc => {
+                select.innerHTML += `<option value="${loc.id}">${loc.name} (${loc.region})</option>`;
+            });
+        }
+
+        async function loadWorkerGrassZones() {
+            const locationId = document.getElementById('workerGrassLocationId').value;
+            const zoneSelect = document.getElementById('workerGrassZoneId');
+            
+            if (!locationId) {
+                zoneSelect.innerHTML = '<option value="">Select Zone (Optional)</option>';
+                return;
+            }
+            
+            const response = await fetch(`/grass-health/zones/${locationId}`);
+            const zones = await response.json();
+            zoneSelect.innerHTML = '<option value="">Select Zone (Optional)</option>';
+            zones.forEach(zone => {
+                zoneSelect.innerHTML += `<option value="${zone.id}">${zone.name}</option>`;
+            });
+        }
+
+        function openWorkerGrassReportForm() {
+            loadWorkerGrassLocations();
+            document.getElementById('workerGrassReportModal').style.display = 'block';
+            currentWorkerGrassAnalysis = null;
+            document.getElementById('workerGrassAnalysisResult').style.display = 'none';
+            document.getElementById('workerGrassPhotos').value = '';
+            document.getElementById('workerGrassAudio').value = '';
+            document.getElementById('workerGrassVideo').value = '';
+            document.getElementById('workerGrassNotes').value = '';
+        }
+
+        function closeWorkerGrassReportModal() {
+            document.getElementById('workerGrassReportModal').style.display = 'none';
+        }
+
+        async function analyzeWorkerGrassPhoto() {
+            const photoFiles = document.getElementById('workerGrassPhotos').files;
+            
+            if (photoFiles.length === 0) {
+                showMessage("Please select a photo to analyze", "error");
+                return;
+            }
+            
+            showMessage("Analyzing with Gemini AI...", "success");
+            document.getElementById('workerGrassAnalysisResult').style.display = 'none';
+            
+            const file = photoFiles[0];
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            try {
+                const response = await fetch('/grass-health/analyze', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    currentWorkerGrassAnalysis = result.analysis;
+                    displayWorkerGrassAnalysis(result.analysis);
+                    showMessage("AI analysis complete!", "success");
+                } else {
+                    showMessage("Analysis failed", "error");
+                }
+            } catch (err) {
+                console.error("Analysis error:", err);
+                showMessage("Error analyzing photo", "error");
+            }
+        }
+
+        function displayWorkerGrassAnalysis(analysis) {
+            const healthScore = analysis.health_score || 0;
+            const scoreColor = healthScore >= 70 ? '#4CAF50' : (healthScore >= 40 ? '#ff9800' : '#f44336');
+            
+            document.getElementById('workerGrassAnalysisContent').innerHTML = `
+                <p><strong>🦠 Disease:</strong> ${analysis.disease_name} (${Math.round(analysis.confidence * 100)}% confidence)</p>
+                <p><strong>🌱 Growth Stage:</strong> ${analysis.growth_stage}</p>
+                <p><strong>📏 Height Estimate:</strong> ${analysis.plant_height_estimate}</p>
+                <p><strong>🐛 Pest Damage:</strong> ${analysis.pest_damage_present ? '✅ Yes - ' + analysis.pest_type : '❌ No'}</p>
+                <p><strong>💚 Health Score:</strong> <span style="background: ${scoreColor}; color: white; padding: 4px 8px; border-radius: 10px;">${healthScore}/100</span></p>
+                <p><strong>🌾 Harvest Ready:</strong> ${analysis.harvest_ready ? '✅ Yes' : '❌ No'}</p>
+                <p><strong>💡 Recommendation:</strong> ${analysis.recommended_action}</p>
+            `;
+            document.getElementById('workerGrassAnalysisResult').style.display = 'block';
+        }
+
+        async function submitWorkerGrassReport() {
+            const locationId = document.getElementById('workerGrassLocationId').value;
+            const zoneId = document.getElementById('workerGrassZoneId').value;
+            const photoFiles = document.getElementById('workerGrassPhotos').files;
+            const audioFile = document.getElementById('workerGrassAudio').files[0];
+            const videoFile = document.getElementById('workerGrassVideo').files[0];
+            const workerNotes = document.getElementById('workerGrassNotes').value;
+            
+            if (!locationId) {
+                showMessage("Please select a location", "error");
+                return;
+            }
+            
+            if (photoFiles.length === 0) {
+                showMessage("Please upload at least one photo", "error");
+                return;
+            }
+            
+            showMessage("Uploading files...", "success");
+            
+            // Upload multiple photos
+            let photoUrls = [];
+            for (const file of photoFiles) {
+                const formData = new FormData();
+                formData.append('file', file);
+                const response = await fetch('/upload/photo', { method: 'POST', body: formData });
+                if (response.ok) {
+                    const result = await response.json();
+                    photoUrls.push(result.url);
+                }
+            }
+            
+            // Upload audio if any
+            let audioUrl = null;
+            if (audioFile) {
+                const formData = new FormData();
+                formData.append('file', audioFile);
+                const response = await fetch('/upload/audio', { method: 'POST', body: formData });
+                if (response.ok) {
+                    const result = await response.json();
+                    audioUrl = result.url;
+                }
+            }
+            
+            // Upload video if any
+            let videoUrl = null;
+            if (videoFile) {
+                const formData = new FormData();
+                formData.append('file', videoFile);
+                const response = await fetch('/upload/video', { method: 'POST', body: formData });
+                if (response.ok) {
+                    const result = await response.json();
+                    videoUrl = result.url;
+                }
+            }
+            
+            const reportData = {
+                location_id: parseInt(locationId),
+                zone_id: zoneId ? parseInt(zoneId) : null,
+                detected_by: currentUser.user_id,
+                photo_urls: photoUrls,
+                ai_disease: currentWorkerGrassAnalysis ? currentWorkerGrassAnalysis.disease_name : null,
+                ai_confidence: currentWorkerGrassAnalysis ? currentWorkerGrassAnalysis.confidence : null,
+                ai_growth_stage: currentWorkerGrassAnalysis ? currentWorkerGrassAnalysis.growth_stage : null,
+                ai_plant_height: currentWorkerGrassAnalysis ? currentWorkerGrassAnalysis.plant_height_estimate : null,
+                ai_harvest_ready: currentWorkerGrassAnalysis ? currentWorkerGrassAnalysis.harvest_ready : null,
+                ai_pest_damage: currentWorkerGrassAnalysis ? currentWorkerGrassAnalysis.pest_damage_present : null,
+                ai_pest_type: currentWorkerGrassAnalysis ? currentWorkerGrassAnalysis.pest_type : null,
+                ai_health_score: currentWorkerGrassAnalysis ? currentWorkerGrassAnalysis.health_score : null,
+                ai_recommendation: currentWorkerGrassAnalysis ? currentWorkerGrassAnalysis.recommended_action : null,
+                ai_full_response: currentWorkerGrassAnalysis,
+                worker_notes: workerNotes,
+                media_audio_url: audioUrl,
+                media_video_url: videoUrl
+            };
+            
+            const response = await fetch('/grass-health/report', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(reportData)
+            });
+            
+            if (response.ok) {
+                showMessage("Grass health report submitted successfully!", "success");
+                closeWorkerGrassReportModal();
+                loadWorkerGrassIssues();
+                // Also refresh admin view if they are looking
+                if (typeof loadActiveGrassIssues === 'function') {
+                    loadActiveGrassIssues();
+                }
+            } else {
+                const error = await response.json();
+                showMessage(error.detail || "Failed to submit report", "error");
+            }
+        }
+
+        async function viewWorkerGrassIssueDetail(issueId) {
+            const response = await fetch(`/grass-health/issues/${issueId}`);
+            const issue = await response.json();
+            
+            const locRes = await fetch('/locations/all');
+            const locations = await locRes.json();
+            const location = locations.find(l => l.id === issue.location_id);
+            
+            let photosHtml = '';
+            if (issue.photo_urls && issue.photo_urls.length > 0) {
+                photosHtml = '<p><strong>📸 Photos:</strong></p>';
+                for (const url of issue.photo_urls) {
+                    photosHtml += `<button onclick="viewMedia('${url}', 'image')" style="background: #2196F3; padding: 5px 10px; width: auto; margin: 5px;">📷 View Photo</button>`;
+                }
+            }
+            
+            const healthColor = issue.ai_health_score >= 70 ? '#4CAF50' : (issue.ai_health_score >= 40 ? '#ff9800' : '#f44336');
+            
+            let resolutionHtml = '';
+            if (issue.status === 'resolved') {
+                resolutionHtml = `
+                    <hr>
+                    <h4>✅ Resolution:</h4>
+                    <p><strong>Resolved By:</strong> ${issue.resolved_by || 'Admin'}</p>
+                    <p><strong>Resolved At:</strong> ${new Date(issue.resolved_at).toLocaleString()}</p>
+                    <p><strong>Notes:</strong> ${issue.resolution_notes || 'No notes'}</p>
+                `;
+            }
+            
+            // Add reply form for worker
+            let replyFormHtml = '';
+            if (currentUser.role === 'worker') {
+                replyFormHtml = `
+                    <div style="margin-top: 15px; border-top: 1px solid #ddd; padding-top: 15px;">
+                        <h4>✏️ Reply to Admin</h4>
+                        <textarea id="workerReplyText" rows="2" style="width: 100%; margin-bottom: 10px;" placeholder="Type your reply here..."></textarea>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="file" id="workerReplyPhoto" accept="image/*" style="flex: 1;">
+                            <input type="file" id="workerReplyAudio" accept="audio/*" style="flex: 1;">
+                            <input type="file" id="workerReplyVideo" accept="video/*" style="flex: 1;">
+                        </div>
+                        <button onclick="submitWorkerReply(${issueId})" style="background: #4CAF50; width: 100%; margin-top: 10px;">📤 Send Reply</button>
+                    </div>
+                `;
+            }
+            
+            
+            // ========== LOAD COMMENTS (INSIDE FUNCTION) ==========
+            let commentsHtml = '<h4>💬 Conversation</h4>';
+            try {
+                const commentsRes = await fetch(`/grass-health/comments/${issueId}`);
+                const comments = await commentsRes.json();
+                
+                if (comments.length === 0) {
+                    commentsHtml += '<p style="color: #999;">No comments yet</p>';
+                } else {
+                    for (const comment of comments) {
+                        const userIcon = comment.user_role === 'admin' ? '👑' : (comment.user_role === 'supervisor' ? '👔' : '👷');
+                        const date = new Date(comment.created_at).toLocaleString();
+                        
+                        commentsHtml += `
+                            <div style="background: #f9f9f9; padding: 10px; margin-bottom: 10px; border-radius: 8px; border-left: 3px solid ${comment.user_role === 'admin' ? '#f44336' : (comment.user_role === 'supervisor' ? '#ff9800' : '#4CAF50')}">
+                                <p><strong>${userIcon} ${comment.user_role}:</strong> <small>${date}</small></p>
+                                <p>${comment.comment_text || ''}</p>
+                            </div>
+                        `;
+                    }
+                }
+            } catch (err) {
+                console.error("Error loading comments:", err);
+                commentsHtml += '<p style="color: #999;">Error loading comments</p>';
+            }
+            // ========== END COMMENTS ==========
+            
+            const modalHtml = `
+                <div id="workerDetailModal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 7000; display: flex; align-items: center; justify-content: center;">
+                    <div style="background: white; margin: 5% auto; max-width: 500px; max-height: 80vh; overflow-y: auto; padding: 20px; border-radius: 16px; width: 90%;">
+                        <h3>📋 Grass Health Report</h3>
+                        <p><strong>📍 Location:</strong> ${location ? location.name : 'Unknown'}</p>
+                        <p><strong>🗺️ Zone:</strong> ${issue.zone_id || 'All'}</p>
+                        <p><strong>📅 Date:</strong> ${new Date(issue.detected_at).toLocaleString()}</p>
+                        <hr>
+                        <h4>🤖 AI Analysis:</h4>
+                        <p><strong>🦠 Disease:</strong> ${issue.ai_disease || 'Unknown'} (${Math.round((issue.ai_confidence || 0) * 100)}%)${issue.ai_disease_details ? ` - ${issue.ai_disease_details}` : ''}</p>
+                        <p><strong>🌱 Growth Stage:</strong> ${issue.ai_growth_stage || 'Unknown'}</p>
+                        <p><strong>💚 Health Score:</strong> <span style="background: ${healthColor}; color: white; padding: 4px 8px; border-radius: 10px;">${issue.ai_health_score || 'N/A'}/100</span></p>
+                        <p><strong>🌾 Harvest Ready:</strong> ${issue.ai_harvest_ready ? '✅ Yes' : '❌ No'}${issue.ai_harvest_ready_text ? ` - ${issue.ai_harvest_ready_text}` : ''}</p>
+                        <p><strong>📏 Height Estimate:</strong> ${issue.ai_plant_height || 'Unknown'}</p>
+                        ${issue.ai_environmental_stress ? `<p><strong>⚠️ Environmental Stress:</strong> ${issue.ai_environmental_stress}</p>` : ''}
+                        <p><strong>💡 Recommendation:</strong> ${issue.ai_recommendation || 'No recommendation'}</p>
+                        ${issue.ai_worker_notes_guidance ? `<p><strong>📝 Worker Guidance:</strong> ${issue.ai_worker_notes_guidance}</p>` : ''}
+                        <hr>
+                        <h4>📝 Notes:</h4>
+                        <p>${issue.worker_notes || 'No notes'}</p>
+                        ${photosHtml}
+                        ${issue.media_audio_url ? `<button onclick="viewMedia('${issue.media_audio_url}', 'audio')" style="background: #9c27b0; padding: 5px 10px; width: auto; margin: 5px;">🎧 Listen Audio</button>` : ''}
+                        ${issue.media_video_url ? `<button onclick="viewMedia('${issue.media_video_url}', 'video')" style="background: #e91e63; padding: 5px 10px; width: auto; margin: 5px;">📹 Watch Video</button>` : ''}
+                        ${commentsHtml}
+                        ${replyFormHtml}
+                        ${resolutionHtml}
+                        <button onclick="closeWorkerDetailModal()" style="background: #4CAF50; padding: 10px; margin-top: 20px;">Close</button>
+                    </div>
+                </div>
+            `;
+            
+            const existingModal = document.getElementById('workerDetailModal');
+            if (existingModal) existingModal.remove();
+            
+            const modalDiv = document.createElement('div');
+            modalDiv.innerHTML = modalHtml;
+            document.body.appendChild(modalDiv);
+        }
+
+        function closeWorkerDetailModal() {
+            const modal = document.getElementById('workerDetailModal');
+            if (modal) modal.remove();
+        }
+        
+        
+        async function submitWorkerReply(issueId) {
+            const replyText = document.getElementById('workerReplyText').value;
+            const photoFile = document.getElementById('workerReplyPhoto').files[0];
+            const audioFile = document.getElementById('workerReplyAudio').files[0];
+            const videoFile = document.getElementById('workerReplyVideo').files[0];
+            
+            if (!replyText && !photoFile && !audioFile && !videoFile) {
+                showMessage("Please enter a reply or attach media", "error");
+                return;
+            }
+            
+            showMessage("Uploading reply...", "success");
+            
+            let photoUrl = null;
+            if (photoFile) {
+                const formData = new FormData();
+                formData.append('file', photoFile);
+                const response = await fetch('/upload/photo', { method: 'POST', body: formData });
+                if (response.ok) {
+                    const result = await response.json();
+                    photoUrl = result.url;
+                }
+            }
+            
+            let audioUrl = null;
+            if (audioFile) {
+                const formData = new FormData();
+                formData.append('file', audioFile);
+                const response = await fetch('/upload/audio', { method: 'POST', body: formData });
+                if (response.ok) {
+                    const result = await response.json();
+                    audioUrl = result.url;
+                }
+            }
+            
+            let videoUrl = null;
+            if (videoFile) {
+                const formData = new FormData();
+                formData.append('file', videoFile);
+                const response = await fetch('/upload/video', { method: 'POST', body: formData });
+                if (response.ok) {
+                    const result = await response.json();
+                    videoUrl = result.url;
+                }
+            }
+            
+            const commentData = {
+                issue_id: issueId,
+                user_role: currentUser.role,  // ← ADD THIS LINE
+                comment_type: "reply",
+                comment_text: replyText || "Worker replied",
+                photo_urls: photoUrl ? [photoUrl] : [],
+                audio_url: audioUrl,
+                video_url: videoUrl
+            };
+            
+            const response = await fetch('/grass-health/comments/add', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(commentData)
+            });
+            
+            if (response.ok) {
+                showMessage("Reply sent to Admin!", "success");
+                document.getElementById('workerReplyText').value = '';
+                document.getElementById('workerReplyPhoto').value = '';
+                document.getElementById('workerReplyAudio').value = '';
+                document.getElementById('workerReplyVideo').value = '';
+                viewWorkerGrassIssueDetail(issueId);
+            } else {
+                const error = await response.json();
+                showMessage(error.detail || "Failed to send reply", "error");
+            }
+        }
+        
+        
+        // ============================================
         // NEW PROGRESS TRACKING FUNCTIONS
         // ============================================
 
@@ -1890,7 +3122,7 @@
         }
 
         function showAdminTab(tabName) {
-            const tabs = ['addTask', 'addLocation', 'addZone', 'manageZones', 'viewZones', 'addContact', 'viewUsers', 'viewTasks', 'addUser'];
+            const tabs = ['addTask', 'addLocation', 'addZone', 'manageZones', 'viewZones', 'addContact', 'viewUsers', 'viewTasks', 'grassHealth', 'addUser'];
             
             tabs.forEach(tab => {
                 const element = document.getElementById(`${tab}Form`);
@@ -1913,7 +3145,13 @@
             if (tabName === 'viewTasks') {
                 loadAllTasks();
             }
-            
+            if (tabName === 'grassHealth') {
+                loadAllGrassIssuesForReporting();
+                loadGrassLocations();
+            }
+            if (sectionName === 'grassHealthWorker') {
+                loadWorkerGrassIssues();
+            }
             if (tabName === 'manageZones') {
                 loadLocationsForDropdowns();
             }
@@ -2130,6 +3368,12 @@
             if (tabName === 'viewTasks') {
                 loadAllTasks();
             }
+
+            if (tabName === 'grassHealth') {
+                loadActiveGrassIssues();
+                loadGrassLocations();
+            }
+
             if (tabName === 'manageZones') {
                 loadLocationsForDropdowns();
             }
@@ -2281,7 +3525,145 @@
                 showMessage(error.detail || 'Failed to complete task', 'error');
             }
         }
+        
+        let allGrassIssues = [];
+
+        async function loadAllGrassIssuesForReporting() {
+            try {
+                const response = await fetch(`/grass-health/issues/active?role=admin&user_id=${currentUser.user_id}`);
+                allGrassIssues = await response.json();
+                populateLocationFilter();
+                applyGrassFilters();
+            } catch (err) {
+                console.error("Error loading issues:", err);
+            }
+        }
+
+        function populateLocationFilter() {
+            const locations = [...new Map(allGrassIssues.map(issue => [issue.location_id, issue.location_id])).values()];
+            const locationSelect = document.getElementById('reportLocationFilter');
+            
+            locations.forEach(async (locId) => {
+                const locRes = await fetch('/locations/all');
+                const locations = await locRes.json();
+                const location = locations.find(l => l.id === locId);
+                if (location) {
+                    locationSelect.innerHTML += `<option value="${locId}">${location.name}</option>`;
+                }
+            });
+        }
+
+        async function applyGrassFilters() {
+            const locationId = document.getElementById('reportLocationFilter').value;
+            const zoneId = document.getElementById('reportZoneFilter').value;
+            const startDate = document.getElementById('reportStartDate').value;
+            const endDate = document.getElementById('reportEndDate').value;
+            
+            let filtered = [...allGrassIssues];
+            
+            if (locationId) {
+                filtered = filtered.filter(issue => issue.location_id == locationId);
+                // Update zone dropdown based on selected location
+                await updateZoneFilter(locationId);
+            }
+            
+            if (zoneId) {
+                filtered = filtered.filter(issue => issue.zone_id == zoneId);
+            }
+            
+            if (startDate) {
+                filtered = filtered.filter(issue => new Date(issue.detected_at) >= new Date(startDate));
+            }
+            
+            if (endDate) {
+                filtered = filtered.filter(issue => new Date(issue.detected_at) <= new Date(endDate));
+            }
+            
+            displayFilteredGrassIssues(filtered);
+        }
+
+        async function updateZoneFilter(locationId) {
+            const response = await fetch(`/grass-health/zones/${locationId}`);
+            const zones = await response.json();
+            const zoneSelect = document.getElementById('reportZoneFilter');
+            zoneSelect.innerHTML = '<option value="">All Zones</option>';
+            zones.forEach(zone => {
+                zoneSelect.innerHTML += `<option value="${zone.id}">${zone.name}</option>`;
+            });
+        }
+
+        async function displayFilteredGrassIssues(issues) {
+            const container = document.getElementById('grassActiveIssuesList');
+            
+            if (issues.length === 0) {
+                container.innerHTML = '<p style="color: #999;">No issues found</p>';
+                return;
+            }
+            
+            let html = '<div class="table-container"><table style="width:100%; border-collapse: collapse;">';
+            html += '<tr style="background: #f0f0f0;"><th>Location</th><th>Zone</th><th>Disease</th><th>Health Score</th><th>Date Reported</th><th>Actions</th></tr>';
+            
+            for (const issue of issues) {
+                const locRes = await fetch('/locations/all');
+                const locations = await locRes.json();
+                const location = locations.find(l => l.id === issue.location_id);
+                const locationName = location ? location.name : 'Unknown';
                 
+                const zoneName = issue.zone_id ? 'Zone ' + issue.zone_id : 'All';
+                const healthColor = issue.ai_health_score >= 70 ? '#4CAF50' : (issue.ai_health_score >= 40 ? '#ff9800' : '#f44336');
+                
+                html += `
+                    <tr>
+                        <td>${locationName}</td>
+                        <td>${zoneName}</td>
+                        <td>${issue.ai_disease || 'Unknown'} (${Math.round((issue.ai_confidence || 0) * 100)}%)</td>
+                        <td><span style="background: ${healthColor}; color: white; padding: 4px 8px; border-radius: 10px;">${issue.ai_health_score || 'N/A'}</span></td>
+                        <td>${new Date(issue.detected_at).toLocaleDateString()}</td>
+                        <td>
+                            <button onclick="viewGrassIssueDetail(${issue.id})" style="background: #2196F3; padding: 5px 10px; width: auto;">📋 View</button>
+                            <button onclick="openGrassResolveModal(${issue.id})" style="background: #4CAF50; padding: 5px 10px; width: auto;">✅ Resolve</button>
+                        </td>
+                    </tr>
+                `;
+            }
+            html += '</table></div>';
+            container.innerHTML = html;
+        }
+
+        async function exportGrassReport() {
+            const locationId = document.getElementById('reportLocationFilter').value;
+            const startDate = document.getElementById('reportStartDate').value;
+            const endDate = document.getElementById('reportEndDate').value;
+            
+            let url = `/grass-health/issues/active?role=admin&user_id=${currentUser.user_id}`;
+            const response = await fetch(url);
+            const issues = await response.json();
+            
+            let filtered = [...issues];
+            if (locationId) filtered = filtered.filter(i => i.location_id == locationId);
+            if (startDate) filtered = filtered.filter(i => new Date(i.detected_at) >= new Date(startDate));
+            if (endDate) filtered = filtered.filter(i => new Date(i.detected_at) <= new Date(endDate));
+            
+            let csv = "Location,Zone,Disease,Health Score,Date Reported,Status\n";
+            for (const issue of filtered) {
+                const locRes = await fetch('/locations/all');
+                const locations = await locRes.json();
+                const location = locations.find(l => l.id === issue.location_id);
+                csv += `"${location ? location.name : 'Unknown'}","${issue.zone_id || 'All'}","${issue.ai_disease || 'Unknown'}","${issue.ai_health_score || 'N/A'}","${new Date(issue.detected_at).toLocaleDateString()}","${issue.status}"\n`;
+            }
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url_csv = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url_csv;
+            a.download = `grass_health_report_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            URL.revokeObjectURL(url_csv);
+            showMessage("Report exported successfully!", "success");
+        }
+
+
+
         // ============================================
         // 👇 ADD NEW ADMIN FUNCTIONS RIGHT HERE 👇
         // ============================================
@@ -2526,16 +3908,15 @@
         }
 
         function viewMedia(mediaUrl, mediaType) {
-            // Close the history modal first
+            // Close the history modal first if open
             closeMediaHistoryModal();
             
-            // Now open the media viewer
+            // Hide all media elements
             const imageEl = document.getElementById('viewerImage');
             const audioEl = document.getElementById('viewerAudio');
             const videoEl = document.getElementById('viewerVideo');
             const noMediaEl = document.getElementById('noMediaMessage');
             
-            // Hide all first
             if (imageEl) imageEl.style.display = 'none';
             if (audioEl) audioEl.style.display = 'none';
             if (videoEl) videoEl.style.display = 'none';
@@ -2568,7 +3949,11 @@
                 }
             }
             
-            document.getElementById('mediaViewerModal').style.display = 'flex';
+            const mediaModal = document.getElementById('mediaViewerModal');
+            if (mediaModal) {
+                mediaModal.style.zIndex = '10001';  // Higher than report modal
+                mediaModal.style.display = 'flex';
+            }
         }
 
         function closeMediaViewer() {
@@ -2974,7 +4359,7 @@
     
 
     <!-- Media Viewer Modal -->
-    <div id="mediaViewerModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 3000;">
+    <div id="mediaViewerModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 10000;">
         <div style="position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
             <button onclick="closeMediaViewer()" style="position: absolute; top: 20px; right: 20px; background: red; color: white; border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 20px; cursor: pointer; z-index: 3001;">✕</button>
             
