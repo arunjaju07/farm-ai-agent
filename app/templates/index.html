@@ -347,6 +347,7 @@
                     </div>
 
                     <!-- Add Task Form -->
+                    <div id="addTaskForm" class="admin-tab" style="display: none;">
                     <h3>➕ Add New Task Template</h3>
                     <input type="text" id="taskTitle" placeholder="Task Title" required>
                     <textarea id="taskDesc" placeholder="Description (optional)"></textarea>
@@ -441,6 +442,12 @@
                         <button onclick="loadAllTasks()" style="width: auto; padding: 8px 16px; background: #2196F3;">🔍 Filter</button>
                         <button onclick="clearAdminDateFilter()" style="width: auto; padding: 8px 16px; background: #999;">Clear</button>
                         
+                        <label style="display: flex; align-items: center; margin-bottom: 12px; gap: 8px;">
+                            <input type="checkbox" id="showAllTasksAdmin" onchange="loadAllTasks()">
+                            <span>Show all tasks (ignore morning/night filter)</span>
+                        </label>
+
+
                         <!-- ========== 4.1 ADD LOCATION FILTER HERE ========== -->
                         <div style="margin: 12px 0; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
                             <label style="font-weight: 500;">📍 Filter by Location:</label>
@@ -3301,6 +3308,11 @@
                     }
                 }
                 
+                // ========== ADD THIS LINE ==========
+                const showAll = document.getElementById("showAllTasksAdmin")?.checked || false;
+                // ==================================
+
+                
                 // If no date selected, use today
                 if (!selectedDate) {
                     const today = new Date();
@@ -3315,13 +3327,13 @@
                 
                 // Filter by date
                 let filteredTasks = tasks;
-                if (selectedDate) {
+                
+                if (selectedDate && !showAll) {
                     filteredTasks = tasks.filter(task => {
-                        // Water release tasks always show (no date filter needed)
+                        // Water release tasks always show
                         if (task.task_category === 'water_release') {
                             return true;
                         }
-                        // Other tasks filter by due date or creation date
                         const taskDate = task.due_date ? task.due_date.split('T')[0] : task.created_at.split('T')[0];
                         return taskDate === selectedDate;
                     });
