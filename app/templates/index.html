@@ -318,6 +318,7 @@
                         <button onclick="showAdminTab('viewIssues')" style="width: auto; padding: 8px 16px;">📋 Issues</button>
                         <button onclick="showAdminTab('addUser')" style="width: auto; padding: 8px 16px;">👤 Add User</button>
                         <button onclick="showAdminTab('viewUsers')" style="width: auto; padding: 8px 16px;">👥 View Users</button>
+                        <button onclick="showAdminTab('equipment')" style="width: auto; padding: 8px 16px;">🔧 Equipment</button>
                     </div>
                     
                     <!-- Add User Form -->
@@ -346,44 +347,51 @@
                     </div>
 
                     <!-- Add Task Form -->
-                    <div id="addTaskForm" class="admin-tab" style="display: none;">
-                        <h3>➕ Add New Task Template</h3>
-                        <input type="text" id="taskTitle" placeholder="Task Title" required>
-                        <textarea id="taskDesc" placeholder="Description (optional)"></textarea>
-                        
-                        <select id="taskType">
-                            <option value="daily">Daily</option>
-                            <option value="interval">Interval</option>
-                            <option value="manual">Manual</option>
-                        </select>
-                        
-                        <select id="taskTimeSlot">
-                            <option value="morning">🌅 Morning</option>
-                            <option value="night">🌙 Night</option>
-                            <option value="anytime">🕐 Anytime</option>
-                        </select>
-                        
-                        <select id="taskLocationId"></select>
-                        
-                        <select id="taskZoneId">
-                            <option value="">No Zone (Whole Farm)</option>
-                        </select>
-                        
-                        <!-- Recurring Options -->
-                        <label style="display: block; margin-top: 12px; font-weight: 500;">Recurring:</label>
-                        <select id="taskRecurring" onchange="toggleRecurringOptions()">
-                            <option value="none">None (One-time task)</option>
-                            <option value="daily">Daily (Every day)</option>
-                            <option value="interval">Interval (Every X days)</option>
-                            <option value="monthly">Monthly (Same day each month)</option>
-                        </select>
-                        
-                        <div id="intervalDaysDiv" style="display: none;">
-                            <input type="number" id="taskIntervalDays" placeholder="Interval days (e.g., 10, 30)">
-                        </div>
-                        
-                        <button onclick="createTask()">Create Task Template</button>
+                    <h3>➕ Add New Task Template</h3>
+                    <input type="text" id="taskTitle" placeholder="Task Title" required>
+                    <textarea id="taskDesc" placeholder="Description (optional)"></textarea>
+                    
+                    <label>Task Category:</label>
+                    <select id="taskCategory">
+                        <option value="general">📋 General</option>
+                        <option value="water_release">💧 Water Release</option>
+                        <option value="fertilizer">🌱 Fertilizer</option>
+                        <option value="grass_cutting">✂️ Grass Cutting</option>
+                    </select>
+                    
+                    <select id="taskType">
+                        <option value="daily">Daily</option>
+                        <option value="interval">Interval</option>
+                        <option value="manual">Manual</option>
+                    </select>
+                    
+                    <select id="taskTimeSlot">
+                        <option value="morning">🌅 Morning</option>
+                        <option value="night">🌙 Night</option>
+                        <option value="anytime">🕐 Anytime</option>
+                    </select>
+                    
+                    <select id="taskLocationId"></select>
+                    
+                    <select id="taskZoneId">
+                        <option value="">No Zone (Whole Farm)</option>
+                    </select>
+                    
+                    <!-- Recurring Options -->
+                    <label style="display: block; margin-top: 12px; font-weight: 500;">Recurring:</label>
+                    <select id="taskRecurring" onchange="toggleRecurringOptions()">
+                        <option value="none">None (One-time task)</option>
+                        <option value="daily">Daily (Every day)</option>
+                        <option value="interval">Interval (Every X days)</option>
+                        <option value="monthly">Monthly (Same day each month)</option>
+                    </select>
+                    
+                    <div id="intervalDaysDiv" style="display: none;">
+                        <input type="number" id="taskIntervalDays" placeholder="Interval days (e.g., 10, 30)">
                     </div>
+                    
+                    <button onclick="createTask()">Create Task Template</button>
+                </div>
                     
                     <!-- Add Location Form -->
                     <div id="addLocationForm" class="admin-tab" style="display: none;">
@@ -455,6 +463,128 @@
                     <div id="viewContactsForm" class="admin-tab" style="display: none;">
                         <h3>📞 Contact List</h3>
                         <div id="allContactsList" style="max-height: 400px; overflow-y: auto;"></div>
+                    </div>
+                    
+                    
+                    <!-- Equipment Management Tab -->
+                    <div id="equipmentForm" class="admin-tab" style="display: none;">
+                        <h3>🔧 Equipment Management</h3>
+                        
+                        <!-- Dashboard Cards -->
+                        <div id="equipmentStats" style="display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 20px;"></div>
+                        
+                        <!-- Action Buttons -->
+                        <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
+                            <button onclick="openEquipmentForm()" style="background: #4CAF50; width: auto; padding: 10px 20px;">➕ Add Equipment</button>
+                            <button onclick="loadEquipmentList()" style="background: #2196F3; width: auto; padding: 10px 20px;">🔄 Refresh</button>
+                        </div>
+                        
+                        <!-- Equipment List -->
+                        <div id="equipmentList" style="max-height: 500px; overflow-y: auto;"></div>
+                    </div>
+
+                    <!-- Add/Edit Equipment Modal -->
+                    <div id="equipmentModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 6000;">
+                        <div style="background: white; margin: 5% auto; max-width: 500px; max-height: 85vh; overflow-y: auto; padding: 20px; border-radius: 16px; width: 90%;">
+                            <h3 id="equipmentModalTitle">Add Equipment</h3>
+                            <input type="hidden" id="editEquipmentId">
+                            
+                            <label>Equipment Name:</label>
+                            <input type="text" id="equipmentName" placeholder="e.g., Motor #1" required>
+                            
+                            <label>Equipment Type:</label>
+                            <select id="equipmentType" required>
+                                <option value="">Select Type</option>
+                            </select>
+                            
+                            <label>Location:</label>
+                            <select id="equipmentLocationId" onchange="loadEquipmentZones()" required>
+                                <option value="">Select Location</option>
+                            </select>
+                            
+                            <label>Zone (Optional):</label>
+                            <select id="equipmentZoneId">
+                                <option value="">Select Zone</option>
+                            </select>
+                            
+                            <label>Serial Number:</label>
+                            <input type="text" id="equipmentSerial" placeholder="Serial Number">
+                            
+                            <label>Purchase Date:</label>
+                            <input type="date" id="equipmentPurchaseDate">
+                            
+                            <label>Purchase Cost (₹):</label>
+                            <input type="number" id="equipmentPurchaseCost" placeholder="0.00">
+                            
+                            <label>Running Hours:</label>
+                            <input type="number" id="equipmentRunningHours" placeholder="0" value="0">
+                            
+                            <label>Status:</label>
+                            <select id="equipmentStatus">
+                                <option value="active">🟢 Active</option>
+                                <option value="service_due">🟡 Service Due</option>
+                                <option value="repair_required">🔴 Repair Required</option>
+                                <option value="inactive">⚫ Inactive</option>
+                            </select>
+                            
+                            <label>Last Service Date:</label>
+                            <input type="date" id="equipmentLastServiceDate">
+                            
+                            <label>Next Service Date:</label>
+                            <input type="date" id="equipmentNextServiceDate">
+                            
+                            <label>Notes:</label>
+                            <textarea id="equipmentNotes" rows="3" placeholder="Additional notes..."></textarea>
+                            
+                            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                                <button onclick="saveEquipment()" style="background: #4CAF50; flex: 1;">💾 Save</button>
+                                <button onclick="closeEquipmentModal()" style="background: #999; flex: 1;">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Maintenance Modal -->
+                    <div id="maintenanceModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 6000;">
+                        <div style="background: white; margin: 5% auto; max-width: 400px; padding: 20px; border-radius: 16px; width: 90%;">
+                            <h3>Add Maintenance Record</h3>
+                            <input type="hidden" id="maintenanceEquipmentId">
+                            
+                            <label>Maintenance Date:</label>
+                            <input type="date" id="maintenanceDate">
+                            
+                            <label>Maintenance Type:</label>
+                            <select id="maintenanceType">
+                                <option value="preventive">Preventive</option>
+                                <option value="corrective">Corrective</option>
+                                <option value="emergency">Emergency</option>
+                            </select>
+                            
+                            <label>Cost (₹):</label>
+                            <input type="number" id="maintenanceCost" placeholder="0.00">
+                            
+                            <label>Performed By:</label>
+                            <input type="text" id="maintenancePerformedBy" placeholder="Worker name or vendor">
+                            
+                            <label>Running Hours After:</label>
+                            <input type="number" id="maintenanceRunningHours" placeholder="Current running hours">
+                            
+                            <label>Notes:</label>
+                            <textarea id="maintenanceNotes" rows="3" placeholder="Work done..."></textarea>
+                            
+                            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                                <button onclick="saveMaintenance()" style="background: #4CAF50; flex: 1;">💾 Save</button>
+                                <button onclick="closeMaintenanceModal()" style="background: #999; flex: 1;">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Equipment Detail Modal -->
+                    <div id="equipmentDetailModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 7000;">
+                        <div style="background: white; margin: 5% auto; max-width: 500px; max-height: 85vh; overflow-y: auto; padding: 20px; border-radius: 16px; width: 90%;">
+                            <h3 id="detailTitle">Equipment Details</h3>
+                            <div id="equipmentDetailContent"></div>
+                            <button onclick="closeEquipmentDetailModal()" style="background: #4CAF50; margin-top: 20px;">Close</button>
+                        </div>
                     </div>
                     
                     
@@ -1452,14 +1582,14 @@
                 if (response.ok) {
                     let tasks = await response.json();
                     
-                    // Filter by selected date
+                    // NEW: Filter tasks - pending tasks always show, completed tasks filter by date
                     tasks = tasks.filter(task => {
-                        // Water release tasks always show (no date filter needed)
-                        if (task.task_category === 'water_release') {
+                        // If task is not completed, always show it
+                        if (task.status !== 'completed') {
                             return true;
                         }
-                        // Other tasks filter by due date or creation date
-                        const taskDate = task.due_date ? task.due_date.split('T')[0] : task.created_at.split('T')[0];
+                        // For completed tasks, only show on their completion date
+                        const taskDate = task.completed_at ? task.completed_at.split('T')[0] : task.created_at.split('T')[0];
                         return taskDate === selectedDate;
                     });
                     
@@ -1480,7 +1610,7 @@
                     });
                     
                     if (tasks.length === 0) {
-                        tasksDiv.innerHTML = `<p style="color: #999;">No tasks for ${displayDate}</p>`;
+                        tasksDiv.innerHTML = `<p style="color: #999;">No pending tasks for ${displayDate}</p>`;
                         return;
                     }
                     
@@ -1493,6 +1623,30 @@
                         
                         // Get progress percentage
                         const progress = task.progress_percentage || 0;
+                        
+                        // ========== NEW: Calculate pending days ==========
+                        let pendingDays = 0;
+                        let pendingBadge = '';
+                        
+                        if (task.status !== 'completed') {
+                            if (task.task_category === 'water_release' && task.last_water_release_date) {
+                                const lastRelease = new Date(task.last_water_release_date);
+                                const today = new Date();
+                                pendingDays = Math.max(0, Math.ceil((today - lastRelease) / (1000 * 60 * 60 * 24)));
+                            } else {
+                                const createdDate = new Date(task.created_at);
+                                const today = new Date();
+                                pendingDays = Math.max(0, Math.ceil((today - createdDate) / (1000 * 60 * 60 * 24)));
+                            }
+                            
+                            if (pendingDays === 0) {
+                                pendingBadge = '<span style="color: #4CAF50; font-size: 11px;">✅ Due today</span>';
+                            } else if (pendingDays === 1) {
+                                pendingBadge = '<span style="color: #ff9800; font-size: 11px;">⚠️ 1 day pending</span>';
+                            } else {
+                                pendingBadge = `<span style="color: #f44336; font-size: 11px;">🔴 ${pendingDays} days pending</span>`;
+                            }
+                        }
                         
                         // Progress bar HTML
                         const progressBar = `
@@ -1543,36 +1697,33 @@
                             }
                         }
                         
-                        // Days Pending display for worker (BEFORE the HTML)
-                        let workerDaysHtml = '';
-                        if (task.days_pending === 0) {
-                            workerDaysHtml = '<p style="font-size: 11px; color: #4CAF50; margin-top: 5px;">✅ Status: Good - No pending days</p>';
-                        } else if (task.days_pending <= 2) {
-                            workerDaysHtml = `<p style="font-size: 11px; color: #ff9800; margin-top: 5px;">⚠️ Pending: ${task.days_pending} day${task.days_pending > 1 ? 's' : ''} - Please start soon</p>`;
-                        } else {
-                            workerDaysHtml = `<p style="font-size: 11px; color: #f44336; margin-top: 5px;">🔴 URGENT: ${task.days_pending} day${task.days_pending > 1 ? 's' : ''} overdue! Start immediately</p>`;
-                        }
-                        
                         tasksDiv.innerHTML += `
                             <div class="task-item" style="border-left-color: ${statusColor};">
                                 <strong>${task.title}</strong>
+                                ${pendingBadge ? `<div style="margin-top: 5px;">${pendingBadge}</div>` : ''}
                                 <p style="font-size: 12px; color: #666;">${task.description || "No description"}</p>
-                                ${workerDaysHtml}
                                 <p style="font-size: 11px; margin-top: 8px;">
                                     <span style="background: #f0f0f0; padding: 2px 8px; border-radius: 10px;">${timeBadge}</span>
                                     Status: <span style="color: ${statusColor}; font-weight: bold;">${task.status === "completed" ? "Completed" : (progress > 0 ? "In Progress" : "Pending")}</span>
                                 </p>
+                                
                                 ${progressBar}
+                                
                                 ${waterInfo ? `<p style="margin-top: 5px;">${waterInfo}</p>` : ''}
+                                
                                 ${mediaButtons ? `<div style="margin-top: 8px;">${mediaButtons}</div>` : ''}
                                 
-                                <div style="display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap;">
+                                <div style="display: flex; gap: 8px; margin-top: 12px;">
                                     ${task.status !== "completed" ? `
-                                        <button onclick="viewTaskMediaHistory(${task.id})" style="background: #9c27b0; padding: 8px; font-size: 12px; flex: 1;">📜 Media History</button>
-                                        <button onclick="openProgressModal(${task.id}, '${task.title.replace(/'/g, "\\'")}', ${progress})" style="background: #2196F3; padding: 8px; font-size: 12px; flex: 1;">📊 Update Progress</button>
-                                        <button onclick="openCompletionModal(${task.id}, '${task.title.replace(/'/g, "\\'")}')" style="background: #4CAF50; padding: 8px; font-size: 12px; flex: 1;">✅ Complete Task</button>
+                                        <button onclick="openProgressModal(${task.id}, '${task.title.replace(/'/g, "\\'")}', ${progress})" 
+                                                style="background: #2196F3; padding: 10px; font-size: 13px; flex: 1;">
+                                            📊 Update Progress
+                                        </button>
+                                        <button onclick="openCompletionModal(${task.id}, '${task.title.replace(/'/g, "\\'")}')" 
+                                                style="background: #4CAF50; padding: 10px; font-size: 13px; flex: 1;">
+                                            ✅ Complete Task
+                                        </button>
                                     ` : `
-                                        <button onclick="viewTaskMediaHistory(${task.id})" style="background: #9c27b0; padding: 8px; font-size: 12px; width: auto;">📜 Media History</button>
                                         <p style="margin-top: 8px; font-size: 12px; color: green;">✓ Task Completed</p>
                                     `}
                                 </div>
@@ -1613,6 +1764,335 @@
             }
         }
 
+        // ============================================
+        // EQUIPMENT MANAGEMENT FUNCTIONS
+        // ============================================
+
+        async function loadEquipmentList() {
+            try {
+                const response = await fetch('/equipment/all');
+                const equipment = await response.json();
+                const container = document.getElementById('equipmentList');
+                
+                // Load stats
+                await loadEquipmentStats(equipment);
+                
+                if (equipment.length === 0) {
+                    container.innerHTML = '<p style="color: #999;">No equipment added yet</p>';
+                    return;
+                }
+                
+                let html = '<div class="table-container"><table style="width:100%; border-collapse: collapse;">';
+                html += '<tr style="background: #f0f0f0;"><th>Name</th><th>Type</th><th>Location</th><th>Running Hours</th><th>Last Service</th><th>Next Service</th><th>Status</th><th>Actions</th></tr>';
+                
+                for (const eq of equipment) {
+                    // Get location name
+                    const locRes = await fetch('/locations/all');
+                    const locations = await locRes.json();
+                    const location = locations.find(l => l.id === eq.location_id);
+                    const locationName = location ? location.name : 'Unknown';
+                    
+                    // Status badge
+                    let statusBadge = '';
+                    if (eq.status === 'active') statusBadge = '<span style="background: #4CAF50; color: white; padding: 4px 8px; border-radius: 10px;">🟢 Active</span>';
+                    else if (eq.status === 'service_due') statusBadge = '<span style="background: #ff9800; color: white; padding: 4px 8px; border-radius: 10px;">🟡 Service Due</span>';
+                    else if (eq.status === 'repair_required') statusBadge = '<span style="background: #f44336; color: white; padding: 4px 8px; border-radius: 10px;">🔴 Repair Required</span>';
+                    else statusBadge = '<span style="background: #999; color: white; padding: 4px 8px; border-radius: 10px;">⚫ Inactive</span>';
+                    
+                    // Calculate days since last service
+                    let lastServiceText = 'Never';
+                    if (eq.last_service_date) {
+                        const lastDate = new Date(eq.last_service_date);
+                        const today = new Date();
+                        const days = Math.ceil((today - lastDate) / (1000 * 60 * 60 * 24));
+                        lastServiceText = `${days} days ago`;
+                    }
+                    
+                    // Next service status
+                    let nextServiceText = eq.next_service_date || 'Not set';
+                    if (eq.next_service_date) {
+                        const nextDate = new Date(eq.next_service_date);
+                        const today = new Date();
+                        const days = Math.ceil((nextDate - today) / (1000 * 60 * 60 * 24));
+                        if (days < 0) nextServiceText += ' ⚠️ Overdue';
+                        else if (days <= 7) nextServiceText += ' ⚠️ Soon';
+                    }
+                    
+                    html += `
+                        <tr>
+                            <td><strong>${eq.equipment_name}</strong></td>
+                            <td>${eq.equipment_type}</td>
+                            <td>${locationName}${eq.zone_id ? ` - Zone ${eq.zone_id}` : ''}</td>
+                            <td>${eq.running_hours || 0} hrs</td>
+                            <td>${lastServiceText}</td>
+                            <td>${nextServiceText}</td>
+                            <td>${statusBadge}</td>
+                            <td>
+                                <button onclick="viewEquipmentDetail(${eq.id})" style="background: #2196F3; padding: 5px 10px; width: auto; margin-right: 5px;">📋 View</button>
+                                <button onclick="editEquipment(${eq.id})" style="background: #ff9800; padding: 5px 10px; width: auto; margin-right: 5px;">✏️ Edit</button>
+                                <button onclick="openMaintenanceModal(${eq.id})" style="background: #4CAF50; padding: 5px 10px; width: auto;">🔧 Add Service</button>
+                            </td>
+                        </tr>
+                    `;
+                }
+                html += '</table></div>';
+                container.innerHTML = html;
+            } catch (err) {
+                console.error("Error loading equipment:", err);
+            }
+        }
+
+        async function loadEquipmentStats(equipment) {
+            const stats = {
+                active: equipment.filter(e => e.status === 'active').length,
+                service_due: equipment.filter(e => e.status === 'service_due').length,
+                repair_required: equipment.filter(e => e.status === 'repair_required').length,
+                total: equipment.length
+            };
+            
+            const container = document.getElementById('equipmentStats');
+            container.innerHTML = `
+                <div style="background: #e8f5e9; padding: 15px; border-radius: 10px; flex: 1; text-align: center;">
+                    <h4>Total Equipment</h4>
+                    <p style="font-size: 28px; margin: 0;">${stats.total}</p>
+                </div>
+                <div style="background: #e3f2fd; padding: 15px; border-radius: 10px; flex: 1; text-align: center;">
+                    <h4>🟢 Active</h4>
+                    <p style="font-size: 28px; margin: 0;">${stats.active}</p>
+                </div>
+                <div style="background: #fff3e0; padding: 15px; border-radius: 10px; flex: 1; text-align: center;">
+                    <h4>🟡 Service Due</h4>
+                    <p style="font-size: 28px; margin: 0;">${stats.service_due}</p>
+                </div>
+                <div style="background: #ffebee; padding: 15px; border-radius: 10px; flex: 1; text-align: center;">
+                    <h4>🔴 Repair Required</h4>
+                    <p style="font-size: 28px; margin: 0;">${stats.repair_required}</p>
+                </div>
+            `;
+        }
+
+        async function loadEquipmentTypes() {
+            try {
+                const response = await fetch('/equipment/types/list');
+                const types = await response.json();
+                const select = document.getElementById('equipmentType');
+                select.innerHTML = '<option value="">Select Type</option>';
+                types.forEach(type => {
+                    select.innerHTML += `<option value="${type}">${type}</option>`;
+                });
+            } catch (err) {
+                console.error("Error loading types:", err);
+                // Fallback types if API fails
+                const fallbackTypes = ["Motor", "Tractor", "Pump", "Generator", "Drip System", "Borewell", "Sprayer", "Vehicle"];
+                const select = document.getElementById('equipmentType');
+                select.innerHTML = '<option value="">Select Type</option>';
+                fallbackTypes.forEach(type => {
+                    select.innerHTML += `<option value="${type}">${type}</option>`;
+                });
+            }
+        }
+
+        async function loadEquipmentZones() {
+            const locationId = document.getElementById('equipmentLocationId').value;
+            const zoneSelect = document.getElementById('equipmentZoneId');
+            
+            if (!locationId) {
+                zoneSelect.innerHTML = '<option value="">Select Zone</option>';
+                return;
+            }
+            
+            const response = await fetch(`/zones/location/${locationId}`);
+            const zones = await response.json();
+            zoneSelect.innerHTML = '<option value="">Select Zone</option>';
+            zones.forEach(zone => {
+                zoneSelect.innerHTML += `<option value="${zone.id}">${zone.name}</option>`;
+            });
+        }
+
+        function openEquipmentForm() {
+            document.getElementById('equipmentModalTitle').textContent = 'Add Equipment';
+            document.getElementById('editEquipmentId').value = '';
+            document.getElementById('equipmentName').value = '';
+            document.getElementById('equipmentType').value = '';
+            document.getElementById('equipmentLocationId').value = '';
+            document.getElementById('equipmentZoneId').value = '';
+            document.getElementById('equipmentSerial').value = '';
+            document.getElementById('equipmentPurchaseDate').value = '';
+            document.getElementById('equipmentPurchaseCost').value = '';
+            document.getElementById('equipmentRunningHours').value = '0';
+            document.getElementById('equipmentStatus').value = 'active';
+            document.getElementById('equipmentLastServiceDate').value = '';
+            document.getElementById('equipmentNextServiceDate').value = '';
+            document.getElementById('equipmentNotes').value = '';
+            document.getElementById('equipmentModal').style.display = 'block';
+        }
+
+        function closeEquipmentModal() {
+            document.getElementById('equipmentModal').style.display = 'none';
+        }
+
+        async function saveEquipment() {
+            const equipmentId = document.getElementById('editEquipmentId').value;
+            const equipmentData = {
+                equipment_name: document.getElementById('equipmentName').value,
+                equipment_type: document.getElementById('equipmentType').value,
+                location_id: parseInt(document.getElementById('equipmentLocationId').value),
+                zone_id: document.getElementById('equipmentZoneId').value ? parseInt(document.getElementById('equipmentZoneId').value) : null,
+                serial_number: document.getElementById('equipmentSerial').value || null,
+                purchase_date: document.getElementById('equipmentPurchaseDate').value || null,
+                purchase_cost: document.getElementById('equipmentPurchaseCost').value ? parseFloat(document.getElementById('equipmentPurchaseCost').value) : null,
+                status: document.getElementById('equipmentStatus').value,
+                running_hours: parseInt(document.getElementById('equipmentRunningHours').value) || 0,
+                last_service_date: document.getElementById('equipmentLastServiceDate').value || null,
+                next_service_date: document.getElementById('equipmentNextServiceDate').value || null,
+                notes: document.getElementById('equipmentNotes').value || null
+            };
+            
+            const url = equipmentId ? `/equipment/update/${equipmentId}` : '/equipment/add';
+            const method = equipmentId ? 'PUT' : 'POST';
+            
+            const response = await fetch(url, {
+                method: method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(equipmentData)
+            });
+            
+            if (response.ok) {
+                showMessage(equipmentId ? "Equipment updated!" : "Equipment added!", "success");
+                closeEquipmentModal();
+                loadEquipmentList();
+            } else {
+                const error = await response.json();
+                showMessage(error.detail || "Failed to save equipment", "error");
+            }
+        }
+
+        async function editEquipment(equipmentId) {
+            const response = await fetch(`/equipment/${equipmentId}`);
+            const eq = await response.json();
+            
+            document.getElementById('equipmentModalTitle').textContent = 'Edit Equipment';
+            document.getElementById('editEquipmentId').value = eq.id;
+            document.getElementById('equipmentName').value = eq.equipment_name;
+            document.getElementById('equipmentType').value = eq.equipment_type;
+            document.getElementById('equipmentLocationId').value = eq.location_id;
+            await loadEquipmentZones();
+            document.getElementById('equipmentZoneId').value = eq.zone_id || '';
+            document.getElementById('equipmentSerial').value = eq.serial_number || '';
+            document.getElementById('equipmentPurchaseDate').value = eq.purchase_date || '';
+            document.getElementById('equipmentPurchaseCost').value = eq.purchase_cost || '';
+            document.getElementById('equipmentRunningHours').value = eq.running_hours || 0;
+            document.getElementById('equipmentStatus').value = eq.status;
+            document.getElementById('equipmentLastServiceDate').value = eq.last_service_date || '';
+            document.getElementById('equipmentNextServiceDate').value = eq.next_service_date || '';
+            document.getElementById('equipmentNotes').value = eq.notes || '';
+            document.getElementById('equipmentModal').style.display = 'block';
+        }
+
+        async function viewEquipmentDetail(equipmentId) {
+            const response = await fetch(`/equipment/${equipmentId}`);
+            const eq = await response.json();
+            
+            const locRes = await fetch('/locations/all');
+            const locations = await locRes.json();
+            const location = locations.find(l => l.id === eq.location_id);
+            
+            let statusText = '';
+            if (eq.status === 'active') statusText = '🟢 Active';
+            else if (eq.status === 'service_due') statusText = '🟡 Service Due';
+            else if (eq.status === 'repair_required') statusText = '🔴 Repair Required';
+            else statusText = '⚫ Inactive';
+            
+            // Load maintenance history
+            const maintRes = await fetch(`/equipment/maintenance/${equipmentId}`);
+            const maintenance = await maintRes.json();
+            
+            let maintHtml = '<h4>🔧 Maintenance History</h4>';
+            if (maintenance.length === 0) {
+                maintHtml += '<p>No maintenance records</p>';
+            } else {
+                maintHtml += '<div class="table-container"><table style="width:100%; border-collapse: collapse;">';
+                maintHtml += '<tr style="background: #f0f0f0;"><th>Date</th><th>Type</th><th>Cost</th><th>Performed By</th><th>Notes</th></tr>';
+                for (const m of maintenance) {
+                    maintHtml += `
+                        <tr>
+                            <td>${new Date(m.maintenance_date).toLocaleDateString()}</td>
+                            <td>${m.maintenance_type}</td>
+                            <td>₹${m.cost || 0}</td>
+                            <td>${m.performed_by || '-'}</td>
+                            <td>${m.notes || '-'}</td>
+                        </tr>
+                    `;
+                }
+                maintHtml += '</table></div>';
+            }
+            
+            document.getElementById('detailTitle').textContent = eq.equipment_name;
+            document.getElementById('equipmentDetailContent').innerHTML = `
+                <p><strong>📍 Location:</strong> ${location ? location.name : 'Unknown'}${eq.zone_id ? ` - Zone ${eq.zone_id}` : ''}</p>
+                <p><strong>🔢 Serial Number:</strong> ${eq.serial_number || 'N/A'}</p>
+                <p><strong>📅 Purchase Date:</strong> ${eq.purchase_date ? new Date(eq.purchase_date).toLocaleDateString() : 'N/A'}</p>
+                <p><strong>💰 Purchase Cost:</strong> ${eq.purchase_cost ? `₹${eq.purchase_cost.toLocaleString()}` : 'N/A'}</p>
+                <p><strong>⏱️ Running Hours:</strong> ${eq.running_hours || 0} hrs</p>
+                <p><strong>📊 Status:</strong> ${statusText}</p>
+                <p><strong>🔧 Last Service:</strong> ${eq.last_service_date ? new Date(eq.last_service_date).toLocaleDateString() : 'Never'}</p>
+                <p><strong>📅 Next Service:</strong> ${eq.next_service_date ? new Date(eq.next_service_date).toLocaleDateString() : 'Not set'}</p>
+                <p><strong>📝 Notes:</strong> ${eq.notes || 'No notes'}</p>
+                <hr>
+                ${maintHtml}
+            `;
+            document.getElementById('equipmentDetailModal').style.display = 'block';
+        }
+
+        function closeEquipmentDetailModal() {
+            document.getElementById('equipmentDetailModal').style.display = 'none';
+        }
+
+        function openMaintenanceModal(equipmentId) {
+            document.getElementById('maintenanceEquipmentId').value = equipmentId;
+            document.getElementById('maintenanceDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('maintenanceType').value = 'preventive';
+            document.getElementById('maintenanceCost').value = '';
+            document.getElementById('maintenancePerformedBy').value = '';
+            document.getElementById('maintenanceRunningHours').value = '';
+            document.getElementById('maintenanceNotes').value = '';
+            document.getElementById('maintenanceModal').style.display = 'block';
+        }
+
+        function closeMaintenanceModal() {
+            document.getElementById('maintenanceModal').style.display = 'none';
+        }
+
+        async function saveMaintenance() {
+            const equipmentId = document.getElementById('maintenanceEquipmentId').value;
+            const maintenanceData = {
+                equipment_id: parseInt(equipmentId),
+                maintenance_date: document.getElementById('maintenanceDate').value,
+                maintenance_type: document.getElementById('maintenanceType').value,
+                cost: document.getElementById('maintenanceCost').value ? parseFloat(document.getElementById('maintenanceCost').value) : null,
+                performed_by: document.getElementById('maintenancePerformedBy').value || null,
+                running_hours_after: document.getElementById('maintenanceRunningHours').value ? parseInt(document.getElementById('maintenanceRunningHours').value) : null,
+                notes: document.getElementById('maintenanceNotes').value || null
+            };
+            
+            const response = await fetch('/equipment/maintenance/add', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(maintenanceData)
+            });
+            
+            if (response.ok) {
+                showMessage("Maintenance record added!", "success");
+                closeMaintenanceModal();
+                loadEquipmentList();
+            } else {
+                const error = await response.json();
+                showMessage(error.detail || "Failed to add maintenance", "error");
+            }
+        }
+        
+        
+        
         // ============================================
         // GRASS HEALTH FUNCTIONS
         // ============================================
@@ -3122,7 +3602,7 @@
         }
 
         function showAdminTab(tabName) {
-            const tabs = ['addTask', 'addLocation', 'addZone', 'manageZones', 'viewZones', 'addContact', 'viewUsers', 'viewTasks', 'grassHealth', 'addUser'];
+            const tabs = ['addTask', 'addLocation', 'addZone', 'manageZones', 'viewZones', 'addContact', 'viewUsers', 'viewTasks', 'grassHealth', 'equipment', 'addUser'];
             
             tabs.forEach(tab => {
                 const element = document.getElementById(`${tab}Form`);
@@ -3149,6 +3629,12 @@
                 loadAllGrassIssuesForReporting();
                 loadGrassLocations();
             }
+            if (tabName === 'equipment') {
+                loadEquipmentList();
+                loadEquipmentTypes();
+                loadLocationsForDropdowns();
+            }
+            
             if (sectionName === 'grassHealthWorker') {
                 loadWorkerGrassIssues();
             }
@@ -3307,6 +3793,21 @@
                     locations.forEach(loc => {
                         contactLocationSelect.innerHTML += `<option value="${loc.id}">${loc.name} (${loc.region})</option>`;
                     });
+                }
+                
+                // For Equipment Location dropdown
+                const equipmentLocationSelect = document.getElementById('equipmentLocationId');
+                if (equipmentLocationSelect) {
+                    equipmentLocationSelect.innerHTML = '<option value="">Select Location</option>';
+                    locations.forEach(loc => {
+                        equipmentLocationSelect.innerHTML += `<option value="${loc.id}">${loc.name} (${loc.region})</option>`;
+                    });
+                }
+                
+                // For Equipment Zone dropdown
+                const equipmentZoneSelect = document.getElementById('equipmentZoneId');
+                if (equipmentZoneSelect) {
+                    equipmentZoneSelect.innerHTML = '<option value="">Select Zone</option>';
                 }
                 
                 // For Task Assigned To dropdown (users)
@@ -3676,6 +4177,7 @@
             const taskData = {
                 title: document.getElementById('taskTitle').value,
                 description: document.getElementById('taskDesc').value,
+                task_category: document.getElementById('taskCategory').value,
                 task_type: document.getElementById('taskType').value,
                 time_slot: document.getElementById('taskTimeSlot').value,
                 location_id: parseInt(document.getElementById('taskLocationId').value),

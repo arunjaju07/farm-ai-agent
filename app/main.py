@@ -5,6 +5,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
 from app.routers import contact_router
 from app.routers import grass_health_router
+from app.routers import equipment_router
 from pathlib import Path
 
 from app.routers import (
@@ -43,6 +44,7 @@ app.include_router(upload_router.router)
 app.include_router(issue_router.router)
 app.include_router(contact_router.router)
 app.include_router(grass_health_router.router)
+app.include_router(equipment_router.router)
 
 # Root endpoint
 @app.get("/", response_class=HTMLResponse)

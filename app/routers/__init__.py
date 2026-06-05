@@ -7,3 +7,4 @@ from . import upload_router
 from . import issue_router
 from . import contact_router
 from . import grass_health_router  # ← ADD THIS
+from . import equipment_router

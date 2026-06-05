@@ -5,3 +5,4 @@ from .issue_model import Issue
 from .contact_model import Contact
 from .grass_health_model import GrassHealthIssue  # ← ADD THIS
 from .grass_health_comment_model import GrassHealthComment
+from .equipment_model import Equipment, EquipmentMaintenance
