@@ -26,7 +26,7 @@ def login_user(login: LoginRequest):
     db = SessionLocal()
     
     # Find user by username
-    user = db.query(User).filter(User.username == login.username).first()
+    user = db.query(User).filter(func.lower(User.username) == func.lower(login.username)).first()
     
     # Check if user exists and password matches
     if not user or user.password != login.password:

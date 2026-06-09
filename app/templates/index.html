@@ -663,7 +663,7 @@
                             <input type="file" id="grassAudio" accept="audio/*">
                             
                             <label>📹 Video Note (Optional):</label>
-                            <input type="file" id="grassVideo" accept="video/*">
+                            <input type="file" id="grassVideo" accept="video/*, video/mp4, video/3gp, video/mkv, video/avi">
                             
                             <div style="display: flex; gap: 10px; margin-top: 20px;">
                                 <button onclick="submitGrassReport()" style="background: #4CAF50; flex: 1;">✓ Submit Report</button>
@@ -845,7 +845,7 @@
                     <input type="file" id="issueAudio" accept="audio/*" capture="user" style="margin-bottom: 12px;">
                     
                     <label>🎥 Attach Video:</label>
-                    <input type="file" id="issueVideo" accept="video/*" capture="environment" style="margin-bottom: 12px;">
+                    <input type="file" id="issueVideo" accept="video/*, video/mp4, video/3gp, video/mkv, video/avi" capture="environment" style="margin-bottom: 12px;">
                     
                     <button onclick="reportIssue()">Submit Report</button>
                 </div>
@@ -892,7 +892,7 @@
                     <input type="file" id="workerGrassAudio" accept="audio/*" style="margin-bottom: 12px;">
                     
                     <label>📹 Video Note (Optional):</label>
-                    <input type="file" id="workerGrassVideo" accept="video/*" style="margin-bottom: 12px;">
+                    <input type="file" id="workerGrassVideo" accept="video/*, video/mp4, video/3gp, video/mkv, video/avi" style="margin-bottom: 12px;">
                     
                     <button onclick="analyzeWorkerGrassPhoto()" style="background: #9c27b0; margin-bottom: 12px;">🔬 Analyze with AI</button>
                     
@@ -3014,7 +3014,7 @@
                         <div style="display: flex; gap: 10px;">
                             <input type="file" id="workerReplyPhoto" accept="image/*" style="flex: 1;">
                             <input type="file" id="workerReplyAudio" accept="audio/*" style="flex: 1;">
-                            <input type="file" id="workerReplyVideo" accept="video/*" style="flex: 1;">
+                            <input type="file" id="workerReplyVideo" accept="video/*, video/mp4, video/3gp, video/mkv, video/avi" style="flex: 1;">
                         </div>
                         <button onclick="submitWorkerReply(${issueId})" style="background: #4CAF50; width: 100%; margin-top: 10px;">📤 Send Reply</button>
                     </div>
@@ -4854,7 +4854,7 @@
             <input type="file" id="progressAudio" accept="audio/*" capture="user" style="margin-bottom: 16px; width: 100%;">
             <label style="font-size: 12px; color: #666;">🎤 Record voice OR choose audio file</label>
             <label style="font-weight: bold; display: block; margin-bottom: 8px;">📹 Video (Optional)</label>
-            <input type="file" id="progressVideo" accept="video/*" capture="environment" style="margin-bottom: 16px; width: 100%;">
+            <input type="file" id="progressVideo" accept="video/*, video/mp4, video/3gp, video/mkv, video/avi" capture="environment" style="margin-bottom: 16px; width: 100%;">
             <label style="font-size: 12px; color: #666;">🎥 Record video OR choose from gallery</label>
 
 
