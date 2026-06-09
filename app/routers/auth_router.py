@@ -25,39 +25,44 @@ class LoginResponse(BaseModel):
 @router.post("/login")
 def login_user(login: LoginRequest):
     db = SessionLocal()
-    
-    # Find user by username
-    user = db.query(User).filter(func.lower(User.username) == func.lower(login.username)).first()
-    
-    # Check if user exists and password matches
-    if not user or user.password != login.password:
-        raise HTTPException(status_code=401, detail="Invalid username or password")
-    
-    # Login successful
-    return {
-        "message": f"Welcome back, {user.name}!",
-        "user_id": user.id,
-        "name": user.name,
-        "role": user.role,
-        "region": user.region,
-        "success": True
-    }
+    try:
+        # Find user by username
+        user = db.query(User).filter(func.lower(User.username) == func.lower(login.username)).first()
+        
+        # Check if user exists and password matches
+        if not user or user.password != login.password:
+            raise HTTPException(status_code=401, detail="Invalid username or password")
+        
+        # Login successful
+        return {
+            "message": f"Welcome back, {user.name}!",
+            "user_id": user.id,
+            "name": user.name,
+            "role": user.role,
+            "region": user.region,
+            "success": True
+        }
+    finally:
+        db.close()
 
 # Get user info (without password)
 @router.get("/user/{user_id}")
 def get_user_info(user_id: int):
     db = SessionLocal()
-    user = db.query(User).filter(User.id == user_id).first()
-    
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-    
-    return {
-        "id": user.id,
-        "name": user.name,
-        "role": user.role,
-        "phone": user.phone,
-        "username": user.username,
-        "language": user.language,
-        "region": user.region
-    }
+    try:
+        user = db.query(User).filter(User.id == user_id).first()
+        
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        return {
+            "id": user.id,
+            "name": user.name,
+            "role": user.role,
+            "phone": user.phone,
+            "username": user.username,
+            "language": user.language,
+            "region": user.region
+        }
+    finally:
+        db.close()
