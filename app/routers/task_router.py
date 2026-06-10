@@ -308,7 +308,8 @@ def update_task_progress(task_id: int, update: dict):
             comment=comment,
             water_released=water_released,
             photo_url=photo_url,
-            audio_url=audio_url
+            audio_url=audio_url,
+            video_url=video_url
         )
         db.add(history)
         

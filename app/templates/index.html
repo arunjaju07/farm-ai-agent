@@ -2342,7 +2342,7 @@
                 }
             }
             
-            // Upload video if any
+            // Upload video if selected
             let videoUrl = null;
             if (videoFile) {
                 const formData = new FormData();
@@ -2351,6 +2351,7 @@
                 if (response.ok) {
                     const result = await response.json();
                     videoUrl = result.url;
+                    console.log("📹 Video uploaded, URL:", videoUrl);
                 }
             }
             
@@ -4545,7 +4546,9 @@
                     if (record.media && record.media.audio) {
                         html += `<button onclick="viewMedia('${record.media.audio}', 'audio')" style="background: #9c27b0; padding: 6px 12px; width: auto; font-size: 12px; border: none; border-radius: 8px; cursor: pointer;">🎧 Listen Audio</button>`;
                     }
-                    
+                    if (record.media && record.media.video) {
+                        html += `<button onclick="viewMedia('${record.media.video}', 'video')" style="background: #e91e63; padding: 6px 12px; width: auto;">📹 Watch Video</button>`;
+                    }
                     html += `
                             </div>
                         </div>
@@ -4611,7 +4614,8 @@
             const waterReleased = document.getElementById('waterReleasedCheckbox').checked;
             const photoFile = document.getElementById('progressPhoto').files[0];
             const audioFile = document.getElementById('progressAudio').files[0];
-            
+            const videoFile = document.getElementById('progressVideo').files[0];
+
             if (!taskId) {
                 showMessage("No task selected", "error");
                 return;
@@ -4627,6 +4631,7 @@
             
             let photoUrl = null;
             let audioUrl = null;
+            let videoUrl = null;  // ← ADD THIS
             
             // Upload photo if selected
             if (photoFile) {
@@ -4636,9 +4641,9 @@
                 if (response.ok) {
                     const result = await response.json();
                     photoUrl = result.url;
-                    console.log("📸 Photo uploaded, URL:", photoUrl);  // ← ADD THIS LINE
+                    console.log("📸 Photo uploaded, URL:", photoUrl);
                 } else {
-                    console.log("Photo upload failed");  // ← ADD THIS LINE
+                    console.log("Photo upload failed");
                 }
             }
             
@@ -4650,21 +4655,37 @@
                 if (response.ok) {
                     const result = await response.json();
                     audioUrl = result.url;
-                    console.log("🎤 Audio uploaded, URL:", audioUrl);  // ← ADD THIS LINE
+                    console.log("🎤 Audio uploaded, URL:", audioUrl);
                 } else {
-                    console.log("Audio upload failed");  // ← ADD THIS LINE
+                    console.log("Audio upload failed");
                 }
             }
+            
+            // ========== ADD VIDEO UPLOAD ==========
+            if (videoFile) {
+                const formData = new FormData();
+                formData.append('file', videoFile);
+                const response = await fetch('/upload/video', { method: 'POST', body: formData });
+                if (response.ok) {
+                    const result = await response.json();
+                    videoUrl = result.url;
+                    console.log("📹 Video uploaded, URL:", videoUrl);
+                } else {
+                    console.log("Video upload failed");
+                }
+            }
+            // ======================================
             
             // Create simple comment
             const comment = audioFile ? `Voice note recorded - Progress: ${newProgress}%` : `Progress updated to ${newProgress}%`;
             
-            console.log("📦 Sending to backend:", {  // ← ADD THIS WHOLE BLOCK
+            console.log("📦 Sending to backend:", {
                 new_progress: newProgress,
                 comment: comment,
                 water_released: waterReleased,
                 photo_url: photoUrl,
-                audio_url: audioUrl
+                audio_url: audioUrl,
+                video_url: videoUrl  // ← ADD THIS
             });
             
             try {
@@ -4676,11 +4697,12 @@
                         comment: comment,
                         water_released: waterReleased,
                         photo_url: photoUrl,
-                        audio_url: audioUrl
+                        audio_url: audioUrl,
+                        video_url: videoUrl  // ← ADD THIS
                     })
                 });
                 
-                console.log("📡 Backend response status:", response.status);  // ← ADD THIS LINE
+                console.log("📡 Backend response status:", response.status);
                 
                 if (response.ok) {
                     const result = await response.json();
@@ -4691,11 +4713,9 @@
                     }
                     closeProgressModal();
                     
-                    // Refresh both views (without await)
                     if (typeof loadAllTasks === 'function') loadAllTasks();
                     if (typeof loadTasks === 'function') loadTasks();
                     
-                    // Force refresh for current active view after short delay
                     setTimeout(function() {
                         if (document.getElementById('tasksSection') && document.getElementById('tasksSection').classList.contains('active')) {
                             loadTasks();
@@ -4713,10 +4733,9 @@
                 console.error("Progress update error:", err);
                 showMessage('Network error', 'error');
             }
-        }  // ← Close async function
+        }
 
-
-        
+       
         
         // Function to get media for a completed task
         async function viewTaskMedia(completionId) {
