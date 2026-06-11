@@ -130,7 +130,8 @@ def complete_task(completion: TaskComplete):
         completed_by=completion.completed_by,
         completion_notes=completion.notes,
         image_url=completion.image_url,
-        audio_url=completion.audio_url
+        audio_url=completion.audio_url,
+        video_url=completion.video_url
     )
     
     db.add(task_completion)
@@ -286,7 +287,8 @@ def update_task_progress(task_id: int, update: dict):
         water_released = update.get("water_released", False)
         photo_url = update.get("photo_url")
         audio_url = update.get("audio_url")
-        
+        video_url = update.get("video_url")
+
         if new_progress not in [0, 25, 50, 75, 100]:
             db.close()
             raise HTTPException(status_code=400, detail="Progress must be 0, 25, 50, 75, or 100")

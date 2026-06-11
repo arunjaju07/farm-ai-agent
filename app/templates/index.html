@@ -3998,10 +3998,7 @@
             if (videoFile) {
                 const formData = new FormData();
                 formData.append('file', videoFile);
-                const response = await fetch('/upload/video', {
-                    method: 'POST',
-                    body: formData
-                });
+                const response = await fetch('/upload/video', { method: 'POST', body: formData });
                 if (response.ok) {
                     const result = await response.json();
                     videoUrl = result.url;
