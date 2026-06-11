@@ -3303,18 +3303,13 @@
                     if (adminDatePicker && adminDatePicker.value) {
                         selectedDate = adminDatePicker.value;
                     } else {
-                        // Use today's date if no date picker or no value
                         const today = new Date();
                         selectedDate = today.toISOString().split('T')[0];
                     }
                 }
                 
-                // ========== ADD THIS LINE ==========
                 const showAll = document.getElementById("showAllTasksAdmin")?.checked || false;
-                // ==================================
-
                 
-                // If no date selected, use today
                 if (!selectedDate) {
                     const today = new Date();
                     selectedDate = today.toISOString().split('T')[0];
@@ -3326,19 +3321,52 @@
                 let tasks = await response.json();
                 console.log("Tasks found:", tasks.length);
                 
+                console.log("Selected Date:", selectedDate);
+                console.log("Today's Date:", new Date().toISOString().split('T')[0]);
+                
                 // Filter by date
                 let filteredTasks = tasks;
                 if (selectedDate) {
                     filteredTasks = tasks.filter(task => {
-                        // Pending/In Progress tasks always show
-                        if (task.status !== 'completed') {
+                        const createdDate = task.created_at.split('T')[0];
+                        const completedDate = task.last_completed_at ? task.last_completed_at.split('T')[0] : null;
+                        
+                        // Water release tasks always show (no date filter)
+                        if (task.task_category === 'water_release') {
                             return true;
                         }
-                        // Completed tasks: only show if completed on selected date
-                        const completedDate = task.completed_at ? task.completed_at.split('T')[0] : null;
-                        return completedDate === selectedDate;
+                        
+                        // For completed tasks: ONLY show on dates between created and completed
+                        if (task.status === 'completed' && completedDate) {
+                            return selectedDate >= createdDate && selectedDate <= completedDate;
+                        }
+                        
+                        // For pending tasks: show from created date onwards
+                        if (task.status !== 'completed') {
+                            return selectedDate >= createdDate;
+                        }
+                        
+                        return false;
                     });
                 }
+                
+                // Calculate days pending for each task based on selected date (MOVED OUTSIDE FILTER)
+                filteredTasks = filteredTasks.map(task => {
+                    const selected = new Date(selectedDate);
+                    const created = new Date(task.created_at);
+                    let pendingDays = 0;
+                    
+                    if (task.status === 'completed') {
+                        const completed = new Date(task.completed_at);
+                        if (selected >= created && selected <= completed) {
+                            pendingDays = Math.ceil((completed - selected) / (1000 * 60 * 60 * 24));
+                        }
+                    } else {
+                        pendingDays = Math.max(0, Math.ceil((selected - created) / (1000 * 60 * 60 * 24)));
+                    }
+                    
+                    return { ...task, pendingDays };
+                });
                 
                 // Fetch all workers for assignment dropdown
                 const usersResponse = await fetch('/users');
@@ -3349,7 +3377,7 @@
                 const locationsResponse = await fetch('/locations/all');
                 const allLocations = await locationsResponse.json();
                 
-                // ========== LOCATION FILTER - MOVED HERE (AFTER allLocations is fetched) ==========
+                // Location filter
                 const locationFilter = document.getElementById("adminLocationFilter")?.value || "all";
                 if (locationFilter !== "all") {
                     filteredTasks = filteredTasks.filter(task => {
@@ -3375,31 +3403,28 @@
                 
                 let html = '<div class="table-container"><table style="width:100%; border-collapse: collapse;">';
                 html += '<tr style="background: #f0f0f0;"><th>ID</th><th>Title</th><th>Description</th><th>Assigned To</th><th>Progress</th><th>Water Release</th><th>Days Pending</th><th>Time Slot</th><th>Layout</th><th>Status</th><th>Media</th><th>Actions</th></tr>';
+                
                 for (const task of filteredTasks) {
                     // Get location for this task
                     const location = allLocations.find(l => l.id === task.location_id);
                     
-                    // Get layout button if location has layout_url
                     let layoutButton = '-';
                     if (location && location.layout_url) {
                         layoutButton = `<button onclick="viewLocationLayout('${location.layout_url}', '${location.name}')" style="background: #2196F3; padding: 3px 8px; width: auto; font-size: 10px;">🗺️ View Layout</button>`;
                     }
                     
-                    // Get current assigned user name
                     let assignedToName = 'Unassigned';
                     if (task.assigned_to) {
                         const assignedUser = allUsers.find(u => u.id === task.assigned_to);
                         assignedToName = assignedUser ? assignedUser.name : 'Unknown';
                     }
                     
-                    // Build dropdown options
                     let dropdownOptions = '<option value="">Unassign</option>';
                     workers.forEach(worker => {
                         const selected = task.assigned_to === worker.id ? 'selected' : '';
                         dropdownOptions += `<option value="${worker.id}" ${selected}>${worker.name}</option>`;
                     });
                     
-                    // ========== Progress Bar with Update Button ==========
                     const progress = task.progress_percentage || 0;
                     const progressBar = `
                         <div class="progress-container">
@@ -3410,7 +3435,6 @@
                         </div>
                     `;
                     
-                    // ========== Water Release Tracking ==========
                     let waterReleaseHtml = '<span style="color: #999;">Not tracked</span>';
                     if (task.last_water_release_date) {
                         const daysSince = getDaysSinceLastRelease(task.last_water_release_date);
@@ -3425,18 +3449,16 @@
                         waterReleaseHtml = '<span style="color: #999;">No release recorded</span>';
                     }
                     
-                    // ========== Days Pending ==========
                     let daysPendingHtml = '';
-                    if (task.days_pending === 0) {
+                    const pendingDays = task.pendingDays || 0;
+                    if (pendingDays === 0) {
                         daysPendingHtml = '<span style="color: #4CAF50;">✅ 0 days</span>';
-                    } else if (task.days_pending <= 2) {
-                        daysPendingHtml = `<span style="color: #ff9800;">⚠️ ${task.days_pending} day${task.days_pending > 1 ? 's' : ''}</span>`;
+                    } else if (pendingDays <= 2) {
+                        daysPendingHtml = `<span style="color: #ff9800;">⚠️ ${pendingDays} day${pendingDays > 1 ? 's' : ''}</span>`;
                     } else {
-                        daysPendingHtml = `<span style="color: #f44336;">🔴 ${task.days_pending} day${task.days_pending > 1 ? 's' : ''} overdue</span>`;
+                        daysPendingHtml = `<span style="color: #f44336;">🔴 ${pendingDays} day${pendingDays > 1 ? 's' : ''} overdue</span>`;
                     }
-                                       
                     
-                    // Fetch completion media if task is completed
                     let mediaButtons = '';
                     if (task.status === "completed") {
                         try {
@@ -3461,13 +3483,11 @@
                         }
                     }
                     
-                    // Show recurring badge if applicable
                     let recurringBadge = '';
                     if (task.recurring !== 'none' && task.recurring !== null) {
                         recurringBadge = `<br><small style="color: #2196F3;">🔄 ${task.recurring}${task.recurring_interval ? ` (every ${task.recurring_interval} days)` : ''}</small>`;
                     }
                     
-                    // Status color
                     const statusColor = task.status === 'completed' ? '#4CAF50' : (task.progress_percentage > 0 ? '#2196F3' : '#ff9800');
                     const statusText = task.status === 'completed' ? 'Completed' : (task.progress_percentage > 0 ? `In Progress (${task.progress_percentage}%)` : 'Pending');
                     
@@ -3501,6 +3521,7 @@
                 html += '</table></div>';
                 container.innerHTML = html;
                 console.log("✅ Tasks displayed:", filteredTasks.length);
+                
             } catch (error) {
                 console.error("Error loading tasks:", error);
                 const container = document.getElementById('allTasksList');

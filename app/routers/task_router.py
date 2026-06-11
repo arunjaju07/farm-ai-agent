@@ -86,34 +86,36 @@ def get_user_tasks(user_id: int):
 def get_all_tasks():
     db = SessionLocal()
     tasks = db.query(Task).all()
+    result = []
     for task in tasks:
         task.days_pending = calculate_days_pending(task)
+        result.append({
+            "id": task.id,
+            "title": task.title,
+            "description": task.description,
+            "task_type": task.task_type,
+            "time_slot": task.time_slot,
+            "location_id": task.location_id,
+            "zone_id": task.zone_id,
+            "assigned_to": task.assigned_to,
+            "created_by": task.created_by,
+            "status": task.status,
+            "progress_percentage": task.progress_percentage,
+            "current_cycle": task.current_cycle,
+            "cycle_start_date": task.cycle_start_date,
+            "last_water_release_date": task.last_water_release_date,
+            "days_pending": task.days_pending,
+            "task_category": task.task_category,
+            "is_zone_based": task.is_zone_based,
+            "recurring": task.recurring,
+            "recurring_interval": task.recurring_interval,
+            "due_date": task.due_date,
+            "created_at": task.created_at,
+            "last_completed_at": task.last_completed_at
+        })
     db.close()
-    return tasks
+    return result
 
-# Get tasks by region
-@router.get("/region/{region}")
-def get_tasks_by_region(region: str):
-    db = SessionLocal()
-    tasks = db.query(Task).join(Location).filter(Location.region == region).all()
-    db.close()
-    return [
-        {
-            "id": t.id,
-            "title": t.title,
-            "description": t.description,
-            "task_type": t.task_type,
-            "time_slot": t.time_slot,
-            "location_id": t.location_id,
-            "zone_id": t.zone_id,
-            "status": t.status,
-            "due_date": t.due_date,
-            "created_at": t.created_at
-        }
-        for t in tasks
-    ]
-
-# Complete a task
 @router.post("/complete")
 def complete_task(completion: TaskComplete):
     db = SessionLocal()
@@ -124,6 +126,10 @@ def complete_task(completion: TaskComplete):
         raise HTTPException(status_code=404, detail="Task not found")
     
     task.status = "completed"
+    
+    # ========== ADD THIS LINE HERE ==========
+    task.last_completed_at = datetime.now(timezone.utc)
+    # =======================================
     
     task_completion = TaskCompletion(
         task_id=completion.task_id,
