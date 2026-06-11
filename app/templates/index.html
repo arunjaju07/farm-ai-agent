@@ -3328,15 +3328,15 @@
                 
                 // Filter by date
                 let filteredTasks = tasks;
-                
-                if (selectedDate && !showAll) {
+                if (selectedDate) {
                     filteredTasks = tasks.filter(task => {
-                        // Water release tasks always show
-                        if (task.task_category === 'water_release') {
+                        // Pending/In Progress tasks always show
+                        if (task.status !== 'completed') {
                             return true;
                         }
-                        const taskDate = task.due_date ? task.due_date.split('T')[0] : task.created_at.split('T')[0];
-                        return taskDate === selectedDate;
+                        // Completed tasks: only show if completed on selected date
+                        const completedDate = task.completed_at ? task.completed_at.split('T')[0] : null;
+                        return completedDate === selectedDate;
                     });
                 }
                 
