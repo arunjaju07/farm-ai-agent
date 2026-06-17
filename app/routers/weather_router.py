@@ -4,8 +4,12 @@ from typing import Optional, List
 import requests
 import os
 from datetime import datetime, timedelta
+from dotenv import load_dotenv
 from app.database.db import SessionLocal
 from app.models.location_model import Location
+
+# Load environment variables
+load_dotenv()
 
 router = APIRouter()
 
@@ -13,10 +17,15 @@ router = APIRouter()
 OPENWEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY", "")
 WEATHER_API_URL = "https://api.openweathermap.org/data/2.5"
 
+# 🚨 DEBUG: Check if key is loaded
+print(f"🔍 Weather API Key loaded: {'✅ Yes' if OPENWEATHER_API_KEY else '❌ No'}")
+print(f"🔍 Key length: {len(OPENWEATHER_API_KEY) if OPENWEATHER_API_KEY else 0}")
+print(f"🔍 First 4 chars: {OPENWEATHER_API_KEY[:4] if OPENWEATHER_API_KEY else 'None'}")
+
 # Request/Response models
 class WeatherRequest(BaseModel):
     location_id: int
-    
+
 class WeatherResponse(BaseModel):
     location_name: str
     region: str
@@ -34,17 +43,6 @@ class WeatherResponse(BaseModel):
     sunset: str
     last_updated: str
     forecast: List[dict]
-
-class ForecastResponse(BaseModel):
-    date: str
-    temperature_min: float
-    temperature_max: float
-    weather_main: str
-    weather_description: str
-    weather_icon: str
-    humidity: int
-    wind_speed: float
-    rain_probability: float
 
 @router.get("/weather/locations")
 def get_weather_locations():
@@ -64,16 +62,11 @@ def get_weather_locations():
     finally:
         db.close()
 
-# Weather API configuration
-OPENWEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY", "")  # ← DO NOT hardcode the key here!
-WEATHER_API_URL = "https://api.openweathermap.org/data/2.5"
-
-# ... (rest of your imports and code)
-
 @router.post("/weather/current")
 def get_current_weather(request: WeatherRequest):
     if not OPENWEATHER_API_KEY:
-        raise HTTPException(status_code=503, detail="Weather service not configured")
+        print("❌ OPENWEATHER_API_KEY is empty!")
+        raise HTTPException(status_code=503, detail="Weather service not configured - API key missing")
     
     db = SessionLocal()
     try:
@@ -82,20 +75,19 @@ def get_current_weather(request: WeatherRequest):
         if not location:
             raise HTTPException(status_code=404, detail="Location not found")
         
-        # ========== UPDATED COORDINATES ==========
-        # EXACT coordinates based on location name/region
-        if "Morshi" in location.name or "Maharashtra" in location.region:
-            lat = 21.3266   # Exact Morshi, Amravati coordinates
+        # EXACT coordinates for your locations
+        if "Maharashtra" in location.region or "Morshi" in location.name:
+            lat = 21.3266   # Morshi, Amravati
             lon = 77.99628
-        elif "Ramanjapur" in location.name or "Ramanjapur" in location.region:
-            lat = 18.33284  # Exact Rāmanjāpur, Telangana coordinates
+        elif "Ramanjapur" in location.region or "Ramanjapur" in location.name:
+            lat = 18.33284  # Rāmanjāpur, Telangana
             lon = 78.6187
         else:
-            # Fallback coordinates (in case of unknown location)
             lat = 17.3850   # Default to Hyderabad
             lon = 78.4867
-        # ========================================
-            
+        
+        print(f"📍 Fetching weather for: {location.name} ({lat}, {lon})")
+        
         # Get current weather
         current_url = f"{WEATHER_API_URL}/weather"
         current_params = {
@@ -109,7 +101,6 @@ def get_current_weather(request: WeatherRequest):
         current_response.raise_for_status()
         current_data = current_response.json()
         
-        
         # Get 5-day forecast
         forecast_url = f"{WEATHER_API_URL}/forecast"
         forecast_params = {
@@ -117,7 +108,7 @@ def get_current_weather(request: WeatherRequest):
             "lon": lon,
             "appid": OPENWEATHER_API_KEY,
             "units": "metric",
-            "cnt": 40  # 5 days * 8 readings per day
+            "cnt": 40
         }
         
         forecast_response = requests.get(forecast_url, params=forecast_params)
@@ -138,22 +129,13 @@ def get_current_weather(request: WeatherRequest):
                     'weather_icon': item['weather'][0]['icon'],
                     'rain_probability': item.get('pop', 0) * 100
                 }
-                daily_forecasts[date_str]['temps'].append(item['main']['temp'])
-                daily_forecasts[date_str]['humidity'].append(item['main']['humidity'])
-                daily_forecasts[date_str]['wind_speed'].append(item['wind']['speed'])
-            else:
-                daily_forecasts[date_str]['temps'].append(item['main']['temp'])
-                daily_forecasts[date_str]['humidity'].append(item['main']['humidity'])
-                daily_forecasts[date_str]['wind_speed'].append(item['wind']['speed'])
-                # Update weather for the day
-                if item['weather'][0]['main'] != daily_forecasts[date_str]['weather_main']:
-                    daily_forecasts[date_str]['weather_main'] = item['weather'][0]['main']
-                    daily_forecasts[date_str]['weather_description'] = item['weather'][0]['description']
-                    daily_forecasts[date_str]['weather_icon'] = item['weather'][0]['icon']
+            daily_forecasts[date_str]['temps'].append(item['main']['temp'])
+            daily_forecasts[date_str]['humidity'].append(item['main']['humidity'])
+            daily_forecasts[date_str]['wind_speed'].append(item['wind']['speed'])
         
         # Build forecast list
         forecast_list = []
-        for date_str, data in list(daily_forecasts.items())[:5]:  # Max 5 days
+        for date_str, data in list(daily_forecasts.items())[:5]:
             if data['temps']:
                 forecast_list.append({
                     'date': date_str,
@@ -191,8 +173,10 @@ def get_current_weather(request: WeatherRequest):
         }
         
     except requests.exceptions.RequestException as e:
+        print(f"❌ Weather API error: {e}")
         raise HTTPException(status_code=500, detail=f"Weather API error: {str(e)}")
     except Exception as e:
+        print(f"❌ Error: {e}")
         raise HTTPException(status_code=500, detail=f"Error fetching weather: {str(e)}")
     finally:
         db.close()
@@ -209,13 +193,16 @@ def get_weather_forecast(location_id: int):
         if not location:
             raise HTTPException(status_code=404, detail="Location not found")
         
-        # Use same coordinates as above
-        lat = 17.3850
-        lon = 78.4867
-        
+        # Coordinates
         if "Maharashtra" in location.region:
-            lat = 18.5204
-            lon = 73.8567
+            lat = 21.3266
+            lon = 77.99628
+        elif "Ramanjapur" in location.region:
+            lat = 18.33284
+            lon = 78.6187
+        else:
+            lat = 17.3850
+            lon = 78.4867
         
         forecast_url = f"{WEATHER_API_URL}/forecast"
         forecast_params = {
@@ -242,8 +229,6 @@ def get_weather_forecast(location_id: int):
                     'rain_probability': item.get('pop', 0) * 100
                 }
             daily_forecasts[date_str]['temps'].append(item['main']['temp'])
-            if item.get('pop', 0) * 100 > daily_forecasts[date_str]['rain_probability']:
-                daily_forecasts[date_str]['rain_probability'] = item.get('pop', 0) * 100
         
         forecast_list = []
         for date_str, data in list(daily_forecasts.items())[:5]:

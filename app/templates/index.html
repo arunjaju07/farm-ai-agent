@@ -436,11 +436,20 @@
                     <div id="viewTasksForm" class="admin-tab" style="display: none;">
                         <h3>📊 Task Status (Assign, Complete, View Media)</h3>
                         
-                        <!-- Date Filter for Admin -->
+                        <!-- Date Filter -->
                         <label style="display: block; margin: 12px 0 8px 0; font-weight: 500;">Filter by Date:</label>
                         <input type="date" id="adminTaskDatePicker" style="margin-bottom: 12px; width: auto; display: inline-block; margin-right: 10px;">
                         <button onclick="loadAllTasks()" style="width: auto; padding: 8px 16px; background: #2196F3;">🔍 Filter</button>
                         <button onclick="clearAdminDateFilter()" style="width: auto; padding: 8px 16px; background: #999;">Clear</button>
+                        
+                        <!-- ========== NEW: USER FILTER ========== -->
+                        <div style="margin: 12px 0; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                            <label style="font-weight: 500;">👤 Filter by Worker:</label>
+                            <select id="adminUserFilter" onchange="loadAllTasks()" style="width: auto; padding: 8px; min-width: 150px;">
+                                <option value="all">👥 All Workers</option>
+                            </select>
+                        </div>
+                        <!-- ======================================== -->
                         
                         <label style="display: flex; align-items: center; margin-bottom: 12px; gap: 8px;">
                             <input type="checkbox" id="showAllTasksAdmin" onchange="loadAllTasks()">
@@ -822,6 +831,31 @@
                 </div>
             </div>
 
+            <!-- Worker Completed Tasks Section -->
+                <div id="completedTasksSection" class="section">
+                    <div class="card">
+                        <div class="card-title">✅ My Completed Tasks</div>
+                        
+                        <!-- Date Range Filter -->
+                        <div style="margin: 12px 0; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                            <label style="font-weight: 500;">From:</label>
+                            <input type="date" id="completedFromDate" style="width: auto; padding: 8px;">
+                            <label style="font-weight: 500;">To:</label>
+                            <input type="date" id="completedToDate" style="width: auto; padding: 8px;">
+                            <button onclick="loadCompletedTasks()" style="width: auto; padding: 8px 16px; background: #2196F3;">🔍 Filter</button>
+                            <button onclick="clearCompletedDateFilter()" style="width: auto; padding: 8px 16px; background: #999;">Clear</button>
+                        </div>
+                        
+                        <!-- Stats Summary -->
+                        <div id="completedStats" style="display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 16px;"></div>
+                        
+                        <!-- Completed Tasks List -->
+                        <div id="completedTasksList" style="max-height: 500px; overflow-y: auto;">
+                            <p style="color: #999;">Loading completed tasks...</p>
+                        </div>
+                    </div>
+                </div>
+            
             <!-- Report Issue Section -->
             <div id="reportIssueSection" class="section">
                 <div class="card">
@@ -921,12 +955,12 @@
                         </span>
                     </div>
                     
-                    <div style="margin-bottom: 16px;">
-                        <label style="display: block; margin-bottom: 8px; font-weight: 500;">📍 Select Location:</label>
+                    <div id="weatherLocationSelector" style="margin-bottom: 16px;">
+                        <label id="weatherLocationLabel" style="display: block; margin-bottom: 8px; font-weight: 500;">📍 Select Location:</label>
                         <select id="weatherLocationSelect" onchange="fetchWeather()" style="width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #ddd;">
                             <option value="">Select a location</option>
                         </select>
-                        <p id="weatherLocationInfo" style="font-size: 12px; color: #999; margin-top: 4px;"></p>
+                        <p id="weatherLocationInfo" style="font-size: 13px; color: #666; margin-top: 6px;"></p>
                     </div>
                     
                     <div id="weatherLoading" style="display: none; text-align: center; padding: 40px;">
@@ -1027,8 +1061,9 @@
         <button class="nav-btn" onclick="showSection('tasks')">📋 Tasks</button>
         <button class="nav-btn" onclick="showSection('locations')">📍 Farms</button>
         <button class="nav-btn" onclick="showSection('reportIssue')">🚨 Report</button>
-        <button class="nav-btn" onclick="showSection('grassHealthWorker')">🌿 Health</button>            <button class="nav-btn" onclick="showSection('weather')">🌤️ Weather</button>
+        <button class="nav-btn" onclick="showSection('grassHealthWorker')">🌿 Health</button>
         <button class="nav-btn" onclick="showSection('weather')">🌤️ Weather</button>
+        <button class="nav-btn" onclick="showSection('completedTasks')" id="completedTasksNavBtn" style="display: none;">✅ Completed</button>
     </div>
 
     <script>
@@ -1105,6 +1140,8 @@
             document.getElementById("reportIssueSection").classList.remove("active");
             document.getElementById("adminSection").classList.remove("active");  // 👈 ADD THIS
             document.getElementById("grassHealthWorkerSection").classList.remove("active"); // Add this
+            document.getElementById("weatherSection").classList.remove("active"); // 👈 ADD THIS LINE
+            document.getElementById("completedTasksSection").classList.remove("active"); // 👈 ADD THIS
 
             // Show selected section
             document.getElementById(`${sectionName}Section`).classList.add("active");
@@ -1122,7 +1159,14 @@
             if (sectionName === "grassHealthWorker") {
                 loadWorkerGrassIssues();  // ← ADD THIS
             }
+            if (sectionName === "weather") { // 👈 ADD THIS BLOCK
+                loadWeatherLocations();
+            
+            }
+            if (sectionName === "completedTasks") { // 👈 ADD THIS
+                loadCompletedTasks();
 
+            }
             if (sectionName === "admin") {
                 // Only admin and supervisor can access admin panel
                 if (currentUser.role !== "admin" && currentUser.role !== "supervisor" && currentUser.role !== "Admin") {
@@ -1154,6 +1198,18 @@
                     document.getElementById("loginSection").classList.remove("active");
                     document.getElementById("appSection").classList.add("active");
                     document.getElementById("bottomNav").style.display = "flex";
+                    
+                    // ========== NEW: Show/Hide Completed Tasks Button ==========
+                    const completedNavBtn = document.getElementById("completedTasksNavBtn");
+                    if (completedNavBtn) {
+                        if (currentUser.role.toLowerCase() === "worker") {
+                            completedNavBtn.style.display = "block";
+                        } else {
+                            completedNavBtn.style.display = "none";
+                        }
+                    }
+                    // ==========================================================
+
                     
                     // Show admin button only for admin and supervisor (NOT for worker)
                     if (currentUser.role.toLowerCase() === "admin" || currentUser.role.toLowerCase() === "supervisor") {
@@ -2818,6 +2874,185 @@
         
         
         // ============================================
+        // WORKER COMPLETED TASKS HISTORY
+        // ============================================
+
+        async function loadCompletedTasks() {
+            if (!currentUser) return;
+            
+            // Get date range
+            let fromDate = document.getElementById('completedFromDate')?.value;
+            let toDate = document.getElementById('completedToDate')?.value;
+            
+            // Default to last 30 days if not set
+            if (!fromDate) {
+                const thirtyDaysAgo = new Date();
+                thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+                fromDate = thirtyDaysAgo.toISOString().split('T')[0];
+                document.getElementById('completedFromDate').value = fromDate;
+            }
+            if (!toDate) {
+                const today = new Date();
+                toDate = today.toISOString().split('T')[0];
+                document.getElementById('completedToDate').value = toDate;
+            }
+            
+            try {
+                // Fetch all tasks completed by this worker
+                const response = await fetch(`/tasks/user/${currentUser.user_id}`);
+                if (!response.ok) {
+                    showMessage("Failed to load completed tasks", "error");
+                    return;
+                }
+                
+                let tasks = await response.json();
+                
+                // Filter only completed tasks
+                let completedTasks = tasks.filter(task => task.status === 'completed');
+                
+                // Filter by date range
+                completedTasks = completedTasks.filter(task => {
+                    if (!task.completed_at) return false;
+                    const completedDate = task.completed_at.split('T')[0];
+                    return completedDate >= fromDate && completedDate <= toDate;
+                });
+                
+                // Sort by completion date (newest first)
+                completedTasks.sort((a, b) => {
+                    return new Date(b.completed_at) - new Date(a.completed_at);
+                });
+                
+                // Display stats
+                displayCompletedStats(completedTasks);
+                
+                // Display tasks
+                displayCompletedTasks(completedTasks, fromDate, toDate);
+                
+            } catch (err) {
+                console.error("Error loading completed tasks:", err);
+                showMessage("Error loading completed tasks", "error");
+            }
+        }
+
+        function displayCompletedStats(tasks) {
+            const container = document.getElementById('completedStats');
+            
+            // Calculate stats
+            const totalTasks = tasks.length;
+            const uniqueLocations = new Set(tasks.map(t => t.location_id)).size;
+            const lastWeek = tasks.filter(t => {
+                const completedDate = new Date(t.completed_at);
+                const weekAgo = new Date();
+                weekAgo.setDate(weekAgo.getDate() - 7);
+                return completedDate >= weekAgo;
+            }).length;
+            
+            container.innerHTML = `
+                <div style="background: #e8f5e9; padding: 15px; border-radius: 10px; flex: 1; text-align: center; min-width: 100px;">
+                    <h4>✅ Total Completed</h4>
+                    <p style="font-size: 28px; margin: 0;">${totalTasks}</p>
+                </div>
+                <div style="background: #e3f2fd; padding: 15px; border-radius: 10px; flex: 1; text-align: center; min-width: 100px;">
+                    <h4>📍 Locations</h4>
+                    <p style="font-size: 28px; margin: 0;">${uniqueLocations}</p>
+                </div>
+                <div style="background: #fff3e0; padding: 15px; border-radius: 10px; flex: 1; text-align: center; min-width: 100px;">
+                    <h4>📅 Last 7 Days</h4>
+                    <p style="font-size: 28px; margin: 0;">${lastWeek}</p>
+                </div>
+            `;
+        }
+
+        async function displayCompletedTasks(tasks, fromDate, toDate) {
+            const container = document.getElementById('completedTasksList');
+            
+            if (tasks.length === 0) {
+                container.innerHTML = `
+                    <p style="color: #999; text-align: center; padding: 40px;">
+                        ✅ No completed tasks found<br>
+                        <small style="font-size: 12px;">From ${fromDate} to ${toDate}</small>
+                    </p>
+                `;
+                return;
+            }
+            
+            // Fetch locations for names
+            const locRes = await fetch('/locations/all');
+            const locations = await locRes.json();
+            
+            let html = `
+                <p style="font-size: 12px; color: #666; margin-bottom: 12px;">
+                    Showing ${tasks.length} completed tasks from ${fromDate} to ${toDate}
+                </p>
+            `;
+            
+            for (const task of tasks) {
+                const location = locations.find(l => l.id === task.location_id);
+                const locationName = location ? location.name : 'Unknown';
+                
+                // Get completion media
+                let mediaButtons = '';
+                try {
+                    const completionsRes = await fetch(`/tasks/completions/${task.id}`);
+                    if (completionsRes.ok) {
+                        const completions = await completionsRes.json();
+                        if (completions.length > 0) {
+                            const media = completions[0];
+                            if (media.image_url) {
+                                mediaButtons += `<button onclick="viewMedia('${media.image_url}', 'image')" style="background: #2196F3; padding: 3px 8px; width: auto; margin-right: 3px; font-size: 11px;">📷 Photo</button>`;
+                            }
+                            if (media.audio_url) {
+                                mediaButtons += `<button onclick="viewMedia('${media.audio_url}', 'audio')" style="background: #9c27b0; padding: 3px 8px; width: auto; margin-right: 3px; font-size: 11px;">🎧 Audio</button>`;
+                            }
+                            if (media.video_url) {
+                                mediaButtons += `<button onclick="viewMedia('${media.video_url}', 'video')" style="background: #e91e63; padding: 3px 8px; width: auto; margin-right: 3px; font-size: 11px;">🎥 Video</button>`;
+                            }
+                        }
+                    }
+                } catch (err) {
+                    console.error("Error fetching media:", err);
+                }
+                
+                const completedDate = task.completed_at ? new Date(task.completed_at).toLocaleString() : 'Unknown';
+                
+                html += `
+                    <div class="task-item" style="border-left-color: #4CAF50; margin-bottom: 12px;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                            <div>
+                                <strong>${task.title}</strong>
+                                ${task.task_category === 'water_release' ? '<span style="font-size: 11px; color: #2196F3;"> 💧 Water Release</span>' : ''}
+                                <p style="font-size: 12px; color: #666; margin-top: 4px;">${task.description || 'No description'}</p>
+                                <p style="font-size: 11px; color: #999;">
+                                    📍 ${locationName} | ⏱️ ${task.time_slot}
+                                </p>
+                                <p style="font-size: 11px; color: #999;">
+                                    ✅ Completed: ${completedDate}
+                                </p>
+                                ${task.notes ? `<p style="font-size: 12px; color: #666; margin-top: 4px;">📝 ${task.notes}</p>` : ''}
+                            </div>
+                            <span style="background: #4CAF50; color: white; padding: 2px 10px; border-radius: 10px; font-size: 11px;">✅ Done</span>
+                        </div>
+                        ${mediaButtons ? `<div style="margin-top: 8px;">${mediaButtons}</div>` : ''}
+                    </div>
+                `;
+            }
+            
+            container.innerHTML = html;
+        }
+
+        function clearCompletedDateFilter() {
+            const thirtyDaysAgo = new Date();
+            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+            const fromDate = thirtyDaysAgo.toISOString().split('T')[0];
+            const toDate = new Date().toISOString().split('T')[0];
+            
+            document.getElementById('completedFromDate').value = fromDate;
+            document.getElementById('completedToDate').value = toDate;
+            
+            loadCompletedTasks();
+        }
+        
+        // ============================================
         // WORKER GRASS HEALTH FUNCTIONS
         // ============================================
 
@@ -3255,6 +3490,184 @@
             }
         }
         
+        // ============================================
+        // WEATHER FUNCTIONS - Role-Based Access
+        // ============================================
+
+        let weatherLocations = [];
+
+        async function loadWeatherLocations() {
+            try {
+                const response = await fetch('/weather/locations');
+                if (response.ok) {
+                    let locations = await response.json();
+                    
+                    const select = document.getElementById('weatherLocationSelect');
+                    const infoText = document.getElementById('weatherLocationInfo');
+                    const roleBadge = document.getElementById('weatherUserRole');
+                    
+                    // Show user role badge
+                    if (roleBadge && currentUser) {
+                        roleBadge.textContent = currentUser.role.charAt(0).toUpperCase() + currentUser.role.slice(1);
+                        if (currentUser.role === 'worker' && currentUser.region) {
+                            roleBadge.textContent += ` (${currentUser.region})`;
+                        }
+                    }
+                    
+                    // 🔒 ROLE-BASED FILTERING
+                    if (currentUser && currentUser.role === 'worker' && currentUser.region) {
+                        // WORKER: Filter by their region only
+                        locations = locations.filter(loc => loc.region === currentUser.region);
+                        
+                        if (locations.length === 0) {
+                            select.innerHTML = '<option value="">No locations in your region</option>';
+                            if (infoText) infoText.textContent = '⚠️ No locations found for your region.';
+                            return;
+                        }
+                        
+                        // HIDE dropdown for workers - auto-select and fetch
+                        select.style.display = 'none';
+                        if (infoText) {
+                            infoText.textContent = `📍 Showing weather for: ${currentUser.region}`;
+                            infoText.style.color = '#2e7d32';
+                            infoText.style.fontWeight = '500';
+                        }
+                        
+                        // Auto-select first location and fetch weather
+                        select.value = locations[0].id;
+                        fetchWeather(); // Auto-fetch weather
+                        
+                    } else {
+                        // ADMIN or SUPERVISOR: Show ALL locations with dropdown
+                        select.style.display = 'block';
+                        if (infoText) {
+                            infoText.textContent = '🌍 Select a location to view weather';
+                            infoText.style.color = '#666';
+                            infoText.style.fontWeight = 'normal';
+                        }
+                        
+                        select.innerHTML = '<option value="">Select a location</option>';
+                        locations.forEach(loc => {
+                            select.innerHTML += `<option value="${loc.id}">${loc.name} (${loc.region})</option>`;
+                        });
+                    }
+                } else {
+                    console.error('Failed to load weather locations');
+                }
+            } catch (err) {
+                console.error('Error loading weather locations:', err);
+            }
+        }
+
+        async function fetchWeather() {
+            const locationId = document.getElementById('weatherLocationSelect').value;
+            
+            if (!locationId) {
+                document.getElementById('weatherContent').style.display = 'none';
+                document.getElementById('weatherError').style.display = 'none';
+                return;
+            }
+            
+            // Show loading
+            document.getElementById('weatherLoading').style.display = 'block';
+            document.getElementById('weatherContent').style.display = 'none';
+            document.getElementById('weatherError').style.display = 'none';
+            
+            try {
+                const response = await fetch('/weather/current', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ location_id: parseInt(locationId) })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    displayWeather(data);
+                    document.getElementById('weatherLoading').style.display = 'none';
+                    document.getElementById('weatherContent').style.display = 'block';
+                } else {
+                    const error = await response.json();
+                    document.getElementById('weatherLoading').style.display = 'none';
+                    document.getElementById('weatherErrorMessage').textContent = error.detail || 'Failed to fetch weather data';
+                    document.getElementById('weatherError').style.display = 'block';
+                }
+            } catch (err) {
+                console.error('Weather fetch error:', err);
+                document.getElementById('weatherLoading').style.display = 'none';
+                document.getElementById('weatherErrorMessage').textContent = 'Network error. Please try again.';
+                document.getElementById('weatherError').style.display = 'block';
+            }
+        }
+
+        function displayWeather(data) {
+            // Current weather
+            document.getElementById('weatherLocation').textContent = data.location_name;
+            document.getElementById('weatherRegion').textContent = data.region;
+            document.getElementById('weatherTemp').textContent = Math.round(data.temperature_celsius);
+            document.getElementById('weatherDescription').textContent = data.weather_description.charAt(0).toUpperCase() + data.weather_description.slice(1);
+            document.getElementById('weatherFeelsLike').textContent = Math.round(data.feels_like);
+            document.getElementById('weatherHumidity').textContent = data.humidity;
+            document.getElementById('weatherWind').textContent = Math.round(data.wind_speed * 3.6); // Convert m/s to km/h
+            document.getElementById('weatherPressure').textContent = data.pressure;
+            document.getElementById('weatherSunrise').textContent = data.sunrise;
+            document.getElementById('weatherSunset').textContent = data.sunset;
+            document.getElementById('weatherLastUpdated').textContent = data.last_updated;
+            
+            // Weather icon mapping
+            const iconMap = {
+                '01d': '☀️', '01n': '🌙',
+                '02d': '⛅', '02n': '☁️',
+                '03d': '☁️', '03n': '☁️',
+                '04d': '☁️', '04n': '☁️',
+                '09d': '🌧️', '09n': '🌧️',
+                '10d': '🌦️', '10n': '🌧️',
+                '11d': '⛈️', '11n': '⛈️',
+                '13d': '❄️', '13n': '❄️',
+                '50d': '🌫️', '50n': '🌫️'
+            };
+            
+            document.getElementById('weatherIcon').textContent = iconMap[data.weather_icon] || '🌤️';
+            document.getElementById('weatherMain').textContent = data.weather_main;
+            
+            // Forecast
+            const forecastContainer = document.getElementById('weatherForecast');
+            forecastContainer.innerHTML = '';
+            
+            if (data.forecast && data.forecast.length > 0) {
+                data.forecast.forEach(day => {
+                    const date = new Date(day.date);
+                    const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
+                    const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                    
+                    const iconMapForecast = {
+                        '01d': '☀️', '01n': '🌙',
+                        '02d': '⛅', '02n': '☁️',
+                        '03d': '☁️', '03n': '☁️',
+                        '04d': '☁️', '04n': '☁️',
+                        '09d': '🌧️', '09n': '🌧️',
+                        '10d': '🌦️', '10n': '🌧️',
+                        '11d': '⛈️', '11n': '⛈️',
+                        '13d': '❄️', '13n': '❄️',
+                        '50d': '🌫️', '50n': '🌫️'
+                    };
+                    
+                    const forecastDiv = document.createElement('div');
+                    forecastDiv.style.cssText = 'background: #f5f5f5; padding: 12px; border-radius: 12px; text-align: center;';
+                    forecastDiv.innerHTML = `
+                        <div style="font-weight: 600; font-size: 14px;">${dayName}</div>
+                        <div style="font-size: 12px; color: #666;">${dateStr}</div>
+                        <div style="font-size: 32px; margin: 8px 0;">${iconMapForecast[day.weather_icon] || '🌤️'}</div>
+                        <div style="font-size: 14px;">${Math.round(day.temperature_min)}°C</div>
+                        <div style="font-size: 18px; font-weight: bold;">${Math.round(day.temperature_max)}°C</div>
+                        <div style="font-size: 11px; color: #999; margin-top: 4px;">${day.weather_description}</div>
+                        ${day.rain_probability > 0 ? `<div style="font-size: 11px; color: #2196F3;">🌧️ ${Math.round(day.rain_probability)}%</div>` : ''}
+                    `;
+                    forecastContainer.appendChild(forecastDiv);
+                });
+            }
+        }
+        
+        
         
         // ============================================
         // NEW PROGRESS TRACKING FUNCTIONS
@@ -3406,8 +3819,26 @@
                 let tasks = await response.json();
                 console.log("Tasks found:", tasks.length);
                 
-                console.log("Selected Date:", selectedDate);
-                console.log("Today's Date:", new Date().toISOString().split('T')[0]);
+                // Fetch all workers for assignment dropdown and filter
+                const usersResponse = await fetch('/users');
+                const allUsers = await usersResponse.json();
+                const workers = allUsers.filter(u => u.role.toLowerCase() === 'worker');
+                
+                // ========== NEW: POPULATE USER FILTER DROPDOWN ==========
+                const userFilter = document.getElementById('adminUserFilter');
+                if (userFilter) {
+                    const currentValue = userFilter.value;
+                    userFilter.innerHTML = '<option value="all">👥 All Workers</option>';
+                    workers.forEach(worker => {
+                        const selected = currentValue == worker.id ? 'selected' : '';
+                        userFilter.innerHTML += `<option value="${worker.id}" ${selected}>${worker.name}</option>`;
+                    });
+                }
+                // ========================================================
+                
+                // Fetch all locations for layout images
+                const locationsResponse = await fetch('/locations/all');
+                const allLocations = await locationsResponse.json();
                 
                 // Filter by date
                 let filteredTasks = tasks;
@@ -3435,7 +3866,7 @@
                     });
                 }
                 
-                // Calculate days pending for each task based on selected date (MOVED OUTSIDE FILTER)
+                // Calculate days pending for each task
                 filteredTasks = filteredTasks.map(task => {
                     const selected = new Date(selectedDate);
                     const created = new Date(task.created_at);
@@ -3453,14 +3884,15 @@
                     return { ...task, pendingDays };
                 });
                 
-                // Fetch all workers for assignment dropdown
-                const usersResponse = await fetch('/users');
-                const allUsers = await usersResponse.json();
-                const workers = allUsers.filter(u => u.role.toLowerCase() === 'worker');
-                
-                // Fetch all locations for layout images
-                const locationsResponse = await fetch('/locations/all');
-                const allLocations = await locationsResponse.json();
+                // ========== NEW: USER FILTER ==========
+                const userFilterValue = document.getElementById("adminUserFilter")?.value || "all";
+                if (userFilterValue !== "all") {
+                    filteredTasks = filteredTasks.filter(task => 
+                        task.assigned_to == userFilterValue
+                    );
+                    console.log(`Filtered by user ${userFilterValue}:`, filteredTasks.length);
+                }
+                // =====================================
                 
                 // Location filter
                 const locationFilter = document.getElementById("adminLocationFilter")?.value || "all";
@@ -3479,14 +3911,28 @@
                     return;
                 }
                 
+                // ========== NEW: SHOW FILTER SUMMARY ==========
+                let filterSummary = '';
+                if (userFilterValue !== "all") {
+                    const workerName = workers.find(w => w.id == userFilterValue)?.name || 'Unknown';
+                    filterSummary += `👤 Worker: ${workerName} | `;
+                }
+                if (locationFilter !== "all") {
+                    filterSummary += `📍 Location: ${locationFilter} | `;
+                }
+                filterSummary += `📅 Date: ${selectedDate}`;
+                // =============================================
+                
                 if (filteredTasks.length === 0) {
-                    container.innerHTML = selectedDate ? 
-                        `<p style="color: #999;">No tasks for ${selectedDate}</p>` :
-                        '<p style="color: #999;">No tasks added yet</p>';
+                    container.innerHTML = `
+                        <p style="color: #999;">No tasks found</p>
+                        <p style="font-size: 12px; color: #999;">${filterSummary}</p>
+                    `;
                     return;
                 }
                 
-                let html = '<div class="table-container"><table style="width:100%; border-collapse: collapse;">';
+                let html = `<p style="font-size: 12px; color: #666; margin-bottom: 8px;">${filterSummary} | Tasks: ${filteredTasks.length}</p>`;
+                html += '<div class="table-container"><table style="width:100%; border-collapse: collapse;">';
                 html += '<tr style="background: #f0f0f0;"><th>ID</th><th>Title</th><th>Description</th><th>Assigned To</th><th>Progress</th><th>Water Release</th><th>Days Pending</th><th>Time Slot</th><th>Layout</th><th>Status</th><th>Media</th><th>Actions</th></tr>';
                 
                 for (const task of filteredTasks) {
