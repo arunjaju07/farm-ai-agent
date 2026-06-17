@@ -912,6 +912,90 @@
             </div>
 
             
+            <!-- Weather Section (for all users - with role-based access) -->
+            <div id="weatherSection" class="section">
+                <div class="card">
+                    <div class="card-title">🌤️ Weather Dashboard 
+                        <span style="font-size: 12px; background: #e8f5e9; padding: 2px 10px; border-radius: 10px; color: #2e7d32; margin-left: 8px;">
+                            👤 <span id="weatherUserRole">Loading...</span>
+                        </span>
+                    </div>
+                    
+                    <div style="margin-bottom: 16px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 500;">📍 Select Location:</label>
+                        <select id="weatherLocationSelect" onchange="fetchWeather()" style="width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #ddd;">
+                            <option value="">Select a location</option>
+                        </select>
+                        <p id="weatherLocationInfo" style="font-size: 12px; color: #999; margin-top: 4px;"></p>
+                    </div>
+                    
+                    <div id="weatherLoading" style="display: none; text-align: center; padding: 40px;">
+                        <p>🌤️ Fetching weather data...</p>
+                    </div>
+                    
+                    <div id="weatherError" style="display: none; padding: 20px; background: #ffcdd2; border-radius: 12px; color: #c62828;">
+                        <p>⚠️ <span id="weatherErrorMessage">Error loading weather data</span></p>
+                    </div>
+                    
+                    <div id="weatherContent" style="display: none;">
+                        <!-- Current Weather Card -->
+                        <div style="background: linear-gradient(135deg, #0288D1, #0277BD); color: white; padding: 20px; border-radius: 16px; margin-bottom: 20px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <h2 id="weatherLocation" style="margin-bottom: 4px;">Location</h2>
+                                    <p id="weatherRegion" style="opacity: 0.9; font-size: 14px;">Region</p>
+                                    <p style="font-size: 42px; font-weight: bold; margin: 8px 0;">
+                                        <span id="weatherTemp">--</span>°C
+                                    </p>
+                                    <p style="font-size: 18px;" id="weatherDescription">--</p>
+                                    <p style="opacity: 0.8; font-size: 14px;">Feels like <span id="weatherFeelsLike">--</span>°C</p>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div id="weatherIcon" style="font-size: 64px;">🌤️</div>
+                                    <span id="weatherMain" style="font-size: 14px; opacity: 0.9;">--</span>
+                                </div>
+                            </div>
+                            
+                            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 12px; margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.2);">
+                                <div style="text-align: center;">
+                                    <div style="font-size: 11px; opacity: 0.8;">💧 Humidity</div>
+                                    <div style="font-size: 16px; font-weight: bold;"><span id="weatherHumidity">--</span>%</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="font-size: 11px; opacity: 0.8;">💨 Wind</div>
+                                    <div style="font-size: 16px; font-weight: bold;"><span id="weatherWind">--</span> km/h</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="font-size: 11px; opacity: 0.8;">🔽 Pressure</div>
+                                    <div style="font-size: 16px; font-weight: bold;"><span id="weatherPressure">--</span> hPa</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="font-size: 11px; opacity: 0.8;">🌅 Sunrise</div>
+                                    <div style="font-size: 14px; font-weight: bold;" id="weatherSunrise">--</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="font-size: 11px; opacity: 0.8;">🌇 Sunset</div>
+                                    <div style="font-size: 14px; font-weight: bold;" id="weatherSunset">--</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 5-Day Forecast -->
+                        <div style="background: white; padding: 20px; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                            <h4 style="margin-bottom: 16px;">📅 5-Day Forecast</h4>
+                            <div id="weatherForecast" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 12px;">
+                                <!-- Forecast items will be inserted here -->
+                            </div>
+                        </div>
+                        
+                        <!-- Last Updated -->
+                        <p style="text-align: center; margin-top: 16px; font-size: 12px; color: #999;">
+                            Last updated: <span id="weatherLastUpdated">--</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
             <!-- Task Completion Modal -->
             <div id="completionModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000;">
                 <div style="background: white; margin: 5% auto; max-width: 500px; max-height: 80vh; overflow-y: auto; padding: 20px; border-radius: 16px;">
@@ -943,7 +1027,8 @@
         <button class="nav-btn" onclick="showSection('tasks')">📋 Tasks</button>
         <button class="nav-btn" onclick="showSection('locations')">📍 Farms</button>
         <button class="nav-btn" onclick="showSection('reportIssue')">🚨 Report</button>
-        <button class="nav-btn" onclick="showSection('grassHealthWorker')">🌿 Health</button>
+        <button class="nav-btn" onclick="showSection('grassHealthWorker')">🌿 Health</button>            <button class="nav-btn" onclick="showSection('weather')">🌤️ Weather</button>
+        <button class="nav-btn" onclick="showSection('weather')">🌤️ Weather</button>
     </div>
 
     <script>
