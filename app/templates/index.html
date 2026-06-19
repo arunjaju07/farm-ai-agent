@@ -992,23 +992,27 @@
                             
                             <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 12px; margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.2);">
                                 <div style="text-align: center;">
-                                    <div style="font-size: 11px; opacity: 0.8;">💧 Humidity</div>
+                                    <div style="font-size: 11px; opacity: 0.8;" data-i18n="weather_humidity">💧 Humidity</div>
                                     <div style="font-size: 16px; font-weight: bold;"><span id="weatherHumidity">--</span>%</div>
                                 </div>
                                 <div style="text-align: center;">
-                                    <div style="font-size: 11px; opacity: 0.8;">💨 Wind</div>
+                                    <div style="font-size: 11px; opacity: 0.8;" data-i18n="weather_wind">💨 Wind</div>
                                     <div style="font-size: 16px; font-weight: bold;"><span id="weatherWind">--</span> km/h</div>
                                 </div>
                                 <div style="text-align: center;">
-                                    <div style="font-size: 11px; opacity: 0.8;">🔽 Pressure</div>
+                                    <div style="font-size: 11px; opacity: 0.8;" data-i18n="weather_pressure">🔽 Pressure</div>
                                     <div style="font-size: 16px; font-weight: bold;"><span id="weatherPressure">--</span> hPa</div>
                                 </div>
                                 <div style="text-align: center;">
-                                    <div style="font-size: 11px; opacity: 0.8;">🌅 Sunrise</div>
+                                    <div style="font-size: 11px; opacity: 0.8;">🌧️ Rain</div>
+                                    <div style="font-size: 14px; font-weight: bold;" id="weatherRain">☀️ No rain</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="font-size: 11px; opacity: 0.8;" data-i18n="weather_sunrise">🌅 Sunrise</div>
                                     <div style="font-size: 14px; font-weight: bold;" id="weatherSunrise">--</div>
                                 </div>
                                 <div style="text-align: center;">
-                                    <div style="font-size: 11px; opacity: 0.8;">🌇 Sunset</div>
+                                    <div style="font-size: 11px; opacity: 0.8;" data-i18n="weather_sunset">🌇 Sunset</div>
                                     <div style="font-size: 14px; font-weight: bold;" id="weatherSunset">--</div>
                                 </div>
                             </div>
@@ -3613,6 +3617,41 @@
             document.getElementById('weatherSunset').textContent = data.sunset;
             document.getElementById('weatherLastUpdated').textContent = data.last_updated;
             
+            // ========== 🌧️ RAIN STATUS ==========
+            const rainElement = document.getElementById('weatherRain');
+            if (rainElement) {
+                const rainProb = data.rain_probability || 0;
+                const rain1h = data.rain_1h || 0;
+                const rain3h = data.rain_3h || 0;
+                
+                let rainText = '';
+                let rainColor = '#4CAF50';
+                
+                if (rain1h > 0) {
+                    rainText = `🌧️ ${rain1h.toFixed(1)} mm (last hour)`;
+                    rainColor = '#2196F3';
+                } else if (rain3h > 0) {
+                    rainText = `🌧️ ${rain3h.toFixed(1)} mm (last 3h)`;
+                    rainColor = '#2196F3';
+                } else if (rainProb > 0 && rainProb <= 30) {
+                    rainText = `🌤️ ${Math.round(rainProb)}% chance of rain`;
+                    rainColor = '#ff9800';
+                } else if (rainProb > 30 && rainProb <= 70) {
+                    rainText = `🌧️ ${Math.round(rainProb)}% chance of rain`;
+                    rainColor = '#ff9800';
+                } else if (rainProb > 70) {
+                    rainText = `🌧️ ${Math.round(rainProb)}% chance of rain - HIGH`;
+                    rainColor = '#f44336';
+                } else {
+                    rainText = '☀️ No rain expected';
+                    rainColor = '#4CAF50';
+                }
+                
+                rainElement.textContent = rainText;
+                rainElement.style.color = rainColor;
+            }
+            // ====================================
+            
             // Weather icon mapping
             const iconMap = {
                 '01d': '☀️', '01n': '🌙',
@@ -3651,6 +3690,15 @@
                         '50d': '🌫️', '50n': '🌫️'
                     };
                     
+                    // Show rain amount for each day
+                    let rainInfo = '';
+                    if (day.rain_probability > 0) {
+                        rainInfo = `<div style="font-size: 11px; color: #2196F3;">🌧️ ${Math.round(day.rain_probability)}%</div>`;
+                    }
+                    if (day.rain_amount > 0) {
+                        rainInfo += `<div style="font-size: 10px; color: #2196F3;">${day.rain_amount.toFixed(1)} mm</div>`;
+                    }
+                    
                     const forecastDiv = document.createElement('div');
                     forecastDiv.style.cssText = 'background: #f5f5f5; padding: 12px; border-radius: 12px; text-align: center;';
                     forecastDiv.innerHTML = `
@@ -3660,7 +3708,7 @@
                         <div style="font-size: 14px;">${Math.round(day.temperature_min)}°C</div>
                         <div style="font-size: 18px; font-weight: bold;">${Math.round(day.temperature_max)}°C</div>
                         <div style="font-size: 11px; color: #999; margin-top: 4px;">${day.weather_description}</div>
-                        ${day.rain_probability > 0 ? `<div style="font-size: 11px; color: #2196F3;">🌧️ ${Math.round(day.rain_probability)}%</div>` : ''}
+                        ${rainInfo}
                     `;
                     forecastContainer.appendChild(forecastDiv);
                 });
@@ -4971,76 +5019,6 @@
             }
         }
 
-        function viewMedia(mediaUrl, mediaType) {
-            // Close the history modal first if open
-            closeMediaHistoryModal();
-            
-            // Hide all media elements
-            const imageEl = document.getElementById('viewerImage');
-            const audioEl = document.getElementById('viewerAudio');
-            const videoEl = document.getElementById('viewerVideo');
-            const noMediaEl = document.getElementById('noMediaMessage');
-            
-            if (imageEl) imageEl.style.display = 'none';
-            if (audioEl) audioEl.style.display = 'none';
-            if (videoEl) videoEl.style.display = 'none';
-            if (noMediaEl) noMediaEl.style.display = 'none';
-            
-            if (!mediaUrl) {
-                if (noMediaEl) noMediaEl.style.display = 'block';
-                document.getElementById('mediaViewerModal').style.display = 'flex';
-                return;
-            }
-            
-            if (mediaType === 'image') {
-                if (imageEl) {
-                    imageEl.src = mediaUrl;
-                    imageEl.style.display = 'block';
-                }
-            } else if (mediaType === 'audio') {
-                if (audioEl) {
-                    const source = audioEl.querySelector('source');
-                    if (source) source.src = mediaUrl;
-                    audioEl.load();
-                    audioEl.style.display = 'block';
-                }
-            } else if (mediaType === 'video') {
-                if (videoEl) {
-                    const source = videoEl.querySelector('source');
-                    if (source) source.src = mediaUrl;
-                    videoEl.load();
-                    videoEl.style.display = 'block';
-                }
-            }
-            
-            const mediaModal = document.getElementById('mediaViewerModal');
-            if (mediaModal) {
-                mediaModal.style.zIndex = '10001';  // Higher than report modal
-                mediaModal.style.display = 'flex';
-            }
-        }
-
-        function closeMediaViewer() {
-            document.getElementById('mediaViewerModal').style.display = 'none';
-            const audioEl = document.getElementById('viewerAudio');
-            const videoEl = document.getElementById('viewerVideo');
-            if (audioEl) audioEl.pause();
-            if (videoEl) videoEl.pause();
-        }
-
-
-        function toggleRecurringOptions() {
-            const recurring = document.getElementById('taskRecurring').value;
-            const intervalDiv = document.getElementById('intervalDaysDiv');
-            
-            if (recurring === 'interval') {
-                intervalDiv.style.display = 'block';
-            } else {
-                intervalDiv.style.display = 'none';
-            }
-        }
-        
-        
         // ============================================
         // MEDIA HISTORY FUNCTIONS
         // ============================================
@@ -5060,13 +5038,13 @@
                     return;
                 }
                 
-                // Filter records that have media (photo or audio)
+                // Filter records that have media (photo, audio, or video)
                 const mediaRecords = history.filter(record => 
-                    (record.media && (record.media.photo || record.media.audio))
+                    (record.media && (record.media.photo || record.media.audio || record.media.video))
                 );
                 
                 if (mediaRecords.length === 0) {
-                    showMessage("No photos or audio found for this task", "info");
+                    showMessage("No photos, audio, or video found for this task", "info");
                     return;
                 }
                 
@@ -5096,8 +5074,9 @@
                         html += `<button onclick="viewMedia('${record.media.audio}', 'audio')" style="background: #9c27b0; padding: 6px 12px; width: auto; font-size: 12px; border: none; border-radius: 8px; cursor: pointer;">🎧 Listen Audio</button>`;
                     }
                     if (record.media && record.media.video) {
-                        html += `<button onclick="viewMedia('${record.media.video}', 'video')" style="background: #e91e63; padding: 6px 12px; width: auto;">📹 Watch Video</button>`;
+                        html += `<button onclick="viewMedia('${record.media.video}', 'video')" style="background: #e91e63; padding: 6px 12px; width: auto; font-size: 12px; border: none; border-radius: 8px; cursor: pointer;">📹 Watch Video</button>`;
                     }
+                    
                     html += `
                             </div>
                         </div>
@@ -5126,6 +5105,85 @@
             }
         }
 
+        // ============================================
+        // MEDIA VIEWER FUNCTIONS
+        // ============================================
+
+        function viewMedia(mediaUrl, mediaType) {
+            console.log("🎬 viewMedia called:", mediaUrl, mediaType);
+            
+            // Close the history modal first if open
+            closeMediaHistoryModal();
+            
+            // Get the media viewer elements
+            const modal = document.getElementById('mediaViewerModal');
+            const imageEl = document.getElementById('viewerImage');
+            const audioEl = document.getElementById('viewerAudio');
+            const videoEl = document.getElementById('viewerVideo');
+            const noMediaEl = document.getElementById('noMediaMessage');
+            
+            if (!modal) {
+                console.error("❌ mediaViewerModal not found!");
+                return;
+            }
+            
+            // Hide all media elements
+            if (imageEl) imageEl.style.display = 'none';
+            if (audioEl) audioEl.style.display = 'none';
+            if (videoEl) videoEl.style.display = 'none';
+            if (noMediaEl) noMediaEl.style.display = 'none';
+            
+            if (!mediaUrl) {
+                if (noMediaEl) noMediaEl.style.display = 'block';
+                modal.style.display = 'flex';
+                return;
+            }
+            
+            console.log("📺 Displaying media type:", mediaType, "URL:", mediaUrl);
+            
+            if (mediaType === 'image') {
+                if (imageEl) {
+                    imageEl.src = mediaUrl;
+                    imageEl.style.display = 'block';
+                    console.log("✅ Image displayed");
+                }
+            } else if (mediaType === 'audio') {
+                if (audioEl) {
+                    const source = audioEl.querySelector('source');
+                    if (source) {
+                        source.src = mediaUrl;
+                        audioEl.load();
+                        audioEl.style.display = 'block';
+                        console.log("✅ Audio loaded");
+                    }
+                }
+            } else if (mediaType === 'video') {
+                if (videoEl) {
+                    const source = videoEl.querySelector('source');
+                    if (source) {
+                        source.src = mediaUrl;
+                        videoEl.load();
+                        videoEl.style.display = 'block';
+                        console.log("✅ Video loaded");
+                    }
+                }
+            }
+            
+            modal.style.zIndex = '10001';
+            modal.style.display = 'flex';
+        }
+
+        function closeMediaViewer() {
+            const modal = document.getElementById('mediaViewerModal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+            const audioEl = document.getElementById('viewerAudio');
+            const videoEl = document.getElementById('viewerVideo');
+            if (audioEl) audioEl.pause();
+            if (videoEl) videoEl.pause();
+        }
+
         function closeMediaHistoryModal() {
             const modal = document.getElementById('mediaHistoryModal');
             if (modal) {
@@ -5133,222 +5191,6 @@
             }
         }
 
-        
-        
-        
-        // ============================================
-        // PROGRESS UPDATE FUNCTIONS - Step 2
-        // ============================================
-
-        function openProgressModal(taskId, taskTitle, currentProgress) {
-            currentProgressTaskId = taskId;
-            document.getElementById('progressTaskTitle').textContent = taskTitle;
-            document.getElementById('progressTaskId').value = taskId;
-            document.getElementById('currentProgressDisplay').textContent = currentProgress || 0;
-            document.getElementById('newProgressSelect').value = currentProgress || 0;
-            document.getElementById('waterReleasedCheckbox').checked = false;
-            document.getElementById('progressPhoto').value = '';
-            document.getElementById('progressAudio').value = '';
-            document.getElementById('progressModal').style.display = 'block';
-        }
-
-        function closeProgressModal() {
-            document.getElementById('progressModal').style.display = 'none';
-            currentProgressTaskId = null;
-        }
-
-        async function submitProgressUpdate() {
-            const taskId = document.getElementById('progressTaskId').value;
-            const newProgress = parseInt(document.getElementById('newProgressSelect').value);
-            const waterReleased = document.getElementById('waterReleasedCheckbox').checked;
-            const photoFile = document.getElementById('progressPhoto').files[0];
-            const audioFile = document.getElementById('progressAudio').files[0];
-            const videoFile = document.getElementById('progressVideo').files[0];
-
-            if (!taskId) {
-                showMessage("No task selected", "error");
-                return;
-            }
-            
-            const currentProgress = parseInt(document.getElementById('currentProgressDisplay').textContent);
-            if (newProgress < currentProgress) {
-                showMessage("Cannot decrease progress. Progress only moves forward.", "error");
-                return;
-            }
-            
-            showMessage("Uploading media...", "success");
-            
-            let photoUrl = null;
-            let audioUrl = null;
-            let videoUrl = null;  // ← ADD THIS
-            
-            // Upload photo if selected
-            if (photoFile) {
-                const formData = new FormData();
-                formData.append('file', photoFile);
-                const response = await fetch('/upload/photo', { method: 'POST', body: formData });
-                if (response.ok) {
-                    const result = await response.json();
-                    photoUrl = result.url;
-                    console.log("📸 Photo uploaded, URL:", photoUrl);
-                } else {
-                    console.log("Photo upload failed");
-                }
-            }
-            
-            // Upload audio if selected
-            if (audioFile) {
-                const formData = new FormData();
-                formData.append('file', audioFile);
-                const response = await fetch('/upload/audio', { method: 'POST', body: formData });
-                if (response.ok) {
-                    const result = await response.json();
-                    audioUrl = result.url;
-                    console.log("🎤 Audio uploaded, URL:", audioUrl);
-                } else {
-                    console.log("Audio upload failed");
-                }
-            }
-            
-            // ========== ADD VIDEO UPLOAD ==========
-            if (videoFile) {
-                const formData = new FormData();
-                formData.append('file', videoFile);
-                const response = await fetch('/upload/video', { method: 'POST', body: formData });
-                if (response.ok) {
-                    const result = await response.json();
-                    videoUrl = result.url;
-                    console.log("📹 Video uploaded, URL:", videoUrl);
-                } else {
-                    console.log("Video upload failed");
-                }
-            }
-            // ======================================
-            
-            // Create simple comment
-            const comment = audioFile ? `Voice note recorded - Progress: ${newProgress}%` : `Progress updated to ${newProgress}%`;
-            
-            console.log("📦 Sending to backend:", {
-                new_progress: newProgress,
-                comment: comment,
-                water_released: waterReleased,
-                photo_url: photoUrl,
-                audio_url: audioUrl,
-                video_url: videoUrl  // ← ADD THIS
-            });
-            
-            try {
-                const response = await fetch(`/tasks/${taskId}/progress`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        new_progress: newProgress,
-                        comment: comment,
-                        water_released: waterReleased,
-                        photo_url: photoUrl,
-                        audio_url: audioUrl,
-                        video_url: videoUrl  // ← ADD THIS
-                    })
-                });
-                
-                console.log("📡 Backend response status:", response.status);
-                
-                if (response.ok) {
-                    const result = await response.json();
-                    if (result.auto_reset) {
-                        showMessage(result.auto_reset.message, 'success');
-                    } else {
-                        showMessage(`Progress updated to ${newProgress}%!`, 'success');
-                    }
-                    closeProgressModal();
-                    
-                    if (typeof loadAllTasks === 'function') loadAllTasks();
-                    if (typeof loadTasks === 'function') loadTasks();
-                    
-                    setTimeout(function() {
-                        if (document.getElementById('tasksSection') && document.getElementById('tasksSection').classList.contains('active')) {
-                            loadTasks();
-                        }
-                        if (document.getElementById('adminSection') && document.getElementById('adminSection').classList.contains('active')) {
-                            loadAllTasks();
-                        }
-                    }, 300);
-                } else {
-                    const error = await response.json();
-                    console.log("❌ Backend error:", error);
-                    showMessage(error.detail || 'Failed to update progress', 'error');
-                }
-            } catch (err) {
-                console.error("Progress update error:", err);
-                showMessage('Network error', 'error');
-            }
-        }
-
-       
-        
-        // Function to get media for a completed task
-        async function viewTaskMedia(completionId) {
-            const response = await fetch(`/task-completions/${completionId}`);
-            if (response.ok) {
-                const data = await response.json();
-                if (data.image_url) {
-                    viewMedia(data.image_url, 'image');
-                } else if (data.audio_url) {
-                    viewMedia(data.audio_url, 'audio');
-                } else if (data.video_url) {
-                    viewMedia(data.video_url, 'video');
-                } else {
-                    viewMedia(null, 'none');
-                }
-            }
-        }
-        
-        
-        async function updateUser() {
-            const userData = {
-                name: document.getElementById('editUserName').value,
-                role: document.getElementById('editUserRole').value,
-                region: document.getElementById('editUserRegion').value,
-                phone: document.getElementById('editUserPhone').value,
-                password: document.getElementById('editUserPassword').value || null
-            };
-            
-            const response = await fetch(`/user/update/${editingUserId}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(userData)
-            });
-            
-            if (response.ok) {
-                showMessage('User updated successfully!');
-                document.getElementById('editUserModal').style.display = 'none';
-                loadAllUsers();
-            } else {
-                const error = await response.json();
-                showMessage(error.detail || 'Failed to update user', 'error');
-            }
-        }
-
-        async function deleteUser(userId) {
-            if (confirm('Are you sure you want to delete this user?')) {
-                const response = await fetch(`/user/delete/${userId}`, {
-                    method: 'DELETE'
-                });
-                
-                if (response.ok) {
-                    showMessage('User deleted successfully!');
-                    loadAllUsers();
-                } else {
-                    const error = await response.json();
-                    showMessage(error.detail || 'Failed to delete user', 'error');
-                }
-            }
-        }
-
-        function closeEditModal() {
-            document.getElementById('editUserModal').style.display = 'none';
-        }
-        
         // ============================================
         // 👆 END OF NEW ADMIN FUNCTIONS 👆
         // ============================================

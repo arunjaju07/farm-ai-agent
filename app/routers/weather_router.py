@@ -43,6 +43,9 @@ class WeatherResponse(BaseModel):
     sunset: str
     last_updated: str
     forecast: List[dict]
+    rain_1h: float = 0
+    rain_3h: float = 0
+    rain_probability: float = 0
 
 @router.get("/weather/locations")
 def get_weather_locations():
@@ -127,11 +130,18 @@ def get_current_weather(request: WeatherRequest):
                     'weather_main': item['weather'][0]['main'],
                     'weather_description': item['weather'][0]['description'],
                     'weather_icon': item['weather'][0]['icon'],
-                    'rain_probability': item.get('pop', 0) * 100
+                    'rain_probability': item.get('pop', 0) * 100,
+                    'rain_amount': item.get('rain', {}).get('3h', 0) if 'rain' in item else 0
                 }
             daily_forecasts[date_str]['temps'].append(item['main']['temp'])
             daily_forecasts[date_str]['humidity'].append(item['main']['humidity'])
             daily_forecasts[date_str]['wind_speed'].append(item['wind']['speed'])
+            # Update rain probability (take max)
+            if item.get('pop', 0) * 100 > daily_forecasts[date_str]['rain_probability']:
+                daily_forecasts[date_str]['rain_probability'] = item.get('pop', 0) * 100
+            # Sum rain amount
+            if 'rain' in item:
+                daily_forecasts[date_str]['rain_amount'] += item['rain'].get('3h', 0)
         
         # Build forecast list
         forecast_list = []
@@ -146,8 +156,17 @@ def get_current_weather(request: WeatherRequest):
                     'weather_icon': data['weather_icon'],
                     'humidity': sum(data['humidity']) // len(data['humidity']),
                     'wind_speed': sum(data['wind_speed']) / len(data['wind_speed']),
-                    'rain_probability': data['rain_probability']
+                    'rain_probability': data['rain_probability'],
+                    'rain_amount': data['rain_amount']
                 })
+        
+        # Get rain data from current weather
+        rain_data = current_data.get('rain', {})
+        rain_1h = rain_data.get('1h', 0)
+        rain_3h = rain_data.get('3h', 0)
+        
+        # Get current rain probability from forecast (first item)
+        current_rain_prob = forecast_list[0].get('rain_probability', 0) if forecast_list else 0
         
         # Format sunrise/sunset times
         sunrise_time = datetime.fromtimestamp(current_data['sys']['sunrise']).strftime('%I:%M %p')
@@ -169,7 +188,10 @@ def get_current_weather(request: WeatherRequest):
             "sunrise": sunrise_time,
             "sunset": sunset_time,
             "last_updated": datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-            "forecast": forecast_list
+            "forecast": forecast_list,
+            "rain_1h": rain_1h,
+            "rain_3h": rain_3h,
+            "rain_probability": current_rain_prob
         }
         
     except requests.exceptions.RequestException as e:
@@ -226,9 +248,14 @@ def get_weather_forecast(location_id: int):
                     'weather_main': item['weather'][0]['main'],
                     'weather_description': item['weather'][0]['description'],
                     'weather_icon': item['weather'][0]['icon'],
-                    'rain_probability': item.get('pop', 0) * 100
+                    'rain_probability': item.get('pop', 0) * 100,
+                    'rain_amount': item.get('rain', {}).get('3h', 0) if 'rain' in item else 0
                 }
             daily_forecasts[date_str]['temps'].append(item['main']['temp'])
+            if item.get('pop', 0) * 100 > daily_forecasts[date_str]['rain_probability']:
+                daily_forecasts[date_str]['rain_probability'] = item.get('pop', 0) * 100
+            if 'rain' in item:
+                daily_forecasts[date_str]['rain_amount'] += item['rain'].get('3h', 0)
         
         forecast_list = []
         for date_str, data in list(daily_forecasts.items())[:5]:
@@ -240,7 +267,8 @@ def get_weather_forecast(location_id: int):
                     'weather_main': data['weather_main'],
                     'weather_description': data['weather_description'],
                     'weather_icon': data['weather_icon'],
-                    'rain_probability': data['rain_probability']
+                    'rain_probability': data['rain_probability'],
+                    'rain_amount': data['rain_amount']
                 })
         
         return {
