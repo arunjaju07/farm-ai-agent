@@ -1164,8 +1164,11 @@
                 loadWorkerGrassIssues();  // ← ADD THIS
             }
             if (sectionName === "weather") { // 👈 ADD THIS BLOCK
-                loadWeatherLocations();
-            
+                // ✅ Small delay to ensure DOM is ready
+                setTimeout(() => {
+                    loadWeatherLocations();
+                }, 100);
+                        
             }
             if (sectionName === "completedTasks") { // 👈 ADD THIS
                 loadCompletedTasks();
@@ -3204,6 +3207,131 @@
             document.getElementById('workerGrassAnalysisResult').style.display = 'block';
         }
 
+        async function submitProgressUpdate() {
+            const taskId = document.getElementById('progressTaskId').value;
+            const newProgress = parseInt(document.getElementById('newProgressSelect').value);
+            const waterReleased = document.getElementById('waterReleasedCheckbox').checked;
+            const photoFile = document.getElementById('progressPhoto').files[0];
+            const audioFile = document.getElementById('progressAudio').files[0];
+            const videoFile = document.getElementById('progressVideo').files[0];
+            const comment = document.getElementById('progressComment').value || `Progress updated to ${newProgress}%`;
+
+            if (!taskId) {
+                showMessage("No task selected", "error");
+                return;
+            }
+            
+            const currentProgress = parseInt(document.getElementById('currentProgressDisplay').textContent);
+            if (newProgress < currentProgress) {
+                showMessage("Cannot decrease progress. Progress only moves forward.", "error");
+                return;
+            }
+            
+            showMessage("Uploading media...", "success");
+            
+            let photoUrl = null;
+            let audioUrl = null;
+            let videoUrl = null;
+            
+            // Upload photo if selected
+            if (photoFile) {
+                const formData = new FormData();
+                formData.append('file', photoFile);
+                const response = await fetch('/upload/photo', { method: 'POST', body: formData });
+                if (response.ok) {
+                    const result = await response.json();
+                    photoUrl = result.url;
+                    console.log("📸 Photo uploaded, URL:", photoUrl);
+                } else {
+                    console.log("Photo upload failed");
+                }
+            }
+            
+            // Upload audio if selected
+            if (audioFile) {
+                const formData = new FormData();
+                formData.append('file', audioFile);
+                const response = await fetch('/upload/audio', { method: 'POST', body: formData });
+                if (response.ok) {
+                    const result = await response.json();
+                    audioUrl = result.url;
+                    console.log("🎤 Audio uploaded, URL:", audioUrl);
+                } else {
+                    console.log("Audio upload failed");
+                }
+            }
+            
+            // Upload video if selected
+            if (videoFile) {
+                const formData = new FormData();
+                formData.append('file', videoFile);
+                const response = await fetch('/upload/video', { method: 'POST', body: formData });
+                if (response.ok) {
+                    const result = await response.json();
+                    videoUrl = result.url;
+                    console.log("📹 Video uploaded, URL:", videoUrl);
+                } else {
+                    console.log("Video upload failed");
+                }
+            }
+            
+            console.log("📦 Sending to backend:", {
+                new_progress: newProgress,
+                comment: comment,
+                water_released: waterReleased,
+                photo_url: photoUrl,
+                audio_url: audioUrl,
+                video_url: videoUrl
+            });
+            
+            try {
+                const response = await fetch(`/tasks/${taskId}/progress`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        new_progress: newProgress,
+                        comment: comment,
+                        water_released: waterReleased,
+                        photo_url: photoUrl,
+                        audio_url: audioUrl,
+                        video_url: videoUrl
+                    })
+                });
+                
+                console.log("📡 Backend response status:", response.status);
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.auto_reset) {
+                        showMessage(result.auto_reset.message, 'success');
+                    } else {
+                        showMessage(`Progress updated to ${newProgress}%!`, 'success');
+                    }
+                    closeProgressModal();
+                    
+                    if (typeof loadAllTasks === 'function') loadAllTasks();
+                    if (typeof loadTasks === 'function') loadTasks();
+                    
+                    setTimeout(function() {
+                        if (document.getElementById('tasksSection') && document.getElementById('tasksSection').classList.contains('active')) {
+                            loadTasks();
+                        }
+                        if (document.getElementById('adminSection') && document.getElementById('adminSection').classList.contains('active')) {
+                            loadAllTasks();
+                        }
+                    }, 300);
+                } else {
+                    const error = await response.json();
+                    console.log("❌ Backend error:", error);
+                    showMessage(error.detail || 'Failed to update progress', 'error');
+                }
+            } catch (err) {
+                console.error("Progress update error:", err);
+                showMessage('Network error', 'error');
+            }
+        }
+        
+        
         async function submitWorkerGrassReport() {
             const locationId = document.getElementById('workerGrassLocationId').value;
             const zoneId = document.getElementById('workerGrassZoneId').value;
@@ -3540,7 +3668,11 @@
                         // Auto-select first location and fetch weather
                         select.value = locations[0].id;
                         fetchWeather(); // Auto-fetch weather
-                        
+                        // Small delay to ensure DOM is ready
+                        setTimeout(() => {
+                            fetchWeather();
+                        }, 300);
+
                     } else {
                         // ADMIN or SUPERVISOR: Show ALL locations with dropdown
                         select.style.display = 'block';
@@ -5255,18 +5387,21 @@
                 <option value="100">100% - Complete</option>
             </select>
             
-            <!-- Media Section -->
+            <!-- ✅ ADD THIS COMMENT FIELD -->
+            <label style="font-weight: bold; display: block; margin-bottom: 8px;">💬 Comment (Optional)</label>
+            <textarea id="progressComment" rows="2" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 12px;" placeholder="Add a comment about this progress update..."></textarea>
+            
+            <!-- Photo Input -->
             <label style="font-weight: bold; display: block; margin-bottom: 8px;">📸 Photo (Recommended)</label>
             <input type="file" id="progressPhoto" accept="image/*" capture="environment" style="margin-bottom: 16px; width: 100%;">
-            <label style="font-size: 12px; color: #666;">📸 Take photo OR choose from gallery</label>
             
+            <!-- Audio Input -->
             <label style="font-weight: bold; display: block; margin-bottom: 8px;">🎤 Audio (Voice Note)</label>
             <input type="file" id="progressAudio" accept="audio/*" capture="user" style="margin-bottom: 16px; width: 100%;">
-            <label style="font-size: 12px; color: #666;">🎤 Record voice OR choose audio file</label>
+            
+            <!-- Video Input -->
             <label style="font-weight: bold; display: block; margin-bottom: 8px;">📹 Video (Optional)</label>
             <input type="file" id="progressVideo" accept="video/*, video/mp4, video/3gp, video/mkv, video/avi" capture="environment" style="margin-bottom: 16px; width: 100%;">
-            <label style="font-size: 12px; color: #666;">🎥 Record video OR choose from gallery</label>
-
 
             <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
                 <input type="checkbox" id="waterReleasedCheckbox"> 
