@@ -1210,158 +1210,11 @@
 <!--  ALL EXISTING ADMIN FORMS (NOW OUTSIDE adminSection)         -->
 <!-- ============================================================ -->
 
-<div id="adminTabForms" style="margin-top:var(--space-lg);">
+    <div id="adminTabForms" style="margin-top:var(--space-lg);">
     
-    <div id="weatherForm" style="display:none;">
-
-        <div class="card">
-
-            <button onclick="goBackToDashboard()"
-                style="background:#2E7D32;width:auto;padding:8px 16px;margin-bottom:16px;border:none;border-radius:8px;color:white;cursor:pointer;font-weight:600;">
-                ← Back to Dashboard
-            </button>
-
-            <h2 style="margin-bottom:20px;">🌤 Weather & Rain Forecast</h2>
-
-            <!-- Role -->
-            <div style="margin-bottom:15px;">
-                <strong>Role:</strong>
-                <span id="weatherUserRole"
-                    style="background:#4CAF50;color:white;padding:4px 10px;border-radius:20px;font-size:13px;">
-                </span>
-            </div>
-
-            <!-- Location -->
-            <div style="margin-bottom:20px;">
-
-                <label style="font-weight:bold;">📍 Location</label>
-
-                <select id="weatherLocationSelect"
-                        onchange="fetchWeather()"
-                        style="margin-top:8px;">
-
-                    <option value="">Select Location</option>
-
-                </select>
-
-                <div id="weatherLocationInfo"
-                    style="margin-top:8px;color:#666;font-size:14px;">
-                </div>
-
-            </div>
-
-            <!-- Loading -->
-            <div id="weatherLoading"
-                style="display:none;text-align:center;padding:30px;">
-
-                ⏳ Loading weather...
-
-            </div>
-
-            <!-- Error -->
-            <div id="weatherError"
-                style="display:none;background:#ffebee;padding:15px;border-radius:10px;">
-
-                ❌ <span id="weatherErrorMessage"></span>
-
-            </div>
-
-            <!-- Weather -->
-            <div id="weatherContent" style="display:none;">
-
-                <!-- Rain -->
-                <div class="card"
-                    style="background:#E3F2FD;margin-bottom:20px;">
-
-                    <h3>🌧 Rain Forecast</h3>
-
-                    <div id="weatherRain"
-                        style="font-size:18px;font-weight:bold;margin-top:10px;">
-                    </div>
-
-                </div>
-
-                <!-- Current -->
-                <div class="card"
-                    style="margin-bottom:20px;">
-
-                    <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
-
-                        <div style="font-size:60px;"
-                            id="weatherIcon">
-                            🌤
-                        </div>
-
-                        <div>
-
-                            <h3 id="weatherLocation"></h3>
-
-                            <div id="weatherRegion"
-                                style="color:#666;"></div>
-
-                            <h2>
-                                <span id="weatherTemp"></span>°C
-                            </h2>
-
-                            <div id="weatherDescription"></div>
-
-                        </div>
-
-                    </div>
-
-                    <hr style="margin:20px 0;">
-
-                    <div style="
-                        display:grid;
-                        grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
-                        gap:15px;">
-
-                        <div>🌡 Feels Like<br><strong><span id="weatherFeelsLike"></span>°C</strong></div>
-
-                        <div>💧 Humidity<br><strong><span id="weatherHumidity"></span>%</strong></div>
-
-                        <div>🌬 Wind<br><strong><span id="weatherWind"></span> km/h</strong></div>
-
-                        <div>📈 Pressure<br><strong><span id="weatherPressure"></span> hPa</strong></div>
-
-                        <div>🌅 Sunrise<br><strong id="weatherSunrise"></strong></div>
-
-                        <div>🌇 Sunset<br><strong id="weatherSunset"></strong></div>
-
-                    </div>
-
-                </div>
-
-                <!-- Forecast -->
-                <div class="card">
-
-                    <h3>📅 5-Day Forecast</h3>
-
-                    <div id="weatherForecast"
-                        style="
-                            display:grid;
-                            grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
-                            gap:12px;
-                            margin-top:15px;">
-                    </div>
-
-                    <div style="
-                        margin-top:20px;
-                        color:#777;
-                        font-size:12px;">
-
-                        Last Updated:
-                        <span id="weatherLastUpdated"></span>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
+    
+    
+</div>
 
     
     
@@ -1684,6 +1537,159 @@
              
         </div>
     </div>
+    
+    <!-- weatherSection -->
+    <div id="weatherSection" class="section" style="display:none;">
+
+        <div class="card">
+
+            <button onclick="goBackToDashboard()"
+                style="background:#2E7D32;width:auto;padding:8px 16px;margin-bottom:16px;border:none;border-radius:8px;color:white;cursor:pointer;font-weight:600;">
+                ← Back to Dashboard
+            </button>
+
+            <h2 style="margin-bottom:20px;">🌤 Weather & Rain Forecast</h2>
+
+            <!-- Role -->
+            <div style="margin-bottom:15px;">
+                <strong>Role:</strong>
+                <span id="weatherUserRole"
+                    style="background:#4CAF50;color:white;padding:4px 10px;border-radius:20px;font-size:13px;">
+                </span>
+            </div>
+
+            <!-- Location -->
+            <div style="margin-bottom:20px;">
+
+                <label style="font-weight:bold;">📍 Location</label>
+
+                <select id="weatherLocationSelect"
+                        onchange="fetchWeather()"
+                        style="margin-top:8px;">
+
+                    <option value="">Select Location</option>
+
+                </select>
+
+                <div id="weatherLocationInfo"
+                    style="margin-top:8px;color:#666;font-size:14px;">
+                </div>
+
+            </div>
+
+            <!-- Loading -->
+            <div id="weatherLoading"
+                style="display:none;text-align:center;padding:30px;">
+
+                ⏳ Loading weather...
+
+            </div>
+
+            <!-- Error -->
+            <div id="weatherError"
+                style="display:none;background:#ffebee;padding:15px;border-radius:10px;">
+
+                ❌ <span id="weatherErrorMessage"></span>
+
+            </div>
+
+            <!-- Weather -->
+            <div id="weatherContent" style="display:none;">
+
+                <!-- Rain -->
+                <div class="card"
+                    style="background:#E3F2FD;margin-bottom:20px;">
+
+                    <h3>🌧 Rain Forecast</h3>
+
+                    <div id="weatherRain"
+                        style="font-size:18px;font-weight:bold;margin-top:10px;">
+                    </div>
+
+                </div>
+
+                <!-- Current -->
+                <div class="card"
+                    style="margin-bottom:20px;">
+
+                    <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+
+                        <div style="font-size:60px;"
+                            id="weatherIcon">
+                            🌤
+                        </div>
+
+                        <div>
+
+                            <h3 id="weatherLocation"></h3>
+
+                            <div id="weatherRegion"
+                                style="color:#666;"></div>
+
+                            <h2>
+                                <span id="weatherTemp"></span>°C
+                            </h2>
+
+                            <div id="weatherDescription"></div>
+
+                        </div>
+
+                    </div>
+
+                    <hr style="margin:20px 0;">
+
+                    <div style="
+                        display:grid;
+                        grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+                        gap:15px;">
+
+                        <div>🌡 Feels Like<br><strong><span id="weatherFeelsLike"></span>°C</strong></div>
+
+                        <div>💧 Humidity<br><strong><span id="weatherHumidity"></span>%</strong></div>
+
+                        <div>🌬 Wind<br><strong><span id="weatherWind"></span> km/h</strong></div>
+
+                        <div>📈 Pressure<br><strong><span id="weatherPressure"></span> hPa</strong></div>
+
+                        <div>🌅 Sunrise<br><strong id="weatherSunrise"></strong></div>
+
+                        <div>🌇 Sunset<br><strong id="weatherSunset"></strong></div>
+
+                    </div>
+
+                </div>
+
+                <!-- Forecast -->
+                <div class="card">
+
+                    <h3>📅 5-Day Forecast</h3>
+
+                    <div id="weatherForecast"
+                        style="
+                            display:grid;
+                            grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
+                            gap:12px;
+                            margin-top:15px;">
+                    </div>
+
+                    <div style="
+                        margin-top:20px;
+                        color:#777;
+                        font-size:12px;">
+
+                        Last Updated:
+                        <span id="weatherLastUpdated"></span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+    
     
     <!-- Equipment Management Tab -->
     <div id="equipmentForm" class="admin-tab" style="display: none;">
@@ -3520,9 +3526,10 @@
             }
 
             const supervisorDashboard = document.getElementById('supervisorDashboardSection');
+
             if (supervisorDashboard) {
-                supervisorDashboard.style.display = 'none';
-                supervisorDashboard.classList.remove('active');
+                supervisorDashboard.style.display = 'block';
+                supervisorDashboard.classList.add('active');
             }
 
             const workerDashboard = document.getElementById('workerDashboardSection');
@@ -3541,11 +3548,7 @@
 
             let targetSection;
 
-            if (sectionName === "weather") {
-                targetSection = document.getElementById("weatherForm");
-            } else {
-                targetSection = document.getElementById(sectionName + "Section");
-            }
+            targetSection = document.getElementById(sectionName + "Section");
 
             console.log("Dynamic lookup:", targetSection);
 
@@ -5153,11 +5156,14 @@
         }
         
         function showAdminDashboardDefault() {
-            const weatherForm = document.getElementById('weatherForm');
-            if (weatherForm) {
-                weatherForm.style.display = 'none';
-                weatherForm.classList.remove('active');
-            }
+            // Hide all sections first
+            document.querySelectorAll(".section").forEach(section => {
+                section.classList.remove("active");
+                section.style.display = "none";
+                section.style.visibility = "hidden";
+            });
+
+           
             console.log("========== showAdminDashboardDefault ==========");
 
             // Hide all admin forms/tabs
@@ -5176,13 +5182,15 @@
                 'addUserForm',
                 'grassHealthForm',
                 'equipmentForm',
-                'weatherForm'
+                'weatherSection'
             ];
 
             tabs.forEach(id => {
                 const el = document.getElementById(id);
                 if (el) {
                     el.style.display = 'none';
+                    el.classList.remove('active');
+                    el.style.visibility = 'hidden';
                 }
             });
 
@@ -5190,6 +5198,8 @@
             const adminSection = document.getElementById('adminSection');
             if (adminSection) {
                 adminSection.style.display = 'block';
+                adminSection.style.visibility = 'visible';
+                adminSection.style.opacity = '1';
                 adminSection.classList.add('active');
             }
 
@@ -5237,6 +5247,7 @@
             }
 
             console.log('🔍 Returning to dashboard for:', user.role);
+            console.log("BACK FUNCTION ROLE:", user.role);
 
             switch (user.role) {
 
@@ -6940,6 +6951,21 @@
         // ============================================
 
         async function loadWeatherLocations() {
+            // Reset previous weather
+            document.getElementById("weatherContent").style.display = "none";
+            document.getElementById("weatherError").style.display = "none";
+            document.getElementById("weatherLoading").style.display = "none";
+
+            document.getElementById("weatherLocation").textContent = "";
+            document.getElementById("weatherTemp").textContent = "";
+            document.getElementById("weatherForecast").innerHTML = "";
+
+            const select = document.getElementById("weatherLocationSelect");
+            if (select) {
+                select.selectedIndex = 0;
+            }
+
+            
             try {
                 const response = await fetch('/weather/locations');
 
@@ -9733,6 +9759,14 @@
         // ============================================
         function hideSupervisorContentContainers() {
 
+            const weatherSection = document.getElementById("weatherSection");
+
+            if (weatherSection) {
+                weatherSection.style.display = "none";
+                weatherSection.style.visibility = "hidden";
+                weatherSection.classList.remove("active");
+            }
+
             const containers = [
                 // Supervisor containers
                 'supervisorTaskListContainer',
@@ -10398,7 +10432,7 @@ document.getElementById('newUserRole').addEventListener('change', function() {
                 'completedTasksSection',
                 'reportIssueSection',
                 'grassHealthWorkerSection',
-                'weatherForm'
+                'weatherSection'
             ];
 
             sections.forEach(id => {
@@ -11352,7 +11386,7 @@ document.getElementById('newUserRole').addEventListener('change', function() {
                 </div>
 
             </div>
-            
+
         </div>
 
         <div id="loadingOverlay" style="
