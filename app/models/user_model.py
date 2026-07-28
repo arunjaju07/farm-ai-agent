@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, DateTime, Float
 from sqlalchemy.sql import func
-from app.database.db import Base  # Changed from 'database.db' to 'app.database.db'
+from app.database.db import Base
 
 class User(Base):
     __tablename__ = "users"
@@ -11,7 +11,8 @@ class User(Base):
     username = Column(String, unique=True, nullable=False)
     password = Column(String, nullable=False)
     language = Column(String, nullable=True)
-    region = Column(String, nullable=True)  # 👈 ADD THIS
+    region = Column(String, nullable=True)
+    permissions = Column(String, nullable=True)  # 👈 ADDED
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
 class Location(Base):
@@ -21,5 +22,5 @@ class Location(Base):
     name = Column(String, nullable=False)
     area_acres = Column(Float, nullable=False)
     region = Column(String, nullable=False)
-    layout_url = Column(String, nullable=True)  # ← ADD THIS LINE
+    layout_url = Column(String, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())

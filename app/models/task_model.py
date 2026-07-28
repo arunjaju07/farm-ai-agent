@@ -19,6 +19,7 @@ class Task(Base):
     status = Column(String, default="pending")
     recurring_interval_days = Column(Integer, nullable=True)
     last_completed_at = Column(DateTime(timezone=True), nullable=True)
+    completed_at = Column(DateTime(timezone=True), nullable=True)
     next_due_date = Column(DateTime(timezone=True), nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     due_date = Column(DateTime(timezone=True), nullable=True)

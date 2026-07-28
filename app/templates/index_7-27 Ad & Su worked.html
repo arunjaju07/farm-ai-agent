@@ -969,7 +969,6 @@
             100% { transform: rotate(360deg); }
         }
 
-
     </style>
 </head>
 <body>
@@ -1874,19 +1873,19 @@
         <!-- Card 2: Completed -->
         <div class="card card-border-info" onclick="showSection('completedTasks')" style="cursor:pointer;">
             <div class="card-icon">✅</div>
-            <div class="card-label">Completed Tasks</div>
+            <div class="card-label">Complete</div>
             <div class="card-stats card-stats-info" id="workerCardCompletedCount">0</div>
             <div class="card-sub-stats" id="workerCardCompletedWeek">This Week</div>
-            <div class="card-action">➡️ View History</div>
+            <div class="card-action">➡️ History</div>
         </div>
 
         <!-- Card 3: Report -->
         <div class="card card-border-warning" onclick="showSection('reportIssue')" style="cursor:pointer;">
             <div class="card-icon">🚨</div>
-            <div class="card-label">Report Issue</div>
+            <div class="card-label">Report</div>
             <div class="card-stats card-stats-warning" id="workerCardReportCount">0</div>
             <div class="card-sub-stats" id="workerCardReportMonth">This Month</div>
-            <div class="card-action">➡️ Report Now</div>
+            <div class="card-action">➡️ New</div>
         </div>
 
         <!-- Card 4: Health -->
@@ -1951,366 +1950,6 @@
 
 
 
-<!-- ============================================================ -->
-<!-- WORKER - TASKS -->
-<!-- ============================================================ -->
-<div id="tasksSection" class="section" style="display:none;">
-
-    <div class="card">
-
-        <button onclick="goBackToDashboard()"
-            style="background:#2E7D32;width:auto;padding:8px 16px;margin-bottom:16px;border:none;border-radius:8px;color:white;cursor:pointer;font-weight:600;">
-            ← Back to Dashboard
-        </button>
-
-        <h3>📋 My Tasks</h3>
-
-        <div style="display:flex;gap:10px;flex-wrap:wrap;margin:15px 0;">
-
-            <input
-                type="date"
-                id="taskDatePicker"
-                onchange="loadTasks()"
-                style="padding:8px;">
-
-            <label style="display:flex;align-items:center;gap:6px;">
-                <input
-                    type="checkbox"
-                    id="showAllTasks"
-                    onchange="loadTasks()">
-                Show All
-            </label>
-
-        </div>
-
-        <div id="tasksList">
-            Loading tasks...
-        </div>
-
-    </div>
-
-</div>
-
-
-<!-- ============================================================ -->
-<!-- WORKER - COMPLETED TASKS -->
-<!-- ============================================================ -->
-<div id="completedTasksSection" class="section" style="display:none;">
-
-    <div class="card">
-
-        <button onclick="goBackToDashboard()"
-            style="background:#2E7D32;width:auto;padding:8px 16px;margin-bottom:16px;border:none;border-radius:8px;color:white;cursor:pointer;font-weight:600;">
-            ← Back to Dashboard
-        </button>
-
-        <h3>✅ Completed Tasks</h3>
-
-        <div style="display:flex;gap:10px;flex-wrap:wrap;margin:15px 0;">
-
-            <input
-                type="date"
-                id="completedTaskDate"
-                onchange="loadCompletedTasks()"
-                style="padding:8px;">
-
-        </div>
-
-        <div id="completedTasksList">
-            Loading completed tasks...
-        </div>
-
-    </div>
-
-</div>
-
-<!-- ============================================================ -->
-<!-- WORKER COMPLETED TASKS HISTORY -->
-<!-- ============================================================ -->
-
-<div id="completedTasksSection" class="section">
-
-    <div class="card">
-
-        <h2>✅ Completed Tasks</h2>
-
-        <button onclick="showSection('workerDashboard')"
-            style="background:#2E7D32;width:auto;padding:8px 16px;margin-bottom:16px;border:none;border-radius:8px;color:white;cursor:pointer;">
-            ← Back to Dashboard
-        </button>
-
-        <!-- Date Filters -->
-        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;">
-
-            <div style="flex:1;min-width:140px;">
-                <label>From</label>
-                <input
-                    type="date"
-                    id="completedFromDate"
-                    onchange="loadCompletedTasks()">
-            </div>
-
-            <div style="flex:1;min-width:140px;">
-                <label>To</label>
-                <input
-                    type="date"
-                    id="completedToDate"
-                    onchange="loadCompletedTasks()">
-            </div>
-
-        </div>
-
-        <div style="display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;">
-
-            <button
-                onclick="loadCompletedTasks()"
-                style="background:#2196F3;width:auto;padding:10px 18px;">
-                🔍 Filter
-            </button>
-
-            <button
-                onclick="clearCompletedDateFilter()"
-                style="background:#4CAF50;width:auto;padding:10px 18px;">
-                🔄 Last 30 Days
-            </button>
-
-        </div>
-
-        <!-- Statistics -->
-        <div
-            id="completedStats"
-            style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;">
-
-        </div>
-
-        <hr style="margin:18px 0;">
-
-        <!-- Task List -->
-        <div id="completedTasksList">
-
-            <div style="text-align:center;padding:30px;color:#888;">
-                Loading completed tasks...
-            </div>
-
-        </div>
-
-    </div>
-
-</div>
-
-
-<!-- ============================================================ -->
-<!-- WORKER REPORT ISSUE -->
-<!-- ============================================================ -->
-
-<div id="reportIssueSection" class="section">
-
-    <button onclick="showSection('workerDashboard')" class="back-btn">
-        ← Back to Dashboard
-    </button>
-
-    <h2>🚨 Report Issue</h2>
-
-    <div style="display:flex;gap:10px;margin-bottom:20px;">
-        <button id="btnNewReport"
-                onclick="showWorkerReportTab('new')"
-                style="flex:1;background:#4CAF50;">
-            ➕ New Report
-        </button>
-
-        <button id="btnMyReports"
-                onclick="showWorkerReportTab('list')"
-                style="flex:1;background:#2196F3;">
-            📋 My Reports
-        </button>
-    </div>
-    
-    <div class="card">
-
-        <div id="workerNewReportSection">
-        
-        <label><strong>Issue Type</strong></label>
-
-        <select id="issueType">
-            <option value="Water">💧 Water Problem</option>
-            <option value="Equipment">🚜 Equipment</option>
-            <option value="Grass">🌿 Grass Health</option>
-            <option value="Pest">🐛 Pest / Disease</option>
-            <option value="Fence">🚧 Fence Damage</option>
-            <option value="Animal">🐄 Animal Issue</option>
-            <option value="Other">📋 Other</option>
-        </select>
-
-        <br><br>
-
-        <label><strong>Farm / Location</strong></label>
-
-        <select id="issueLocation">
-            <option value="">Loading locations...</option>
-        </select>
-
-        <br><br>
-
-        <label><strong>Description</strong></label>
-
-        <textarea
-            id="issueDescription"
-            rows="4"
-            placeholder="Describe the issue..."
-        ></textarea>
-
-        <br><br>
-
-        <label><strong>📷 Photo</strong></label>
-
-        <input
-            type="file"
-            id="issuePhoto"
-            accept="image/*"
-            capture="environment"
-        >
-
-        <br><br>
-
-        <label><strong>🎤 Voice Note</strong></label>
-
-        <input
-            type="file"
-            id="issueAudio"
-            accept="audio/*"
-            capture="user"
-        >
-
-        <br><br>
-
-        <label><strong>📹 Video (Optional)</strong></label>
-
-        <input
-            type="file"
-            id="issueVideo"
-            accept="video/*"
-            capture="environment"
-        >
-
-        <br><br>
-
-        <button
-            onclick="reportIssue()"
-            style="background:#f44336;"
-        >
-            🚨 Submit Report
-        </button>
-
-    </div> <!-- workerNewReportSection -->
-
-    <div id="workerReportListSection" style="display:none;">
-
-        <div id="workerReportList">
-
-            <p style="text-align:center;color:#888;padding:20px;">
-                Loading reports...
-            </p>
-
-        </div>
-
-    </div>
-
-</div> <!-- card -->
-
-</div> <!-- reportIssueSection -->
-
-
-
-<!-- ===================================================== -->
-<!-- WORKER GRASS HEALTH -->
-<!-- ===================================================== -->
-
-<div id="grassHealthWorkerSection" class="section">
-
-    <button onclick="showSection('workerDashboard')" class="back-btn">
-        ← Back to Dashboard
-    </button>
-
-    <h2>🌿 Grass Health</h2>
-
-    <div style="display:flex;gap:10px;margin-bottom:20px;">
-
-        <button
-            id="btnNewHealth"
-            onclick="showWorkerHealthTab('new')"
-            style="flex:1;background:#4CAF50;">
-            📷 New Analysis
-        </button>
-
-        <button
-            id="btnHealthHistory"
-            onclick="showWorkerHealthTab('history')"
-            style="flex:1;background:#2196F3;">
-            📋 History
-        </button>
-
-    </div>
-
-    <div class="card">
-
-        <!-- ================= NEW ANALYSIS ================= -->
-
-        <div id="workerHealthNewSection">
-
-            <label><strong>Location</strong></label>
-
-            <select id="grassHealthLocation"></select>
-
-            <label><strong>Crop</strong></label>
-
-            <input
-                id="grassCropName"
-                type="text"
-                value="Elephant Grass">
-
-            <label><strong>Comments</strong></label>
-
-            <textarea
-                id="grassHealthComments"
-                rows="3"
-                placeholder="Anything you noticed..."></textarea>
-
-            <label><strong>Upload Photo</strong></label>
-
-            <input
-                id="grassHealthPhoto"
-                type="file"
-                accept="image/*"
-                capture="environment">
-
-            <button
-                onclick="submitGrassHealth()"
-                style="margin-top:20px;background:#4CAF50;">
-                🌿 Analyze Grass
-            </button>
-
-        </div>
-
-        <!-- ================= HISTORY ================= -->
-
-        <div
-            id="workerHealthHistorySection"
-            style="display:none;">
-
-            <div id="workerHealthHistory">
-
-                <p style="text-align:center;padding:25px;color:#777;">
-                    Loading...
-                </p>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</div>
-
 <!-- ====================================================== -->
 <!-- GLOBAL SHARED MODALS -->
 <!-- Used by Admin, Supervisor and Worker -->
@@ -2359,71 +1998,6 @@
         </div>
     </div>
 
-    
-    <!-- ====================================================== -->
-    <!-- Task Completion Modal -->
-    <!-- ====================================================== -->
-    <div id="completionModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:5000;">
-        <div style="background:white; margin:5% auto; max-width:450px; padding:20px; border-radius:16px; max-height:85vh; overflow-y:auto;">
-
-            <h3>✅ Complete Task</h3>
-
-            <p style="margin-bottom:15px;">
-                Completing:
-                <strong id="completionTaskTitle"></strong>
-            </p>
-
-            <input type="hidden" id="completionTaskId">
-
-            <label style="font-weight:bold;">📝 Completion Notes</label>
-            <textarea
-                id="completionNotes"
-                rows="3"
-                style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #ddd; border-radius:8px;"
-                placeholder="Describe what was completed..."></textarea>
-
-            <label style="font-weight:bold;">📸 Photo (Optional)</label>
-            <input
-                type="file"
-                id="completionPhoto"
-                accept="image/*"
-                capture="environment"
-                style="width:100%; margin-bottom:15px;">
-
-            <label style="font-weight:bold;">🎤 Audio (Optional)</label>
-            <input
-                type="file"
-                id="completionAudio"
-                accept="audio/*"
-                capture="user"
-                style="width:100%; margin-bottom:15px;">
-
-            <label style="font-weight:bold;">🎥 Video (Optional)</label>
-            <input
-                type="file"
-                id="completionVideo"
-                accept="video/*"
-                capture="environment"
-                style="width:100%; margin-bottom:20px;">
-
-            <div style="display:flex; gap:10px;">
-                <button
-                    onclick="submitTaskCompletion()"
-                    style="flex:1; background:#4CAF50; color:white; border:none; padding:12px; border-radius:8px; cursor:pointer;">
-                    ✅ Complete Task
-                </button>
-
-                <button
-                    onclick="closeCompletionModal()"
-                    style="flex:1; background:#999; color:white; border:none; padding:12px; border-radius:8px; cursor:pointer;">
-                    Cancel
-                </button>
-            </div>
-
-        </div>
-    </div>
-    
-    
     <!-- Progress Update Modal -->
     <div id="progressModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 5000;">
         <div style="background: white; margin: 10% auto; max-width: 400px; padding: 20px; border-radius: 16px;">
@@ -3507,8 +3081,6 @@
                 const el = document.getElementById(id);
                 if (el) {
                     el.classList.remove('active');
-                    el.style.display = 'none';
-                    el.style.visibility = 'hidden';
                 }
             });
 
@@ -3567,19 +3139,12 @@
             }
             if (sectionName === "reportIssue") {
                 loadLocations();
-                showWorkerReportTab("new");
             }
             if (sectionName === "tasks") {
                 loadTasks();
             }
             if (sectionName === "grassHealthWorker") {
-
-                showWorkerHealthTab("new");
-
-                loadGrassHealthLocations();
-
                 loadWorkerGrassIssues();
-
             }
             if (sectionName === "weather") {
                 setTimeout(() => {
@@ -3598,13 +3163,6 @@
                 loadLocationsForDropdowns();
             }
             if (sectionName === "workerDashboard") {
-
-                const reportSection = document.getElementById("reportIssueSection");
-                if (reportSection) {
-                    reportSection.classList.remove("active");
-                    reportSection.style.display = "none";
-                }
-
                 updateWorkerDashboard();
             }
             if (sectionName === "supervisorDashboard") {
@@ -4435,87 +3993,37 @@
         async function loadLocations() {
             try {
                 const response = await fetch(`${API_URL}/locations/all`);
-
-                if (!response.ok) {
-                    console.error("Failed to load locations");
-                    return;
-                }
-
-                let locations = await response.json();
-
-                // Worker should only see locations from their own region
-                if (
-                    currentUser &&
-                    currentUser.role === "worker" &&
-                    currentUser.region
-                ) {
-                    locations = locations.filter(
-                        loc => loc.region === currentUser.region
-                    );
-                }
-
-                // Get elements (may not exist on every page)
-                const locationsDiv = document.getElementById("locationsList");
-                const issueLocationSelect = document.getElementById("issueLocation");
-
-                // Clear Locations page
-                if (locationsDiv) {
+                if (response.ok) {
+                    let locations = await response.json();
+                    const locationsDiv = document.getElementById("locationsList");
+                    const issueLocationSelect = document.getElementById("issueLocation");
+                    
+                    // Filter locations by worker's region (if worker is logged in)
+                    if (currentUser && currentUser.role === 'worker' && currentUser.region) {
+                        locations = locations.filter(loc => loc.region === currentUser.region);
+                    }
+                    
                     locationsDiv.innerHTML = "";
-                }
-
-                // Clear Report Issue dropdown
-                if (issueLocationSelect) {
-                    issueLocationSelect.innerHTML =
-                        `<option value="">Select Location</option>`;
-                }
-
-                // Add locations
-                locations.forEach(loc => {
-
-                    const layoutButton = loc.layout_url
-                        ? `<button
-                                onclick="viewMedia('${loc.layout_url}','image')"
-                                style="
-                                    background:#2196F3;
-                                    padding:5px 10px;
-                                    width:auto;
-                                    font-size:11px;
-                                    margin-top:5px;">
-                                🗺️ View Layout
-                        </button>`
-                        : "";
-
-                    // Locations page
-                    if (locationsDiv) {
+                    issueLocationSelect.innerHTML = '<option value="">Select Location</option>';
+                    
+                    locations.forEach(loc => {
+                        // Create layout button if layout_url exists
+                        const layoutButton = loc.layout_url ? `<button onclick="viewMedia('${loc.layout_url}', 'image')" style="background: #2196F3; padding: 5px 10px; width: auto; font-size: 11px; margin-top: 5px;">🗺️ View Layout</button>` : '';
+                        
                         locationsDiv.innerHTML += `
                             <div class="location-item">
-                                <strong>${loc.name}</strong><br>
-
-                                ${loc.area_acres > 0
-                                    ? `${loc.area_acres} Acres<br>`
-                                    : ""}
-
-                                <small>${loc.region}</small><br>
-
+                                <strong>${loc.name}</strong>
+                                ${loc.area_acres > 0 ? `${loc.area_acres} Acres` : ''}
+                                <small>${loc.region}</small>
                                 ${layoutButton}
                             </div>
                         `;
-                    }
-
-                    // Report Issue dropdown
-                    if (issueLocationSelect) {
-                        issueLocationSelect.innerHTML += `
-                            <option value="${loc.id}">
-                                ${loc.name} (${loc.region})
-                            </option>
-                        `;
-                    }
-
-                });
-
+                        
+                        issueLocationSelect.innerHTML += `<option value="${loc.id}">${loc.name} (${loc.region})</option>`;
+                    });
+                }
             } catch (err) {
                 console.error("Error loading locations:", err);
-                showMessage("Failed to load locations", "error");
             }
         }
 
@@ -6048,23 +5556,6 @@
 
         async function loadCompletedTasks() {
             if (!currentUser) return;
-            const list = document.getElementById("completedTasksList");
-            if (list) {
-                list.innerHTML = `
-                    <div style="text-align:center;padding:30px;">
-                        <div class="spinner" style="
-                            width:40px;
-                            height:40px;
-                            border:4px solid #ddd;
-                            border-top:4px solid #4CAF50;
-                            border-radius:50%;
-                            margin:auto;
-                            animation:spin 1s linear infinite;">
-                        </div>
-                        <p style="margin-top:12px;">Loading completed tasks...</p>
-                    </div>
-                `;
-            }
             
             // Get date range
             let fromDate = document.getElementById('completedFromDate')?.value;
@@ -6253,12 +5744,7 @@
                 const issues = await response.json();
                 console.log("Issues received:", issues);
                 
-                const container = document.getElementById('workerHealthHistory');
-
-                if (!container) {
-                    console.error("workerHealthHistory container not found");
-                    return;
-                }
+                const container = document.getElementById('workerGrassIssuesList');
                 
                 if (issues.length === 0) {
                     container.innerHTML = '<p style="color: #999;">No grass health reports submitted yet</p>';
@@ -6269,10 +5755,6 @@
                 for (const issue of issues) {
                     const locRes = await fetch('/locations/all');
                     const locations = await locRes.json();
-
-                    for (const issue of issues) {
-                        // use locations here
-                    }
                     const location = locations.find(l => l.id === issue.location_id);
                     const locationName = location ? location.name : 'Unknown';
                     
@@ -6811,39 +6293,6 @@
         }
         
         
-        async function loadGrassHealthLocations() {
-
-            try {
-
-                const response = await fetch('/grass-health/locations');
-                let locations = await response.json();
-
-                // Worker should only see their own region
-                if (currentUser && currentUser.role === "worker" && currentUser.region) {
-                    locations = locations.filter(loc => loc.region === currentUser.region);
-                }
-
-                const select = document.getElementById("grassHealthLocation");
-
-                if (!select) return;
-
-                select.innerHTML = '<option value="">Select Location</option>';
-
-                locations.forEach(loc => {
-                    select.innerHTML += `
-                        <option value="${loc.id}">
-                            ${loc.name} (${loc.region})
-                        </option>
-                    `;
-                });
-
-            } catch (err) {
-                console.error("Error loading grass locations:", err);
-            }
-
-        }
-        
-        
         // ============================================
         // UPDATE DASHBOARD STATS
         // ============================================
@@ -7304,11 +6753,9 @@
         
  
         async function reportIssue() {
-
             const issueType = document.getElementById("issueType").value;
             const locationId = document.getElementById("issueLocation").value;
             const description = document.getElementById("issueDescription").value;
-
             const photoFile = document.getElementById("issuePhoto").files[0];
             const audioFile = document.getElementById("issueAudio").files[0];
             const videoFile = document.getElementById("issueVideo").files[0];
@@ -7318,124 +6765,69 @@
                 return;
             }
 
-            showLoadingOverlay(
-                "Uploading Report",
-                "Please wait while your report and media are uploaded..."
-            );
+            showMessage("Uploading media...", "success");
 
             let photoUrl = null;
             let audioUrl = null;
             let videoUrl = null;
 
-            try {
-
-                // ===========================
-                // Upload Photo
-                // ===========================
-                if (photoFile) {
-                    const formData = new FormData();
-                    formData.append("file", photoFile);
-
-                    const response = await fetch("/upload/photo", {
-                        method: "POST",
-                        body: formData
-                    });
-
-                    if (response.ok) {
-                        const result = await response.json();
-                        photoUrl = result.url;
-                    }
-                }
-
-                // ===========================
-                // Upload Audio
-                // ===========================
-                if (audioFile) {
-                    const formData = new FormData();
-                    formData.append("file", audioFile);
-
-                    const response = await fetch("/upload/audio", {
-                        method: "POST",
-                        body: formData
-                    });
-
-                    if (response.ok) {
-                        const result = await response.json();
-                        audioUrl = result.url;
-                    }
-                }
-
-                // ===========================
-                // Upload Video
-                // ===========================
-                if (videoFile) {
-                    const formData = new FormData();
-                    formData.append("file", videoFile);
-
-                    const response = await fetch("/upload/video", {
-                        method: "POST",
-                        body: formData
-                    });
-
-                    if (response.ok) {
-                        const result = await response.json();
-                        videoUrl = result.url;
-                    }
-                }
-
-                // ===========================
-                // Submit Report
-                // ===========================
-                const response = await fetch("/issues/report", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        issue_type: issueType,
-                        location_id: parseInt(locationId),
-                        description: description,
-                        reported_by: currentUser.user_id,
-                        photo_url: photoUrl,
-                        audio_url: audioUrl,
-                        video_url: videoUrl
-                    })
-                });
-
+            // Upload photo if selected
+            if (photoFile) {
+                const formData = new FormData();
+                formData.append('file', photoFile);
+                const response = await fetch('/upload/photo', { method: 'POST', body: formData });
                 if (response.ok) {
-
-                    showMessage("✅ Issue reported successfully!", "success");
-
-                    document.getElementById("issueDescription").value = "";
-                    document.getElementById("issueLocation").value = "";
-                    document.getElementById("issuePhoto").value = "";
-                    document.getElementById("issueAudio").value = "";
-                    document.getElementById("issueVideo").value = "";
-
-                    if (typeof updateWorkerDashboard === "function") {
-                        updateWorkerDashboard();
-                    }
-
-                    setTimeout(() => {
-                        showSection("workerDashboard");
-                    }, 1000);
-
-                } else {
-
-                    const error = await response.json();
-                    showMessage(error.detail || "Failed to report issue", "error");
-
+                    const result = await response.json();
+                    photoUrl = result.url;
                 }
+            }
 
-            } catch (err) {
+            // Upload audio if selected
+            if (audioFile) {
+                const formData = new FormData();
+                formData.append('file', audioFile);
+                const response = await fetch('/upload/audio', { method: 'POST', body: formData });
+                if (response.ok) {
+                    const result = await response.json();
+                    audioUrl = result.url;
+                }
+            }
 
-                console.error("Report Issue Error:", err);
-                showMessage("Failed to report issue.", "error");
+            // Upload video if selected
+            if (videoFile) {
+                const formData = new FormData();
+                formData.append('file', videoFile);
+                const response = await fetch('/upload/video', { method: 'POST', body: formData });
+                if (response.ok) {
+                    const result = await response.json();
+                    videoUrl = result.url;
+                }
+            }
 
-            } finally {
+            const response = await fetch('/issues/report', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    issue_type: issueType,
+                    location_id: parseInt(locationId),
+                    description: description,
+                    reported_by: currentUser.user_id,
+                    photo_url: photoUrl,
+                    audio_url: audioUrl,
+                    video_url: videoUrl
+                })
+            });
 
-                hideLoadingOverlay();
-
+            if (response.ok) {
+                showMessage("Issue reported successfully!", "success");
+                document.getElementById("issueDescription").value = "";
+                document.getElementById("issueLocation").value = "";
+                document.getElementById("issuePhoto").value = "";
+                document.getElementById("issueAudio").value = "";
+                document.getElementById("issueVideo").value = "";
+            } else {
+                const error = await response.json();
+                showMessage(error.detail || "Failed to report issue", "error");
             }
         }
 
@@ -10511,283 +9903,6 @@ document.getElementById('newUserRole').addEventListener('change', function() {
 
         }
 
-        
-        function showWorkerReportTab(tab) {
-
-            const newSection = document.getElementById("workerNewReportSection");
-            const listSection = document.getElementById("workerReportListSection");
-
-            const btnNew = document.getElementById("btnNewReport");
-            const btnList = document.getElementById("btnMyReports");
-
-            if (tab === "new") {
-
-                newSection.style.display = "block";
-                newSection.style.visibility = "visible";
-
-                listSection.style.display = "none";
-                listSection.style.visibility = "hidden";
-
-                btnNew.style.background = "#4CAF50";
-                btnList.style.background = "#2196F3";
-
-            } else {
-
-                newSection.style.display = "none";
-                newSection.style.visibility = "hidden";
-
-                listSection.style.display = "block";
-                listSection.style.visibility = "visible";
-
-                btnNew.style.background = "#999";
-                btnList.style.background = "#4CAF50";
-
-                loadWorkerReports();
-            }
-        }
-
-
-        async function loadWorkerReports() {
-
-            try {
-
-                const response = await fetch(`/issues/user/${currentUser.user_id}`);
-
-                if (!response.ok) {
-                    return;
-                }
-
-                const reports = await response.json();
-
-                const container = document.getElementById("workerReportList");
-
-                if (reports.length === 0) {
-
-                    container.innerHTML = `
-                        <p style="text-align:center;color:#888;padding:20px;">
-                            No reports submitted yet.
-                        </p>
-                    `;
-
-                    return;
-                }
-
-                let html = "";
-
-                reports.forEach(report => {
-
-                    let color = "#ff9800";
-
-                    if (report.status === "resolved") color = "#4CAF50";
-                    if (report.status === "in_progress") color = "#2196F3";
-
-                    html += `
-                        <div class="task-item" style="border-left:4px solid ${color};margin-bottom:12px;">
-
-                            <strong>${report.issue_type}</strong>
-
-                            <p>${report.description}</p>
-
-                            <small>
-                                📍 ${report.location_name || ""}
-                            </small>
-
-                            <br>
-
-                            <small>
-                                📅 ${new Date(report.created_at).toLocaleString()}
-                            </small>
-
-                            <br><br>
-
-                            <span style="
-                                background:${color};
-                                color:white;
-                                padding:4px 10px;
-                                border-radius:20px;
-                                font-size:11px;">
-                                ${report.status}
-                            </span>
-
-                        </div>
-                    `;
-
-                });
-
-                container.innerHTML = html;
-
-            } catch (err) {
-
-                console.error(err);
-
-            }
-
-        }
-        
-        
-        function showWorkerHealthTab(tab){
-
-            const newSection=document.getElementById("workerHealthNewSection");
-            const history=document.getElementById("workerHealthHistorySection");
-
-            const btnNew=document.getElementById("btnNewHealth");
-            const btnHistory=document.getElementById("btnHealthHistory");
-
-            if(tab==="new"){
-
-                newSection.style.display="block";
-                newSection.style.visibility="visible";
-
-                history.style.display="none";
-                history.style.visibility="hidden";
-
-                btnNew.style.background="#4CAF50";
-                btnHistory.style.background="#2196F3";
-
-            }else{
-
-                newSection.style.display="none";
-                newSection.style.visibility="hidden";
-
-                history.style.display="block";
-                history.style.visibility="visible";
-
-                btnNew.style.background="#999";
-                btnHistory.style.background="#4CAF50";
-
-                loadWorkerGrassIssues();
-
-            }
-
-        }
-        
-        async function submitGrassHealth(){
-
-            const locationId=document.getElementById("grassHealthLocation").value;
-            const crop=document.getElementById("grassCropName").value;
-            const comments=document.getElementById("grassHealthComments").value;
-            const photo=document.getElementById("grassHealthPhoto").files[0];
-
-            if(!locationId){
-                showMessage("Please select location","error");
-                return;
-            }
-
-            if(!photo){
-                showMessage("Please upload a photo","error");
-                return;
-            }
-
-            showLoadingOverlay(
-                "Analyzing Crop",
-                "Uploading photo and running AI analysis..."
-            );
-
-            try{
-                const formData = new FormData();
-                formData.append("file", photo);
-                const response = await fetch("/grass-health/analyze", {
-
-                    method: "POST",
-                    body: formData
-
-                });
-
-                console.log("Analyze Status:", response.status);
-
-                const result = await response.json();
-
-                console.log("AI Result:", result);
-
-                if (response.ok) {
-
-                    showMessage("Grass health analyzed successfully","success");
-
-                    document.getElementById("grassHealthComments").value="";
-                    document.getElementById("grassHealthPhoto").value="";
-
-                    showWorkerHealthTab("history");
-
-                }else{
-
-                    showMessage(result.detail || "Analysis failed","error");
-
-                }
-
-            }catch(err){
-
-                console.error(err);
-
-                showMessage("Analysis failed","error");
-
-            }finally{
-
-                hideLoadingOverlay();
-
-            }
-
-        }
-
-        async function loadWorkerGrassHistory(){
-
-            const container=document.getElementById("workerHealthHistory");
-
-            container.innerHTML="<p style='text-align:center'>Loading...</p>";
-
-            try{
-
-                const response=await fetch(`/grass-health/user/${currentUser.user_id}`);
-
-                const reports=await response.json();
-
-                if(reports.length===0){
-
-                    container.innerHTML="<p style='text-align:center;color:#777'>No reports found.</p>";
-
-                    return;
-
-                }
-
-                let html="";
-
-                reports.forEach(report=>{
-
-                    html+=`
-
-                    <div class="task-item" style="margin-bottom:12px;border-left:4px solid #4CAF50;">
-
-                        <strong>${report.crop_name}</strong>
-
-                        <span style="float:right;background:#4CAF50;color:white;padding:3px 8px;border-radius:10px;font-size:11px;">
-
-                            ${report.health_status}
-
-                        </span>
-
-                        <p>${report.ai_result || ""}</p>
-
-                        <small>${new Date(report.created_at).toLocaleString()}</small>
-
-                    </div>
-
-                    `;
-
-                });
-
-                container.innerHTML=html;
-
-            }catch(err){
-
-                console.error(err);
-
-                container.innerHTML="<p style='color:red;text-align:center'>Unable to load history.</p>";
-
-            }
-
-        }
-
-
-
         // ============================================
         // MEDIA VIEWER FUNCTIONS
         // ============================================
@@ -10874,55 +9989,12 @@ document.getElementById('newUserRole').addEventListener('change', function() {
             }
         }
 
-
-        function showLoadingOverlay(title = "Uploading...", message = "Please wait...") {
-            const overlay = document.getElementById("loadingOverlay");
-            const titleEl = document.getElementById("loadingTitle");
-            const messageEl = document.getElementById("loadingMessage");
-            if (titleEl) titleEl.textContent = title;
-            if (messageEl) messageEl.textContent = message;
-            if (overlay) overlay.style.display = "flex";
-        }
-
-        function hideLoadingOverlay() {
-            const overlay = document.getElementById("loadingOverlay");
-            if (overlay) overlay.style.display = "none";
-        }
-
-
-        function showLoadingOverlay(message = "Uploading...") {
-            const overlay = document.getElementById("loadingOverlay");
-            const text = document.getElementById("loadingText");
-            if(text){
-                text.textContent = message;
-            }
-
-            if(overlay){
-                overlay.style.display = "flex";
-            }
-
-        }
-
-        function hideLoadingOverlay() {
-
-            const overlay = document.getElementById("loadingOverlay");
-
-            if(overlay){
-                overlay.style.display = "none";
-            }
-
-        }
-
-
-
-
         // ============================================
         // 👆 END OF NEW ADMIN FUNCTIONS 👆
         // ============================================
 
     </script>
 
-        
         <!-- ============================================================ -->
         <!--  SUPERVISOR DASHBOARD                                         -->
         <!-- ============================================================ -->
@@ -11352,50 +10424,7 @@ document.getElementById('newUserRole').addEventListener('change', function() {
                 </div>
 
             </div>
-            
-        </div>
-
-        <div id="loadingOverlay" style="
-                display:none;
-                position:fixed;
-                top:0;
-                left:0;
-                width:100%;
-                height:100%;
-                background:rgba(0,0,0,0.6);
-                z-index:99999;
-                justify-content:center;
-                align-items:center;
-            ">
-
-                <div style="
-                    background:white;
-                    padding:25px;
-                    border-radius:16px;
-                    text-align:center;
-                    width:300px;
-                    max-width:90%;
-                ">
-
-                    <div style="
-                        width:50px;
-                        height:50px;
-                        border:5px solid #ddd;
-                        border-top:5px solid #4CAF50;
-                        border-radius:50%;
-                        animation:spin 1s linear infinite;
-                        margin:0 auto 20px;
-                    "></div>
-
-                    <h3 id="loadingTitle">Uploading...</h3>
-
-                    <p id="loadingMessage">
-                        Please wait...
-                    </p>
-
-                </div>
-
-            </div>            
+        
     
 
 

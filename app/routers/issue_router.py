@@ -72,6 +72,35 @@ def get_all_issues(db: Session = Depends(get_db)):
         for i in issues
     ]
 
+# Get issues reported by a specific worker
+@router.get("/user/{user_id}")
+def get_user_issues(user_id: int, db: Session = Depends(get_db)):
+    issues = (
+        db.query(Issue)
+        .filter(Issue.reported_by == user_id)
+        .order_by(Issue.created_at.desc())
+        .all()
+    )
+
+    return [
+        {
+            "id": i.id,
+            "issue_type": i.issue_type,
+            "location_id": i.location_id,
+            "description": i.description,
+            "reported_by": i.reported_by,
+            "status": i.status,
+            "assigned_to": i.assigned_to,
+            "photo_url": i.photo_url,
+            "audio_url": i.audio_url,
+            "video_url": i.video_url,
+            "resolved_at": i.resolved_at,
+            "created_at": i.created_at
+        }
+        for i in issues
+    ]
+
+
 # Update issue status (Admin/Supervisor)
 @router.put("/{issue_id}")
 def update_issue(issue_id: int, update: IssueUpdate, db: Session = Depends(get_db)):

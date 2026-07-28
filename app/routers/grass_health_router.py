@@ -37,8 +37,7 @@ async def analyze_grass_photo(file: UploadFile = File(...)):
         mime_type = file.content_type
         
         api_key = os.getenv("GEMINI_API_KEY")
-        if not api_key:
-            raise HTTPException(status_code=500, detail="GEMINI_API_KEY not configured")
+        print("Gemini Key Loaded:", api_key[:10] + "..." if api_key else "NOT FOUND")
         
         prompt = """You are an agricultural AI expert specializing in elephant grass (Napier grass). 
 
@@ -115,6 +114,7 @@ Return ONLY valid JSON, no other text or explanation."""
 
 class GrassHealthReport(BaseModel):
     location_id: int
+    worker_id: int
     zone_id: Optional[int] = None
     photo_urls: List[str]
     ai_disease: Optional[str] = None
@@ -136,7 +136,8 @@ class GrassHealthReport(BaseModel):
     media_video_url: Optional[str] = None
 
 @router.post("/report")
-def report_grass_issue(report: GrassHealthReport, db: Session = Depends(get_db), user_id: int = None):
+def report_grass_issue(report: GrassHealthReport, db: Session = Depends(get_db)
+    ):
     """Create new active grass health issue"""
     # Get user_id from request (will be set by frontend)
     # In production, get from auth token
@@ -144,7 +145,7 @@ def report_grass_issue(report: GrassHealthReport, db: Session = Depends(get_db),
     new_issue = GrassHealthIssue(
         location_id=report.location_id,
         zone_id=report.zone_id,
-        detected_by=user_id,
+        detected_by=report.worker_id,
         photo_urls=report.photo_urls,
         ai_disease=report.ai_disease,
         ai_confidence=report.ai_confidence,

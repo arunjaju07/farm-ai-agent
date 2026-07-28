@@ -58,6 +58,23 @@ def get_zones_by_location(location_id: int):
     db.close()
     return zones
 
+@router.get("/{zone_id}")
+def get_zone(zone_id: int):
+    db = SessionLocal()
+    zone = db.query(Zone).filter(Zone.id == zone_id).first()
+    db.close()
+    
+    if not zone:
+        raise HTTPException(status_code=404, detail="Zone not found")
+    
+    return {
+        "id": zone.id,
+        "name": zone.name,
+        "area_acres": zone.area_acres,
+        "location_id": zone.location_id,
+        "created_at": zone.created_at
+    }
+
 @router.put("/update/{zone_id}")
 def update_zone(zone_id: int, zone: ZoneCreate):
     db = SessionLocal()
@@ -79,6 +96,7 @@ def update_zone(zone_id: int, zone: ZoneCreate):
     
     except Exception as e:
         db.close()
+        print("Error:", str(e))  # ← ADD THIS to see the error in console
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.delete("/delete/{zone_id}")

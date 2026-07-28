@@ -126,11 +126,10 @@ def complete_task(completion: TaskComplete):
         raise HTTPException(status_code=404, detail="Task not found")
     
     task.status = "completed"
-    
-    # ========== ADD THIS LINE HERE ==========
+
+    task.completed_at = datetime.now(timezone.utc)
     task.last_completed_at = datetime.now(timezone.utc)
-    # =======================================
-    
+
     task_completion = TaskCompletion(
         task_id=completion.task_id,
         completed_by=completion.completed_by,

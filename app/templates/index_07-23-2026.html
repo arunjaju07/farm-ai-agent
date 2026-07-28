@@ -969,7 +969,6 @@
             100% { transform: rotate(360deg); }
         }
 
-
     </style>
 </head>
 <body>
@@ -1159,7 +1158,7 @@
         <button class="nav-item" onclick="showAdminTab('grassHealth'); document.getElementById('adminSection').style.display = 'none'; window.scrollTo(0, 0);">
             <span class="nav-icon">🌿</span>Health
         </button>
-        <button class="nav-item" onclick="console.log('Weather clicked'); showSection('weather');">
+        <button class="nav-item" onclick="showSection('weather')">
             <span class="nav-icon">🌤</span>Weather
         </button>
         <button class="nav-item" onclick="toggleMoreMenu()">
@@ -1201,8 +1200,6 @@
             
         </div>
     </div>
-  
-
 
 </div><!-- End adminSection -->
 
@@ -1211,159 +1208,6 @@
 <!-- ============================================================ -->
 
 <div id="adminTabForms" style="margin-top:var(--space-lg);">
-    
-    <div id="weatherForm" style="display:none;">
-
-        <div class="card">
-
-            <button onclick="goBackToDashboard()"
-                style="background:#2E7D32;width:auto;padding:8px 16px;margin-bottom:16px;border:none;border-radius:8px;color:white;cursor:pointer;font-weight:600;">
-                ← Back to Dashboard
-            </button>
-
-            <h2 style="margin-bottom:20px;">🌤 Weather & Rain Forecast</h2>
-
-            <!-- Role -->
-            <div style="margin-bottom:15px;">
-                <strong>Role:</strong>
-                <span id="weatherUserRole"
-                    style="background:#4CAF50;color:white;padding:4px 10px;border-radius:20px;font-size:13px;">
-                </span>
-            </div>
-
-            <!-- Location -->
-            <div style="margin-bottom:20px;">
-
-                <label style="font-weight:bold;">📍 Location</label>
-
-                <select id="weatherLocationSelect"
-                        onchange="fetchWeather()"
-                        style="margin-top:8px;">
-
-                    <option value="">Select Location</option>
-
-                </select>
-
-                <div id="weatherLocationInfo"
-                    style="margin-top:8px;color:#666;font-size:14px;">
-                </div>
-
-            </div>
-
-            <!-- Loading -->
-            <div id="weatherLoading"
-                style="display:none;text-align:center;padding:30px;">
-
-                ⏳ Loading weather...
-
-            </div>
-
-            <!-- Error -->
-            <div id="weatherError"
-                style="display:none;background:#ffebee;padding:15px;border-radius:10px;">
-
-                ❌ <span id="weatherErrorMessage"></span>
-
-            </div>
-
-            <!-- Weather -->
-            <div id="weatherContent" style="display:none;">
-
-                <!-- Rain -->
-                <div class="card"
-                    style="background:#E3F2FD;margin-bottom:20px;">
-
-                    <h3>🌧 Rain Forecast</h3>
-
-                    <div id="weatherRain"
-                        style="font-size:18px;font-weight:bold;margin-top:10px;">
-                    </div>
-
-                </div>
-
-                <!-- Current -->
-                <div class="card"
-                    style="margin-bottom:20px;">
-
-                    <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
-
-                        <div style="font-size:60px;"
-                            id="weatherIcon">
-                            🌤
-                        </div>
-
-                        <div>
-
-                            <h3 id="weatherLocation"></h3>
-
-                            <div id="weatherRegion"
-                                style="color:#666;"></div>
-
-                            <h2>
-                                <span id="weatherTemp"></span>°C
-                            </h2>
-
-                            <div id="weatherDescription"></div>
-
-                        </div>
-
-                    </div>
-
-                    <hr style="margin:20px 0;">
-
-                    <div style="
-                        display:grid;
-                        grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
-                        gap:15px;">
-
-                        <div>🌡 Feels Like<br><strong><span id="weatherFeelsLike"></span>°C</strong></div>
-
-                        <div>💧 Humidity<br><strong><span id="weatherHumidity"></span>%</strong></div>
-
-                        <div>🌬 Wind<br><strong><span id="weatherWind"></span> km/h</strong></div>
-
-                        <div>📈 Pressure<br><strong><span id="weatherPressure"></span> hPa</strong></div>
-
-                        <div>🌅 Sunrise<br><strong id="weatherSunrise"></strong></div>
-
-                        <div>🌇 Sunset<br><strong id="weatherSunset"></strong></div>
-
-                    </div>
-
-                </div>
-
-                <!-- Forecast -->
-                <div class="card">
-
-                    <h3>📅 5-Day Forecast</h3>
-
-                    <div id="weatherForecast"
-                        style="
-                            display:grid;
-                            grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
-                            gap:12px;
-                            margin-top:15px;">
-                    </div>
-
-                    <div style="
-                        margin-top:20px;
-                        color:#777;
-                        font-size:12px;">
-
-                        Last Updated:
-                        <span id="weatherLastUpdated"></span>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-    
     
     <!-- Add User Form -->
     <div id="addUserForm" class="admin-tab" style="display: none;">
@@ -1874,19 +1718,19 @@
         <!-- Card 2: Completed -->
         <div class="card card-border-info" onclick="showSection('completedTasks')" style="cursor:pointer;">
             <div class="card-icon">✅</div>
-            <div class="card-label">Completed Tasks</div>
+            <div class="card-label">Complete</div>
             <div class="card-stats card-stats-info" id="workerCardCompletedCount">0</div>
             <div class="card-sub-stats" id="workerCardCompletedWeek">This Week</div>
-            <div class="card-action">➡️ View History</div>
+            <div class="card-action">➡️ History</div>
         </div>
 
         <!-- Card 3: Report -->
         <div class="card card-border-warning" onclick="showSection('reportIssue')" style="cursor:pointer;">
             <div class="card-icon">🚨</div>
-            <div class="card-label">Report Issue</div>
+            <div class="card-label">Report</div>
             <div class="card-stats card-stats-warning" id="workerCardReportCount">0</div>
             <div class="card-sub-stats" id="workerCardReportMonth">This Month</div>
-            <div class="card-action">➡️ Report Now</div>
+            <div class="card-action">➡️ New</div>
         </div>
 
         <!-- Card 4: Health -->
@@ -1948,821 +1792,6 @@
     </div>
 
 </div>
-
-
-
-<!-- ============================================================ -->
-<!-- WORKER - TASKS -->
-<!-- ============================================================ -->
-<div id="tasksSection" class="section" style="display:none;">
-
-    <div class="card">
-
-        <button onclick="goBackToDashboard()"
-            style="background:#2E7D32;width:auto;padding:8px 16px;margin-bottom:16px;border:none;border-radius:8px;color:white;cursor:pointer;font-weight:600;">
-            ← Back to Dashboard
-        </button>
-
-        <h3>📋 My Tasks</h3>
-
-        <div style="display:flex;gap:10px;flex-wrap:wrap;margin:15px 0;">
-
-            <input
-                type="date"
-                id="taskDatePicker"
-                onchange="loadTasks()"
-                style="padding:8px;">
-
-            <label style="display:flex;align-items:center;gap:6px;">
-                <input
-                    type="checkbox"
-                    id="showAllTasks"
-                    onchange="loadTasks()">
-                Show All
-            </label>
-
-        </div>
-
-        <div id="tasksList">
-            Loading tasks...
-        </div>
-
-    </div>
-
-</div>
-
-
-<!-- ============================================================ -->
-<!-- WORKER - COMPLETED TASKS -->
-<!-- ============================================================ -->
-<div id="completedTasksSection" class="section" style="display:none;">
-
-    <div class="card">
-
-        <button onclick="goBackToDashboard()"
-            style="background:#2E7D32;width:auto;padding:8px 16px;margin-bottom:16px;border:none;border-radius:8px;color:white;cursor:pointer;font-weight:600;">
-            ← Back to Dashboard
-        </button>
-
-        <h3>✅ Completed Tasks</h3>
-
-        <div style="display:flex;gap:10px;flex-wrap:wrap;margin:15px 0;">
-
-            <input
-                type="date"
-                id="completedTaskDate"
-                onchange="loadCompletedTasks()"
-                style="padding:8px;">
-
-        </div>
-
-        <div id="completedTasksList">
-            Loading completed tasks...
-        </div>
-
-    </div>
-
-</div>
-
-<!-- ============================================================ -->
-<!-- WORKER COMPLETED TASKS HISTORY -->
-<!-- ============================================================ -->
-
-<div id="completedTasksSection" class="section">
-
-    <div class="card">
-
-        <h2>✅ Completed Tasks</h2>
-
-        <button onclick="showSection('workerDashboard')"
-            style="background:#2E7D32;width:auto;padding:8px 16px;margin-bottom:16px;border:none;border-radius:8px;color:white;cursor:pointer;">
-            ← Back to Dashboard
-        </button>
-
-        <!-- Date Filters -->
-        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;">
-
-            <div style="flex:1;min-width:140px;">
-                <label>From</label>
-                <input
-                    type="date"
-                    id="completedFromDate"
-                    onchange="loadCompletedTasks()">
-            </div>
-
-            <div style="flex:1;min-width:140px;">
-                <label>To</label>
-                <input
-                    type="date"
-                    id="completedToDate"
-                    onchange="loadCompletedTasks()">
-            </div>
-
-        </div>
-
-        <div style="display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;">
-
-            <button
-                onclick="loadCompletedTasks()"
-                style="background:#2196F3;width:auto;padding:10px 18px;">
-                🔍 Filter
-            </button>
-
-            <button
-                onclick="clearCompletedDateFilter()"
-                style="background:#4CAF50;width:auto;padding:10px 18px;">
-                🔄 Last 30 Days
-            </button>
-
-        </div>
-
-        <!-- Statistics -->
-        <div
-            id="completedStats"
-            style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;">
-
-        </div>
-
-        <hr style="margin:18px 0;">
-
-        <!-- Task List -->
-        <div id="completedTasksList">
-
-            <div style="text-align:center;padding:30px;color:#888;">
-                Loading completed tasks...
-            </div>
-
-        </div>
-
-    </div>
-
-</div>
-
-
-<!-- ============================================================ -->
-<!-- WORKER REPORT ISSUE -->
-<!-- ============================================================ -->
-
-<div id="reportIssueSection" class="section">
-
-    <button onclick="showSection('workerDashboard')" class="back-btn">
-        ← Back to Dashboard
-    </button>
-
-    <h2>🚨 Report Issue</h2>
-
-    <div style="display:flex;gap:10px;margin-bottom:20px;">
-        <button id="btnNewReport"
-                onclick="showWorkerReportTab('new')"
-                style="flex:1;background:#4CAF50;">
-            ➕ New Report
-        </button>
-
-        <button id="btnMyReports"
-                onclick="showWorkerReportTab('list')"
-                style="flex:1;background:#2196F3;">
-            📋 My Reports
-        </button>
-    </div>
-    
-    <div class="card">
-
-        <div id="workerNewReportSection">
-        
-        <label><strong>Issue Type</strong></label>
-
-        <select id="issueType">
-            <option value="Water">💧 Water Problem</option>
-            <option value="Equipment">🚜 Equipment</option>
-            <option value="Grass">🌿 Grass Health</option>
-            <option value="Pest">🐛 Pest / Disease</option>
-            <option value="Fence">🚧 Fence Damage</option>
-            <option value="Animal">🐄 Animal Issue</option>
-            <option value="Other">📋 Other</option>
-        </select>
-
-        <br><br>
-
-        <label><strong>Farm / Location</strong></label>
-
-        <select id="issueLocation">
-            <option value="">Loading locations...</option>
-        </select>
-
-        <br><br>
-
-        <label><strong>Description</strong></label>
-
-        <textarea
-            id="issueDescription"
-            rows="4"
-            placeholder="Describe the issue..."
-        ></textarea>
-
-        <br><br>
-
-        <label><strong>📷 Photo</strong></label>
-
-        <input
-            type="file"
-            id="issuePhoto"
-            accept="image/*"
-            capture="environment"
-        >
-
-        <br><br>
-
-        <label><strong>🎤 Voice Note</strong></label>
-
-        <input
-            type="file"
-            id="issueAudio"
-            accept="audio/*"
-            capture="user"
-        >
-
-        <br><br>
-
-        <label><strong>📹 Video (Optional)</strong></label>
-
-        <input
-            type="file"
-            id="issueVideo"
-            accept="video/*"
-            capture="environment"
-        >
-
-        <br><br>
-
-        <button
-            onclick="reportIssue()"
-            style="background:#f44336;"
-        >
-            🚨 Submit Report
-        </button>
-
-    </div> <!-- workerNewReportSection -->
-
-    <div id="workerReportListSection" style="display:none;">
-
-        <div id="workerReportList">
-
-            <p style="text-align:center;color:#888;padding:20px;">
-                Loading reports...
-            </p>
-
-        </div>
-
-    </div>
-
-</div> <!-- card -->
-
-</div> <!-- reportIssueSection -->
-
-
-
-<!-- ===================================================== -->
-<!-- WORKER GRASS HEALTH -->
-<!-- ===================================================== -->
-
-<div id="grassHealthWorkerSection" class="section">
-
-    <button onclick="showSection('workerDashboard')" class="back-btn">
-        ← Back to Dashboard
-    </button>
-
-    <h2>🌿 Grass Health</h2>
-
-    <div style="display:flex;gap:10px;margin-bottom:20px;">
-
-        <button
-            id="btnNewHealth"
-            onclick="showWorkerHealthTab('new')"
-            style="flex:1;background:#4CAF50;">
-            📷 New Analysis
-        </button>
-
-        <button
-            id="btnHealthHistory"
-            onclick="showWorkerHealthTab('history')"
-            style="flex:1;background:#2196F3;">
-            📋 History
-        </button>
-
-    </div>
-
-    <div class="card">
-
-        <!-- ================= NEW ANALYSIS ================= -->
-
-        <div id="workerHealthNewSection">
-
-            <label><strong>Location</strong></label>
-
-            <select id="grassHealthLocation"></select>
-
-            <label><strong>Crop</strong></label>
-
-            <input
-                id="grassCropName"
-                type="text"
-                value="Elephant Grass">
-
-            <label><strong>Comments</strong></label>
-
-            <textarea
-                id="grassHealthComments"
-                rows="3"
-                placeholder="Anything you noticed..."></textarea>
-
-            <label><strong>Upload Photo</strong></label>
-
-            <input
-                id="grassHealthPhoto"
-                type="file"
-                accept="image/*"
-                capture="environment">
-
-            <button
-                onclick="submitGrassHealth()"
-                style="margin-top:20px;background:#4CAF50;">
-                🌿 Analyze Grass
-            </button>
-
-        </div>
-
-        <!-- ================= HISTORY ================= -->
-
-        <div
-            id="workerHealthHistorySection"
-            style="display:none;">
-
-            <div id="workerHealthHistory">
-
-                <p style="text-align:center;padding:25px;color:#777;">
-                    Loading...
-                </p>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</div>
-
-<!-- ====================================================== -->
-<!-- GLOBAL SHARED MODALS -->
-<!-- Used by Admin, Supervisor and Worker -->
-<!-- Keep all shared popups here -->
-<!-- ====================================================== -->
-
-
-<!-- Edit Task Modal -->
-    <div id="editTaskModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000;">
-        <div style="background: white; margin: 5% auto; max-width: 500px; max-height: 80vh; overflow-y: auto; padding: 20px; border-radius: 16px;">
-            <h3>✏️ Edit Task Template</h3>
-            <input type="hidden" id="editTaskId">
-            
-            <label>Title:</label>
-            <input type="text" id="editTaskTitle" placeholder="Task Title">
-            
-            <label>Description:</label>
-            <textarea id="editTaskDesc" rows="3" style="width: 100%;"></textarea>
-            
-            <label>Task Type:</label>
-            <select id="editTaskType">
-                <option value="daily">Daily</option>
-                <option value="interval">Interval</option>
-                <option value="manual">Manual</option>
-            </select>
-            
-            <label>Time Slot:</label>
-            <select id="editTaskTimeSlot">
-                <option value="morning">🌅 Morning</option>
-                <option value="night">🌙 Night</option>
-                <option value="anytime">🕐 Anytime</option>
-            </select>
-            
-            <label>Location:</label>
-            <select id="editTaskLocationId"></select>
-            
-            <label>Zone:</label>
-            <select id="editTaskZoneId">
-                <option value="">No Zone (Whole Farm)</option>
-            </select>
-            
-            <div style="display: flex; gap: 10px; margin-top: 20px;">
-                <button onclick="saveTaskEdit()" style="background: #4CAF50; flex: 1;">💾 Save Changes</button>
-                <button onclick="closeEditTaskModal()" style="background: #999; flex: 1;">Cancel</button>
-            </div>
-        </div>
-    </div>
-
-    
-    <!-- ====================================================== -->
-    <!-- Task Completion Modal -->
-    <!-- ====================================================== -->
-    <div id="completionModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:5000;">
-        <div style="background:white; margin:5% auto; max-width:450px; padding:20px; border-radius:16px; max-height:85vh; overflow-y:auto;">
-
-            <h3>✅ Complete Task</h3>
-
-            <p style="margin-bottom:15px;">
-                Completing:
-                <strong id="completionTaskTitle"></strong>
-            </p>
-
-            <input type="hidden" id="completionTaskId">
-
-            <label style="font-weight:bold;">📝 Completion Notes</label>
-            <textarea
-                id="completionNotes"
-                rows="3"
-                style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #ddd; border-radius:8px;"
-                placeholder="Describe what was completed..."></textarea>
-
-            <label style="font-weight:bold;">📸 Photo (Optional)</label>
-            <input
-                type="file"
-                id="completionPhoto"
-                accept="image/*"
-                capture="environment"
-                style="width:100%; margin-bottom:15px;">
-
-            <label style="font-weight:bold;">🎤 Audio (Optional)</label>
-            <input
-                type="file"
-                id="completionAudio"
-                accept="audio/*"
-                capture="user"
-                style="width:100%; margin-bottom:15px;">
-
-            <label style="font-weight:bold;">🎥 Video (Optional)</label>
-            <input
-                type="file"
-                id="completionVideo"
-                accept="video/*"
-                capture="environment"
-                style="width:100%; margin-bottom:20px;">
-
-            <div style="display:flex; gap:10px;">
-                <button
-                    onclick="submitTaskCompletion()"
-                    style="flex:1; background:#4CAF50; color:white; border:none; padding:12px; border-radius:8px; cursor:pointer;">
-                    ✅ Complete Task
-                </button>
-
-                <button
-                    onclick="closeCompletionModal()"
-                    style="flex:1; background:#999; color:white; border:none; padding:12px; border-radius:8px; cursor:pointer;">
-                    Cancel
-                </button>
-            </div>
-
-        </div>
-    </div>
-    
-    
-    <!-- Progress Update Modal -->
-    <div id="progressModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 5000;">
-        <div style="background: white; margin: 10% auto; max-width: 400px; padding: 20px; border-radius: 16px;">
-            <h3 id="progressTaskTitle">Update Progress</h3>
-            <input type="hidden" id="progressTaskId">
-            
-            <label>Current Progress: <span id="currentProgressDisplay">0</span>%</label>
-            
-            <label style="margin-top: 12px; display: block;">New Progress:</label>
-            <select id="newProgressSelect" style="width: 100%; padding: 10px; margin-bottom: 12px;">
-                <option value="0">0% - Not Started</option>
-                <option value="25">25% - Quarter Done</option>
-                <option value="50">50% - Half Done</option>
-                <option value="75">75% - Almost Done</option>
-                <option value="100">100% - Complete</option>
-            </select>
-            
-            <!-- ✅ ADD THIS COMMENT FIELD -->
-            <label style="font-weight: bold; display: block; margin-bottom: 8px;">💬 Comment (Optional)</label>
-            <textarea id="progressComment" rows="2" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 12px;" placeholder="Add a comment about this progress update..."></textarea>
-            
-            <!-- Photo Input -->
-            <label style="font-weight: bold; display: block; margin-bottom: 8px;">📸 Photo (Recommended)</label>
-            <input type="file" id="progressPhoto" accept="image/*" capture="environment" style="margin-bottom: 16px; width: 100%;">
-            
-            <!-- Audio Input -->
-            <label style="font-weight: bold; display: block; margin-bottom: 8px;">🎤 Audio (Voice Note)</label>
-            <input type="file" id="progressAudio" accept="audio/*" capture="user" style="margin-bottom: 16px; width: 100%;">
-            
-            <!-- Video Input -->
-            <label style="font-weight: bold; display: block; margin-bottom: 8px;">📹 Video (Optional)</label>
-            <input type="file" id="progressVideo" accept="video/*, video/mp4, video/3gp, video/mkv, video/avi" capture="environment" style="margin-bottom: 16px; width: 100%;">
-
-            <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
-                <input type="checkbox" id="waterReleasedCheckbox"> 
-                <span>💧 Water released today</span>
-            </label>
-            
-            <div style="display: flex; gap: 10px; margin-top: 10px;">
-                <button onclick="submitProgressUpdate()" style="background: #4CAF50; flex: 1;">✓ Update Progress</button>
-                <button onclick="closeProgressModal()" style="background: #999; flex: 1;">Cancel</button>
-            </div>
-        </div>
-    </div>
-    
-
-    <!-- Edit User Modal -->
-    <div id="editUserModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; overflow-y: auto;">
-        <div style="background: white; margin: 5% auto; max-width: 500px; max-height: 90vh; overflow-y: auto; padding: 20px; border-radius: 16px;">
-            <h3>✏️ Edit User</h3>
-            
-            <input type="text" id="editUserName" placeholder="Full Name">
-            
-            <select id="editUserRole">
-                <option value="admin">Admin</option>
-                <option value="supervisor">Supervisor</option>
-                <option value="worker">Worker</option>
-            </select>
-            
-            <!-- Region Dropdown with Add Button -->
-            <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 12px;">
-                <select id="editUserRegion" style="flex: 2; margin-bottom: 0; padding: 10px; border: 1px solid #ddd; border-radius: 8px;">
-                    <option value="">Select Region</option>
-                    <option value="Ramanjapur">Ramanjapur</option>
-                    <option value="Maharashtra">Maharashtra</option>
-                </select>
-                <input type="text" id="editNewRegionInput" placeholder="New region" style="flex: 1; margin-bottom: 0; padding: 10px; border: 1px solid #ddd; border-radius: 8px;">
-                <button onclick="addNewRegion('editUserRegion', 'editNewRegionInput')" style="width: auto; padding: 10px 16px; background: #4CAF50; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; white-space: nowrap;">+ Add</button>
-            </div>
-            
-            <input type="tel" id="editUserPhone" placeholder="Phone Number">
-            <input type="password" id="editUserPassword" placeholder="New Password (leave empty to keep same)">
-
-            <!-- Supervisor Permissions (Only shown when Role = Supervisor) -->
-            <div id="editSupervisorPermissionsSection" style="display: none; margin-top: 16px; padding: 16px; background: #f5f5f5; border-radius: 12px; border: 1px solid #ddd;">
-                <h4 style="margin-bottom: 12px; color: #2E7D32;">👔 Supervisor Permissions</h4>
-                
-                <!-- Task Management -->
-                <div style="margin-bottom: 12px;">
-                    <strong>📋 Task Management</strong>
-                    <div style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 4px;">
-                        <label><input type="checkbox" id="edit_perm_create_tasks"> Create Tasks</label>
-                        <label><input type="checkbox" id="edit_perm_assign_tasks"> Assign Tasks</label>
-                        <label><input type="checkbox" id="edit_perm_view_all_tasks"> View All Tasks</label>
-                        <label><input type="checkbox" id="edit_perm_delete_tasks"> Delete Tasks</label>
-                    </div>
-                </div>
-                
-                <!-- Farm Management -->
-                <div style="margin-bottom: 12px;">
-                    <strong>📍 Farm Management</strong>
-                    <div style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 4px;">
-                        <label><input type="checkbox" id="edit_perm_add_locations"> Add Locations</label>
-                        <label><input type="checkbox" id="edit_perm_add_zones"> Add Zones</label>
-                        <label><input type="checkbox" id="edit_perm_manage_zones"> Manage Zones</label>
-                    </div>
-                </div>
-                
-                <!-- User Management -->
-                <div style="margin-bottom: 12px;">
-                    <strong>👥 User Management</strong>
-                    <div style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 4px;">
-                        <label><input type="checkbox" id="edit_perm_add_users"> Add Users</label>
-                        <label><input type="checkbox" id="edit_perm_view_users"> View Users</label>
-                        <label><input type="checkbox" id="edit_perm_edit_users"> Edit Users</label>
-                        <label><input type="checkbox" id="edit_perm_delete_users"> Delete Users</label>
-                    </div>
-                </div>
-                
-                <!-- Issue Management -->
-                <div style="margin-bottom: 12px;">
-                    <strong>🚨 Issue Management</strong>
-                    <div style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 4px;">
-                        <label><input type="checkbox" id="edit_perm_view_all_issues"> View All Issues</label>
-                        <label><input type="checkbox" id="edit_perm_update_issue_status"> Update Status</label>
-                        <label><input type="checkbox" id="edit_perm_resolve_issues"> Resolve Issues</label>
-                    </div>
-                </div>
-                
-                <!-- Grass Health -->
-                <div style="margin-bottom: 12px;">
-                    <strong>🌿 Grass Health</strong>
-                    <div style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 4px;">
-                        <label><input type="checkbox" id="edit_perm_view_grass_health"> View Reports</label>
-                        <label><input type="checkbox" id="edit_perm_resolve_grass_health"> Resolve Issues</label>
-                        <label><input type="checkbox" id="edit_perm_add_grass_comments"> Add Comments</label>
-                    </div>
-                </div>
-                
-                <!-- Equipment -->
-                <div style="margin-bottom: 12px;">
-                    <strong>🔧 Equipment</strong>
-                    <div style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 4px;">
-                        <label><input type="checkbox" id="edit_perm_add_equipment"> Add Equipment</label>
-                        <label><input type="checkbox" id="edit_perm_edit_equipment"> Edit Equipment</label>
-                        <label><input type="checkbox" id="edit_perm_delete_equipment"> Delete Equipment</label>
-                        <label><input type="checkbox" id="edit_perm_add_maintenance"> Add Maintenance</label>
-                    </div>
-                </div>
-                
-                <!-- Contacts -->
-                <div style="margin-bottom: 12px;">
-                    <strong>📞 Contacts</strong>
-                    <div style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 4px;">
-                        <label><input type="checkbox" id="edit_perm_add_contacts"> Add Contacts</label>
-                        <label><input type="checkbox" id="edit_perm_edit_contacts"> Edit Contacts</label>
-                        <label><input type="checkbox" id="edit_perm_delete_contacts"> Delete Contacts</label>
-                    </div>
-                </div>
-                
-                <!-- Reports -->
-                <div style="margin-bottom: 12px;">
-                    <strong>📊 Reports</strong>
-                    <div style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 4px;">
-                        <label><input type="checkbox" id="edit_perm_export_csv"> Export CSV</label>
-                        <label><input type="checkbox" id="edit_perm_view_analytics"> View Analytics</label>
-                    </div>
-                </div>
-                
-                <!-- Weather -->
-                <div style="margin-bottom: 12px;">
-                    <strong>🌤️ Weather</strong>
-                    <div style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 4px;">
-                        <label><input type="checkbox" id="edit_perm_view_weather"> View Weather</label>
-                        <label><input type="checkbox" id="edit_perm_all_locations_weather"> All Locations</label>
-                    </div>
-                </div>
-                
-                <!-- Location Access -->
-                <div style="margin-bottom: 12px; padding-top: 12px; border-top: 2px solid #ddd;">
-                    <strong>📍 Location Access</strong>
-                    <div style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 4px;">
-                        <label><input type="checkbox" id="edit_perm_location_ramanujapur"> Ramanjapur</label>
-                        <label><input type="checkbox" id="edit_perm_location_maharashtra"> Maharashtra</label>
-                    </div>
-                </div>
-            </div>
-            <div style="display: flex; gap: 10px; margin-top: 10px;">
-                <button onclick="updateUser()" style="background: #2196F3;">💾 Save</button>
-                <button onclick="closeEditModal()" style="background: #999;">Cancel</button>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Equipment Detail Modal -->
-    <div id="equipmentDetailModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 7000; overflow-y: auto;">
-        <div style="background: white; margin: 5% auto; max-width: 500px; max-height: 80vh; overflow-y: auto; padding: 20px; border-radius: 16px; width: 90%;">
-            <h3 id="detailTitle" style="margin-top: 0;">Equipment Details</h3>
-            <div id="equipmentDetailContent"></div>
-            <button onclick="closeEquipmentDetailModal()" style="background: #4CAF50; padding: 10px; margin-top: 20px; border: none; border-radius: 8px; color: white; cursor: pointer; width: 100%;">Close</button>
-        </div>
-    </div>
-
-    <!-- Equipment Add/Edit Modal -->
-    <div id="equipmentModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 7000; overflow-y: auto;">
-        <div style="background: white; margin: 5% auto; max-width: 500px; max-height: 80vh; overflow-y: auto; padding: 20px; border-radius: 16px; width: 90%;">
-            <h3 id="equipmentModalTitle" style="margin-top: 0;">Add Equipment</h3>
-            <input type="hidden" id="editEquipmentId">
-            
-            <label style="display: block; margin: 10px 0 5px; font-weight: 500;">Equipment Name:</label>
-            <input type="text" id="equipmentName" placeholder="Equipment Name" required>
-            
-            <label style="display: block; margin: 10px 0 5px; font-weight: 500;">Equipment Type:</label>
-            <select id="equipmentType"></select>
-            
-            <label style="display: block; margin: 10px 0 5px; font-weight: 500;">Location:</label>
-            <select id="equipmentLocationId" onchange="loadEquipmentZones()"></select>
-            
-            <label style="display: block; margin: 10px 0 5px; font-weight: 500;">Zone (Optional):</label>
-            <select id="equipmentZoneId"><option value="">Select Zone</option></select>
-            
-            <label style="display: block; margin: 10px 0 5px; font-weight: 500;">Serial Number:</label>
-            <input type="text" id="equipmentSerial" placeholder="Serial Number">
-            
-            <label style="display: block; margin: 10px 0 5px; font-weight: 500;">Purchase Date:</label>
-            <input type="date" id="equipmentPurchaseDate">
-            
-            <label style="display: block; margin: 10px 0 5px; font-weight: 500;">Purchase Cost (₹):</label>
-            <input type="number" id="equipmentPurchaseCost" placeholder="Purchase Cost">
-            
-            <label style="display: block; margin: 10px 0 5px; font-weight: 500;">Running Hours:</label>
-            <input type="number" id="equipmentRunningHours" placeholder="Running Hours" value="0">
-            
-            <label style="display: block; margin: 10px 0 5px; font-weight: 500;">Status:</label>
-            <select id="equipmentStatus">
-                <option value="active">🟢 Active</option>
-                <option value="service_due">🟡 Service Due</option>
-                <option value="repair_required">🔴 Repair Required</option>
-                <option value="inactive">⚫ Inactive</option>
-            </select>
-            
-            <label style="display: block; margin: 10px 0 5px; font-weight: 500;">Last Service Date:</label>
-            <input type="date" id="equipmentLastServiceDate">
-            
-            <label style="display: block; margin: 10px 0 5px; font-weight: 500;">Next Service Date:</label>
-            <input type="date" id="equipmentNextServiceDate">
-            
-            <label style="display: block; margin: 10px 0 5px; font-weight: 500;">Notes:</label>
-            <textarea id="equipmentNotes" rows="3" placeholder="Additional notes" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd;"></textarea>
-            
-            <div style="display: flex; gap: 10px; margin-top: 15px;">
-                <button onclick="saveEquipment()" style="background: #4CAF50; flex: 1; padding: 12px; border: none; border-radius: 8px; color: white; cursor: pointer; font-weight: 600;">💾 Save</button>
-                <button onclick="closeEquipmentModal()" style="background: #999; flex: 1; padding: 12px; border: none; border-radius: 8px; color: white; cursor: pointer; font-weight: 600;">Cancel</button>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Maintenance Modal -->
-    <div id="maintenanceModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 7000; overflow-y: auto;">
-        <div style="background: white; margin: 10% auto; max-width: 400px; padding: 20px; border-radius: 16px; width: 90%;">
-            <h3 style="margin-top: 0;">🔧 Add Maintenance Record</h3>
-            <input type="hidden" id="maintenanceEquipmentId">
-            
-            <label style="display: block; margin: 10px 0 5px; font-weight: 500;">Maintenance Date:</label>
-            <input type="date" id="maintenanceDate">
-            
-            <label style="display: block; margin: 10px 0 5px; font-weight: 500;">Maintenance Type:</label>
-            <select id="maintenanceType">
-                <option value="preventive">🟢 Preventive</option>
-                <option value="repair">🔴 Repair</option>
-                <option value="inspection">🔍 Inspection</option>
-            </select>
-            
-            <label style="display: block; margin: 10px 0 5px; font-weight: 500;">Cost (₹):</label>
-            <input type="number" id="maintenanceCost" placeholder="Cost">
-            
-            <label style="display: block; margin: 10px 0 5px; font-weight: 500;">Performed By:</label>
-            <input type="text" id="maintenancePerformedBy" placeholder="Mechanic name">
-            
-            <label style="display: block; margin: 10px 0 5px; font-weight: 500;">Running Hours After:</label>
-            <input type="number" id="maintenanceRunningHours" placeholder="Running hours">
-            
-            <label style="display: block; margin: 10px 0 5px; font-weight: 500;">Notes:</label>
-            <textarea id="maintenanceNotes" rows="3" placeholder="Maintenance notes" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd;"></textarea>
-            
-            <div style="display: flex; gap: 10px; margin-top: 15px;">
-                <button onclick="saveMaintenance()" style="background: #4CAF50; flex: 1; padding: 12px; border: none; border-radius: 8px; color: white; cursor: pointer; font-weight: 600;">💾 Save</button>
-                <button onclick="closeMaintenanceModal()" style="background: #999; flex: 1; padding: 12px; border: none; border-radius: 8px; color: white; cursor: pointer; font-weight: 600;">Cancel</button>
-            </div>
-        </div>
-    </div>
-    
-    <div id="editContactModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,.5); z-index:7000;">
-        <div style="background:white; width:500px; max-width:95%; margin:60px auto; padding:20px; border-radius:10px;">
-
-            <h3>Edit Contact</h3>
-
-            <input type="text" id="editContactName" placeholder="Contact Name">
-
-            <input type="tel" id="editContactPhone" placeholder="Phone Number">
-
-            <select id="editContactIssueType">
-                <option value="Motor Problem">Motor Problem</option>
-                <option value="Line Problem">Line Problem</option>
-                <option value="Leakage">Leakage</option>
-                <option value="Starter Problem">Starter Problem</option>
-                <option value="Other">Other</option>
-            </select>
-
-            <select id="editContactLocationId"></select>
-
-            <div style="margin-top:20px;">
-                <button onclick="updateContact()">💾 Save</button>
-                <button onclick="closeEditContactModal()">❌ Cancel</button>
-            </div>
-
-        </div>
-    </div>
-    
-    
-    <!-- Media Viewer Modal -->
-    <div id="mediaViewerModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 10000;">
-        <div style="position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
-            <button onclick="closeMediaViewer()" style="position: absolute; top: 20px; right: 20px; background: red; color: white; border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 20px; cursor: pointer; z-index: 3001;">✕</button>
-            
-            <!-- Image Viewer -->
-            <img id="viewerImage" src="" style="max-width: 90%; max-height: 90%; object-fit: contain; display: none;">
-            
-            <!-- Audio Player -->
-            <audio id="viewerAudio" controls style="width: 80%; display: none;">
-                <source src="" type="audio/mpeg">
-                Your browser does not support audio.
-            </audio>
-            
-            <!-- Video Player -->
-            <video id="viewerVideo" controls style="max-width: 90%; max-height: 90%; display: none;">
-                <source src="" type="video/mp4">
-                Your browser does not support video.
-            </video>
-            
-            <div id="noMediaMessage" style="color: white; text-align: center; display: none;">
-                <p>No media available for this task completion</p>
-            </div>
-        </div>
-    </div>
-
-
-    
-
 
     <script>
         let currentUser = null;
@@ -3490,10 +2519,9 @@
             // List of all section IDs that might exist
             const sectionIds = [
                 'tasksSection',
-                'locationsSection',
+                'locationsSection', 
                 'reportIssueSection',
                 'adminSection',
-                'adminDashboardSection',
                 'grassHealthWorkerSection',
                 'weatherSection',
                 'completedTasksSection',
@@ -3507,59 +2535,14 @@
                 const el = document.getElementById(id);
                 if (el) {
                     el.classList.remove('active');
-                    el.style.display = 'none';
-                    el.style.visibility = 'hidden';
                 }
             });
 
-            // Hide all dashboard sections
-            const adminDashboard = document.getElementById('adminSection');
-            if (adminDashboard) {
-                adminDashboard.style.display = 'none';
-                adminDashboard.classList.remove('active');
-            }
-
-            const supervisorDashboard = document.getElementById('supervisorDashboardSection');
-            if (supervisorDashboard) {
-                supervisorDashboard.style.display = 'none';
-                supervisorDashboard.classList.remove('active');
-            }
-
-            const workerDashboard = document.getElementById('workerDashboardSection');
-            if (workerDashboard) {
-                workerDashboard.style.display = 'none';
-                workerDashboard.classList.remove('active');
-            }
-            
-            console.log("sectionName =", sectionName);
-            console.log("Exact ID =", sectionName + "Section");
-
-            console.log(
-                "Direct lookup:",
-                document.getElementById("weatherSection")
-            );
-
-            let targetSection;
-
-            if (sectionName === "weather") {
-                targetSection = document.getElementById("weatherForm");
-            } else {
-                targetSection = document.getElementById(sectionName + "Section");
-            }
-
-            console.log("Dynamic lookup:", targetSection);
-
-            // Show selected section
+            // Show selected section - safely check if it exists
+            const targetSection = document.getElementById(`${sectionName}Section`);
             if (targetSection) {
                 targetSection.classList.add('active');
-                targetSection.style.display = 'block';
-                targetSection.style.visibility = 'visible';
-                window.scrollTo(0, 0);
-
-                console.log("Target:", targetSection);
-                console.log("Display:", window.getComputedStyle(targetSection).display);
             }
-
             
             // Load data when showing section
             if (sectionName === "locations") {
@@ -3567,19 +2550,12 @@
             }
             if (sectionName === "reportIssue") {
                 loadLocations();
-                showWorkerReportTab("new");
             }
             if (sectionName === "tasks") {
                 loadTasks();
             }
             if (sectionName === "grassHealthWorker") {
-
-                showWorkerHealthTab("new");
-
-                loadGrassHealthLocations();
-
                 loadWorkerGrassIssues();
-
             }
             if (sectionName === "weather") {
                 setTimeout(() => {
@@ -3598,13 +2574,6 @@
                 loadLocationsForDropdowns();
             }
             if (sectionName === "workerDashboard") {
-
-                const reportSection = document.getElementById("reportIssueSection");
-                if (reportSection) {
-                    reportSection.classList.remove("active");
-                    reportSection.style.display = "none";
-                }
-
                 updateWorkerDashboard();
             }
             if (sectionName === "supervisorDashboard") {
@@ -4435,87 +3404,37 @@
         async function loadLocations() {
             try {
                 const response = await fetch(`${API_URL}/locations/all`);
-
-                if (!response.ok) {
-                    console.error("Failed to load locations");
-                    return;
-                }
-
-                let locations = await response.json();
-
-                // Worker should only see locations from their own region
-                if (
-                    currentUser &&
-                    currentUser.role === "worker" &&
-                    currentUser.region
-                ) {
-                    locations = locations.filter(
-                        loc => loc.region === currentUser.region
-                    );
-                }
-
-                // Get elements (may not exist on every page)
-                const locationsDiv = document.getElementById("locationsList");
-                const issueLocationSelect = document.getElementById("issueLocation");
-
-                // Clear Locations page
-                if (locationsDiv) {
+                if (response.ok) {
+                    let locations = await response.json();
+                    const locationsDiv = document.getElementById("locationsList");
+                    const issueLocationSelect = document.getElementById("issueLocation");
+                    
+                    // Filter locations by worker's region (if worker is logged in)
+                    if (currentUser && currentUser.role === 'worker' && currentUser.region) {
+                        locations = locations.filter(loc => loc.region === currentUser.region);
+                    }
+                    
                     locationsDiv.innerHTML = "";
-                }
-
-                // Clear Report Issue dropdown
-                if (issueLocationSelect) {
-                    issueLocationSelect.innerHTML =
-                        `<option value="">Select Location</option>`;
-                }
-
-                // Add locations
-                locations.forEach(loc => {
-
-                    const layoutButton = loc.layout_url
-                        ? `<button
-                                onclick="viewMedia('${loc.layout_url}','image')"
-                                style="
-                                    background:#2196F3;
-                                    padding:5px 10px;
-                                    width:auto;
-                                    font-size:11px;
-                                    margin-top:5px;">
-                                🗺️ View Layout
-                        </button>`
-                        : "";
-
-                    // Locations page
-                    if (locationsDiv) {
+                    issueLocationSelect.innerHTML = '<option value="">Select Location</option>';
+                    
+                    locations.forEach(loc => {
+                        // Create layout button if layout_url exists
+                        const layoutButton = loc.layout_url ? `<button onclick="viewMedia('${loc.layout_url}', 'image')" style="background: #2196F3; padding: 5px 10px; width: auto; font-size: 11px; margin-top: 5px;">🗺️ View Layout</button>` : '';
+                        
                         locationsDiv.innerHTML += `
                             <div class="location-item">
-                                <strong>${loc.name}</strong><br>
-
-                                ${loc.area_acres > 0
-                                    ? `${loc.area_acres} Acres<br>`
-                                    : ""}
-
-                                <small>${loc.region}</small><br>
-
+                                <strong>${loc.name}</strong>
+                                ${loc.area_acres > 0 ? `${loc.area_acres} Acres` : ''}
+                                <small>${loc.region}</small>
                                 ${layoutButton}
                             </div>
                         `;
-                    }
-
-                    // Report Issue dropdown
-                    if (issueLocationSelect) {
-                        issueLocationSelect.innerHTML += `
-                            <option value="${loc.id}">
-                                ${loc.name} (${loc.region})
-                            </option>
-                        `;
-                    }
-
-                });
-
+                        
+                        issueLocationSelect.innerHTML += `<option value="${loc.id}">${loc.name} (${loc.region})</option>`;
+                    });
+                }
             } catch (err) {
                 console.error("Error loading locations:", err);
-                showMessage("Failed to load locations", "error");
             }
         }
 
@@ -5153,11 +4072,7 @@
         }
         
         function showAdminDashboardDefault() {
-            const weatherForm = document.getElementById('weatherForm');
-            if (weatherForm) {
-                weatherForm.style.display = 'none';
-                weatherForm.classList.remove('active');
-            }
+
             console.log("========== showAdminDashboardDefault ==========");
 
             // Hide all admin forms/tabs
@@ -5175,8 +4090,7 @@
                 'viewContactsForm',
                 'addUserForm',
                 'grassHealthForm',
-                'equipmentForm',
-                'weatherForm'
+                'equipmentForm'
             ];
 
             tabs.forEach(id => {
@@ -5909,19 +4823,6 @@
             }
         }
 
-        function closeMaintenanceModal() {
-            document.getElementById('maintenanceModal').style.display = 'none';
-
-            // Clear form
-            document.getElementById('maintenanceEquipmentId').value = '';
-            document.getElementById('maintenanceDate').value = '';
-            document.getElementById('maintenanceType').value = 'preventive';
-            document.getElementById('maintenanceCost').value = '';
-            document.getElementById('maintenancePerformedBy').value = '';
-            document.getElementById('maintenanceRunningHours').value = '';
-            document.getElementById('maintenanceNotes').value = '';
-        }
-        
         // ============================================
         // GRASS HEALTH COMMENT FUNCTIONS
         // ============================================
@@ -6048,23 +4949,6 @@
 
         async function loadCompletedTasks() {
             if (!currentUser) return;
-            const list = document.getElementById("completedTasksList");
-            if (list) {
-                list.innerHTML = `
-                    <div style="text-align:center;padding:30px;">
-                        <div class="spinner" style="
-                            width:40px;
-                            height:40px;
-                            border:4px solid #ddd;
-                            border-top:4px solid #4CAF50;
-                            border-radius:50%;
-                            margin:auto;
-                            animation:spin 1s linear infinite;">
-                        </div>
-                        <p style="margin-top:12px;">Loading completed tasks...</p>
-                    </div>
-                `;
-            }
             
             // Get date range
             let fromDate = document.getElementById('completedFromDate')?.value;
@@ -6253,12 +5137,7 @@
                 const issues = await response.json();
                 console.log("Issues received:", issues);
                 
-                const container = document.getElementById('workerHealthHistory');
-
-                if (!container) {
-                    console.error("workerHealthHistory container not found");
-                    return;
-                }
+                const container = document.getElementById('workerGrassIssuesList');
                 
                 if (issues.length === 0) {
                     container.innerHTML = '<p style="color: #999;">No grass health reports submitted yet</p>';
@@ -6269,10 +5148,6 @@
                 for (const issue of issues) {
                     const locRes = await fetch('/locations/all');
                     const locations = await locRes.json();
-
-                    for (const issue of issues) {
-                        // use locations here
-                    }
                     const location = locations.find(l => l.id === issue.location_id);
                     const locationName = location ? location.name : 'Unknown';
                     
@@ -6811,39 +5686,6 @@
         }
         
         
-        async function loadGrassHealthLocations() {
-
-            try {
-
-                const response = await fetch('/grass-health/locations');
-                let locations = await response.json();
-
-                // Worker should only see their own region
-                if (currentUser && currentUser.role === "worker" && currentUser.region) {
-                    locations = locations.filter(loc => loc.region === currentUser.region);
-                }
-
-                const select = document.getElementById("grassHealthLocation");
-
-                if (!select) return;
-
-                select.innerHTML = '<option value="">Select Location</option>';
-
-                locations.forEach(loc => {
-                    select.innerHTML += `
-                        <option value="${loc.id}">
-                            ${loc.name} (${loc.region})
-                        </option>
-                    `;
-                });
-
-            } catch (err) {
-                console.error("Error loading grass locations:", err);
-            }
-
-        }
-        
-        
         // ============================================
         // UPDATE DASHBOARD STATS
         // ============================================
@@ -6919,7 +5761,7 @@
                 document.getElementById('cardHealthCount').textContent = activeGrass;
                 document.getElementById('cardHealthPending').textContent = pendingGrass + ' Pending';
                 
-                document.getElementById('cardEquipmentDue').textContent = equipment.length;
+                document.getElementById('cardEquipmentDue').textContent = equipDue;
                 document.getElementById('cardEquipmentRepair').textContent = equipRepair + ' Repair';
                 
                 document.getElementById('cardContactCount').textContent = totalContacts;
@@ -6939,144 +5781,70 @@
         // WEATHER FUNCTIONS - Role-Based Access
         // ============================================
 
+        let weatherLocations = [];
+
         async function loadWeatherLocations() {
             try {
                 const response = await fetch('/weather/locations');
-
                 if (response.ok) {
                     let locations = await response.json();
-
+                    
                     const select = document.getElementById('weatherLocationSelect');
                     const infoText = document.getElementById('weatherLocationInfo');
                     const roleBadge = document.getElementById('weatherUserRole');
-
-                    // Show user role
+                    
+                    // Show user role badge
                     if (roleBadge && currentUser) {
-                        roleBadge.textContent =
-                            currentUser.role.charAt(0).toUpperCase() +
-                            currentUser.role.slice(1);
-
-                        if (
-                            (currentUser.role === 'worker' ||
-                            currentUser.role === 'supervisor') &&
-                            currentUser.region
-                        ) {
+                        roleBadge.textContent = currentUser.role.charAt(0).toUpperCase() + currentUser.role.slice(1);
+                        if (currentUser.role === 'worker' && currentUser.region) {
                             roleBadge.textContent += ` (${currentUser.region})`;
                         }
                     }
-
-                    // ==================================================
-                    // ADMIN → ALL LOCATIONS
-                    // SUPERVISOR → ONLY THEIR REGION
-                    // WORKER → ONLY THEIR REGION + AUTO WEATHER
-                    // ==================================================
-
-                    if (
-                        currentUser &&
-                        (currentUser.role === 'worker' ||
-                        currentUser.role === 'supervisor') &&
-                        currentUser.region
-                    ) {
-
-                        // Filter by region
-                        locations = locations.filter(
-                            loc => loc.region === currentUser.region
-                        );
-
+                    
+                    // 🔒 ROLE-BASED FILTERING
+                    if (currentUser && currentUser.role === 'worker' && currentUser.region) {
+                        // WORKER: Filter by their region only
+                        locations = locations.filter(loc => loc.region === currentUser.region);
+                        
                         if (locations.length === 0) {
-                            select.innerHTML =
-                                '<option value="">No locations found</option>';
-
-                            if (infoText) {
-                                infoText.textContent =
-                                    '⚠️ No locations found for your region.';
-                            }
-
+                            select.innerHTML = '<option value="">No locations in your region</option>';
+                            if (infoText) infoText.textContent = '⚠️ No locations found for your region.';
                             return;
                         }
-
-                        // =========================
-                        // WORKER
-                        // =========================
-                        if (currentUser.role === 'worker') {
-
-                            select.style.display = 'none';
-
-                            if (infoText) {
-                                infoText.textContent =
-                                    `📍 Showing weather for: ${currentUser.region}`;
-                                infoText.style.color = '#2e7d32';
-                                infoText.style.fontWeight = '500';
-                            }
-
-                            select.innerHTML = '';
-
-                            locations.forEach(loc => {
-                                select.innerHTML +=
-                                    `<option value="${loc.id}">
-                                        ${loc.name} (${loc.region})
-                                    </option>`;
-                            });
-
-                            select.value = locations[0].id;
-                            fetchWeather();
-                        }
-
-                        // =========================
-                        // SUPERVISOR
-                        // =========================
-                        else {
-
-                            select.style.display = 'block';
-
-                            if (infoText) {
-                                infoText.textContent =
-                                    '🌍 Select a farm in your region';
-                                infoText.style.color = '#666';
-                                infoText.style.fontWeight = 'normal';
-                            }
-
-                            select.innerHTML =
-                                '<option value="">Select a farm</option>';
-
-                            locations.forEach(loc => {
-                                select.innerHTML +=
-                                    `<option value="${loc.id}">
-                                        ${loc.name} (${loc.region})
-                                    </option>`;
-                            });
-                        }
-                    }
-
-                    // =========================
-                    // ADMIN
-                    // =========================
-                    else {
-
-                        select.style.display = 'block';
-
+                        
+                        // HIDE dropdown for workers - auto-select and fetch
+                        select.style.display = 'none';
                         if (infoText) {
-                            infoText.textContent =
-                                '🌍 Select a location to view weather';
+                            infoText.textContent = `📍 Showing weather for: ${currentUser.region}`;
+                            infoText.style.color = '#2e7d32';
+                            infoText.style.fontWeight = '500';
+                        }
+                        
+                        // Auto-select first location and fetch weather
+                        select.value = locations[0].id;
+                        fetchWeather(); // Auto-fetch weather
+                        // Small delay to ensure DOM is ready
+                        setTimeout(() => {
+                            fetchWeather();
+                        }, 300);
+
+                    } else {
+                        // ADMIN or SUPERVISOR: Show ALL locations with dropdown
+                        select.style.display = 'block';
+                        if (infoText) {
+                            infoText.textContent = '🌍 Select a location to view weather';
                             infoText.style.color = '#666';
                             infoText.style.fontWeight = 'normal';
                         }
-
-                        select.innerHTML =
-                            '<option value="">Select a location</option>';
-
+                        
+                        select.innerHTML = '<option value="">Select a location</option>';
                         locations.forEach(loc => {
-                            select.innerHTML +=
-                                `<option value="${loc.id}">
-                                    ${loc.name} (${loc.region})
-                                </option>`;
+                            select.innerHTML += `<option value="${loc.id}">${loc.name} (${loc.region})</option>`;
                         });
                     }
-
                 } else {
                     console.error('Failed to load weather locations');
                 }
-
             } catch (err) {
                 console.error('Error loading weather locations:', err);
             }
@@ -7123,31 +5891,6 @@
         }
 
         function displayWeather(data) {
-
-            console.log("===== WEATHER DEBUG =====");
-
-            [
-                "weatherLocation",
-                "weatherRegion",
-                "weatherTemp",
-                "weatherDescription",
-                "weatherFeelsLike",
-                "weatherHumidity",
-                "weatherWind",
-                "weatherPressure",
-                "weatherSunrise",
-                "weatherSunset",
-                "weatherLastUpdated",
-                "weatherRain",
-                "weatherIcon",
-                "weatherMain",
-                "weatherForecast"
-            ].forEach(id => {
-                console.log(id, document.getElementById(id));
-            });
-
-            console.log(data);
-
             // Current weather
             document.getElementById('weatherLocation').textContent = data.location_name;
             document.getElementById('weatherRegion').textContent = data.region;
@@ -7209,7 +5952,8 @@
             };
             
             document.getElementById('weatherIcon').textContent = iconMap[data.weather_icon] || '🌤️';
-                        
+            document.getElementById('weatherMain').textContent = data.weather_main;
+            
             // Forecast
             const forecastContainer = document.getElementById('weatherForecast');
             forecastContainer.innerHTML = '';
@@ -7304,11 +6048,9 @@
         
  
         async function reportIssue() {
-
             const issueType = document.getElementById("issueType").value;
             const locationId = document.getElementById("issueLocation").value;
             const description = document.getElementById("issueDescription").value;
-
             const photoFile = document.getElementById("issuePhoto").files[0];
             const audioFile = document.getElementById("issueAudio").files[0];
             const videoFile = document.getElementById("issueVideo").files[0];
@@ -7318,124 +6060,69 @@
                 return;
             }
 
-            showLoadingOverlay(
-                "Uploading Report",
-                "Please wait while your report and media are uploaded..."
-            );
+            showMessage("Uploading media...", "success");
 
             let photoUrl = null;
             let audioUrl = null;
             let videoUrl = null;
 
-            try {
-
-                // ===========================
-                // Upload Photo
-                // ===========================
-                if (photoFile) {
-                    const formData = new FormData();
-                    formData.append("file", photoFile);
-
-                    const response = await fetch("/upload/photo", {
-                        method: "POST",
-                        body: formData
-                    });
-
-                    if (response.ok) {
-                        const result = await response.json();
-                        photoUrl = result.url;
-                    }
-                }
-
-                // ===========================
-                // Upload Audio
-                // ===========================
-                if (audioFile) {
-                    const formData = new FormData();
-                    formData.append("file", audioFile);
-
-                    const response = await fetch("/upload/audio", {
-                        method: "POST",
-                        body: formData
-                    });
-
-                    if (response.ok) {
-                        const result = await response.json();
-                        audioUrl = result.url;
-                    }
-                }
-
-                // ===========================
-                // Upload Video
-                // ===========================
-                if (videoFile) {
-                    const formData = new FormData();
-                    formData.append("file", videoFile);
-
-                    const response = await fetch("/upload/video", {
-                        method: "POST",
-                        body: formData
-                    });
-
-                    if (response.ok) {
-                        const result = await response.json();
-                        videoUrl = result.url;
-                    }
-                }
-
-                // ===========================
-                // Submit Report
-                // ===========================
-                const response = await fetch("/issues/report", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        issue_type: issueType,
-                        location_id: parseInt(locationId),
-                        description: description,
-                        reported_by: currentUser.user_id,
-                        photo_url: photoUrl,
-                        audio_url: audioUrl,
-                        video_url: videoUrl
-                    })
-                });
-
+            // Upload photo if selected
+            if (photoFile) {
+                const formData = new FormData();
+                formData.append('file', photoFile);
+                const response = await fetch('/upload/photo', { method: 'POST', body: formData });
                 if (response.ok) {
-
-                    showMessage("✅ Issue reported successfully!", "success");
-
-                    document.getElementById("issueDescription").value = "";
-                    document.getElementById("issueLocation").value = "";
-                    document.getElementById("issuePhoto").value = "";
-                    document.getElementById("issueAudio").value = "";
-                    document.getElementById("issueVideo").value = "";
-
-                    if (typeof updateWorkerDashboard === "function") {
-                        updateWorkerDashboard();
-                    }
-
-                    setTimeout(() => {
-                        showSection("workerDashboard");
-                    }, 1000);
-
-                } else {
-
-                    const error = await response.json();
-                    showMessage(error.detail || "Failed to report issue", "error");
-
+                    const result = await response.json();
+                    photoUrl = result.url;
                 }
+            }
 
-            } catch (err) {
+            // Upload audio if selected
+            if (audioFile) {
+                const formData = new FormData();
+                formData.append('file', audioFile);
+                const response = await fetch('/upload/audio', { method: 'POST', body: formData });
+                if (response.ok) {
+                    const result = await response.json();
+                    audioUrl = result.url;
+                }
+            }
 
-                console.error("Report Issue Error:", err);
-                showMessage("Failed to report issue.", "error");
+            // Upload video if selected
+            if (videoFile) {
+                const formData = new FormData();
+                formData.append('file', videoFile);
+                const response = await fetch('/upload/video', { method: 'POST', body: formData });
+                if (response.ok) {
+                    const result = await response.json();
+                    videoUrl = result.url;
+                }
+            }
 
-            } finally {
+            const response = await fetch('/issues/report', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    issue_type: issueType,
+                    location_id: parseInt(locationId),
+                    description: description,
+                    reported_by: currentUser.user_id,
+                    photo_url: photoUrl,
+                    audio_url: audioUrl,
+                    video_url: videoUrl
+                })
+            });
 
-                hideLoadingOverlay();
-
+            if (response.ok) {
+                showMessage("Issue reported successfully!", "success");
+                document.getElementById("issueDescription").value = "";
+                document.getElementById("issueLocation").value = "";
+                document.getElementById("issuePhoto").value = "";
+                document.getElementById("issueAudio").value = "";
+                document.getElementById("issueVideo").value = "";
+            } else {
+                const error = await response.json();
+                showMessage(error.detail || "Failed to report issue", "error");
             }
         }
 
@@ -8510,9 +7197,6 @@
                 loadEquipmentTypes(); 
                 loadLocationsForDropdowns(); 
             }
-            if (tabName === 'weather') {
-                loadWeatherLocations();
-            }
 
             console.log("========== showAdminTab END ==========");
         }
@@ -8927,37 +7611,19 @@
                 issue_type: document.getElementById('contactIssueType').value,
                 location_id: parseInt(document.getElementById('contactLocationId').value)
             };
-
-            try {
-                const response = await fetch('/contacts/add', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(contactData)
-                });
-
-                if (response.ok) {
-                    showMessage('Contact added successfully!');
-
-                    // Clear form
-                    document.getElementById('contactName').value = '';
-                    document.getElementById('contactPhone').value = '';
-
-                    const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
-
-                    if (currentUser.role === 'supervisor') {
-                        showSupervisorView('viewContacts');
-                    } else {
-                        loadAllContacts();
-                        showAdminTab('viewContacts');
-                    }
-
-                } else {
-                    showMessage('Failed to add contact', 'error');
-                }
-
-            } catch (err) {
-                console.error('Error creating contact:', err);
-                showMessage('Network error', 'error');
+            
+            const response = await fetch('/contacts/add', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(contactData)
+            });
+            
+            if (response.ok) {
+                showMessage('Contact added successfully!');
+                document.getElementById('contactName').value = '';
+                document.getElementById('contactPhone').value = '';
+            } else {
+                showMessage('Failed to add contact', 'error');
             }
         }
         
@@ -9150,7 +7816,7 @@
                         document.getElementById('supervisorPermissionsSection').style.display = 'none';
 
                         loadAllUsers();
-                        showAdminTab('viewUsers');
+                        goBackToDashboard();
 
                     }
                 } else {
@@ -10280,12 +8946,6 @@ document.getElementById('newUserRole').addEventListener('change', function() {
 
         // Show Supervisor Dashboard Default (Back to Dashboard)
         function showSupervisorDashboardDefault() {
-            const weatherForm = document.getElementById('weatherForm');
-            if (weatherForm) {
-                weatherForm.style.display = 'none';
-                weatherForm.classList.remove('active');
-            }
-            
             const user = JSON.parse(localStorage.getItem('user') || '{}');
             
             if (user.role !== 'supervisor') {
@@ -10381,61 +9041,6 @@ document.getElementById('newUserRole').addEventListener('change', function() {
         }
 
         // ============================================
-        // Show Worker Dashboard Default
-        // ============================================
-        function showWorkerDashboardDefault() {
-
-            // Hide Weather
-            const weather = document.getElementById('weatherForm');
-            if (weather) {
-                weather.style.display = 'none';
-                weather.classList.remove('active');
-            }
-
-            // Hide all worker sections
-            const sections = [
-                'tasksSection',
-                'completedTasksSection',
-                'reportIssueSection',
-                'grassHealthWorkerSection',
-                'weatherForm'
-            ];
-
-            sections.forEach(id => {
-                const el = document.getElementById(id);
-                if (el) {
-                    el.style.display = 'none';
-                    el.classList.remove('active');
-                }
-            });
-
-            // Show Worker Dashboard
-            const dashboard = document.getElementById('workerDashboardSection');
-            if (dashboard) {
-                dashboard.style.display = 'block';
-                dashboard.classList.add('active');
-            }
-
-            // Show dashboard cards
-            const cards = document.getElementById('workerDashboardCards');
-            if (cards) {
-                cards.style.display = 'grid';
-            }
-
-            // Refresh dashboard
-            updateWorkerDashboard();
-
-            // Scroll to top
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-            });
-
-            console.log("✅ Worker dashboard restored");
-        }
-        
-        
-        // ============================================
         // Hide All Supervisor Sections
         // ============================================
         function hideAllSupervisorSections() {
@@ -10482,8 +9087,7 @@ document.getElementById('newUserRole').addEventListener('change', function() {
                 'viewContacts',
                 'addUser',
                 'grassHealth',
-                'equipment',
-                'weatherForm'
+                'equipment'
             ];
 
             tabs.forEach(tabId => {
@@ -10510,283 +9114,6 @@ document.getElementById('newUserRole').addEventListener('change', function() {
             });
 
         }
-
-        
-        function showWorkerReportTab(tab) {
-
-            const newSection = document.getElementById("workerNewReportSection");
-            const listSection = document.getElementById("workerReportListSection");
-
-            const btnNew = document.getElementById("btnNewReport");
-            const btnList = document.getElementById("btnMyReports");
-
-            if (tab === "new") {
-
-                newSection.style.display = "block";
-                newSection.style.visibility = "visible";
-
-                listSection.style.display = "none";
-                listSection.style.visibility = "hidden";
-
-                btnNew.style.background = "#4CAF50";
-                btnList.style.background = "#2196F3";
-
-            } else {
-
-                newSection.style.display = "none";
-                newSection.style.visibility = "hidden";
-
-                listSection.style.display = "block";
-                listSection.style.visibility = "visible";
-
-                btnNew.style.background = "#999";
-                btnList.style.background = "#4CAF50";
-
-                loadWorkerReports();
-            }
-        }
-
-
-        async function loadWorkerReports() {
-
-            try {
-
-                const response = await fetch(`/issues/user/${currentUser.user_id}`);
-
-                if (!response.ok) {
-                    return;
-                }
-
-                const reports = await response.json();
-
-                const container = document.getElementById("workerReportList");
-
-                if (reports.length === 0) {
-
-                    container.innerHTML = `
-                        <p style="text-align:center;color:#888;padding:20px;">
-                            No reports submitted yet.
-                        </p>
-                    `;
-
-                    return;
-                }
-
-                let html = "";
-
-                reports.forEach(report => {
-
-                    let color = "#ff9800";
-
-                    if (report.status === "resolved") color = "#4CAF50";
-                    if (report.status === "in_progress") color = "#2196F3";
-
-                    html += `
-                        <div class="task-item" style="border-left:4px solid ${color};margin-bottom:12px;">
-
-                            <strong>${report.issue_type}</strong>
-
-                            <p>${report.description}</p>
-
-                            <small>
-                                📍 ${report.location_name || ""}
-                            </small>
-
-                            <br>
-
-                            <small>
-                                📅 ${new Date(report.created_at).toLocaleString()}
-                            </small>
-
-                            <br><br>
-
-                            <span style="
-                                background:${color};
-                                color:white;
-                                padding:4px 10px;
-                                border-radius:20px;
-                                font-size:11px;">
-                                ${report.status}
-                            </span>
-
-                        </div>
-                    `;
-
-                });
-
-                container.innerHTML = html;
-
-            } catch (err) {
-
-                console.error(err);
-
-            }
-
-        }
-        
-        
-        function showWorkerHealthTab(tab){
-
-            const newSection=document.getElementById("workerHealthNewSection");
-            const history=document.getElementById("workerHealthHistorySection");
-
-            const btnNew=document.getElementById("btnNewHealth");
-            const btnHistory=document.getElementById("btnHealthHistory");
-
-            if(tab==="new"){
-
-                newSection.style.display="block";
-                newSection.style.visibility="visible";
-
-                history.style.display="none";
-                history.style.visibility="hidden";
-
-                btnNew.style.background="#4CAF50";
-                btnHistory.style.background="#2196F3";
-
-            }else{
-
-                newSection.style.display="none";
-                newSection.style.visibility="hidden";
-
-                history.style.display="block";
-                history.style.visibility="visible";
-
-                btnNew.style.background="#999";
-                btnHistory.style.background="#4CAF50";
-
-                loadWorkerGrassIssues();
-
-            }
-
-        }
-        
-        async function submitGrassHealth(){
-
-            const locationId=document.getElementById("grassHealthLocation").value;
-            const crop=document.getElementById("grassCropName").value;
-            const comments=document.getElementById("grassHealthComments").value;
-            const photo=document.getElementById("grassHealthPhoto").files[0];
-
-            if(!locationId){
-                showMessage("Please select location","error");
-                return;
-            }
-
-            if(!photo){
-                showMessage("Please upload a photo","error");
-                return;
-            }
-
-            showLoadingOverlay(
-                "Analyzing Crop",
-                "Uploading photo and running AI analysis..."
-            );
-
-            try{
-                const formData = new FormData();
-                formData.append("file", photo);
-                const response = await fetch("/grass-health/analyze", {
-
-                    method: "POST",
-                    body: formData
-
-                });
-
-                console.log("Analyze Status:", response.status);
-
-                const result = await response.json();
-
-                console.log("AI Result:", result);
-
-                if (response.ok) {
-
-                    showMessage("Grass health analyzed successfully","success");
-
-                    document.getElementById("grassHealthComments").value="";
-                    document.getElementById("grassHealthPhoto").value="";
-
-                    showWorkerHealthTab("history");
-
-                }else{
-
-                    showMessage(result.detail || "Analysis failed","error");
-
-                }
-
-            }catch(err){
-
-                console.error(err);
-
-                showMessage("Analysis failed","error");
-
-            }finally{
-
-                hideLoadingOverlay();
-
-            }
-
-        }
-
-        async function loadWorkerGrassHistory(){
-
-            const container=document.getElementById("workerHealthHistory");
-
-            container.innerHTML="<p style='text-align:center'>Loading...</p>";
-
-            try{
-
-                const response=await fetch(`/grass-health/user/${currentUser.user_id}`);
-
-                const reports=await response.json();
-
-                if(reports.length===0){
-
-                    container.innerHTML="<p style='text-align:center;color:#777'>No reports found.</p>";
-
-                    return;
-
-                }
-
-                let html="";
-
-                reports.forEach(report=>{
-
-                    html+=`
-
-                    <div class="task-item" style="margin-bottom:12px;border-left:4px solid #4CAF50;">
-
-                        <strong>${report.crop_name}</strong>
-
-                        <span style="float:right;background:#4CAF50;color:white;padding:3px 8px;border-radius:10px;font-size:11px;">
-
-                            ${report.health_status}
-
-                        </span>
-
-                        <p>${report.ai_result || ""}</p>
-
-                        <small>${new Date(report.created_at).toLocaleString()}</small>
-
-                    </div>
-
-                    `;
-
-                });
-
-                container.innerHTML=html;
-
-            }catch(err){
-
-                console.error(err);
-
-                container.innerHTML="<p style='color:red;text-align:center'>Unable to load history.</p>";
-
-            }
-
-        }
-
-
 
         // ============================================
         // MEDIA VIEWER FUNCTIONS
@@ -10874,55 +9201,12 @@ document.getElementById('newUserRole').addEventListener('change', function() {
             }
         }
 
-
-        function showLoadingOverlay(title = "Uploading...", message = "Please wait...") {
-            const overlay = document.getElementById("loadingOverlay");
-            const titleEl = document.getElementById("loadingTitle");
-            const messageEl = document.getElementById("loadingMessage");
-            if (titleEl) titleEl.textContent = title;
-            if (messageEl) messageEl.textContent = message;
-            if (overlay) overlay.style.display = "flex";
-        }
-
-        function hideLoadingOverlay() {
-            const overlay = document.getElementById("loadingOverlay");
-            if (overlay) overlay.style.display = "none";
-        }
-
-
-        function showLoadingOverlay(message = "Uploading...") {
-            const overlay = document.getElementById("loadingOverlay");
-            const text = document.getElementById("loadingText");
-            if(text){
-                text.textContent = message;
-            }
-
-            if(overlay){
-                overlay.style.display = "flex";
-            }
-
-        }
-
-        function hideLoadingOverlay() {
-
-            const overlay = document.getElementById("loadingOverlay");
-
-            if(overlay){
-                overlay.style.display = "none";
-            }
-
-        }
-
-
-
-
         // ============================================
         // 👆 END OF NEW ADMIN FUNCTIONS 👆
         // ============================================
 
     </script>
 
-        
         <!-- ============================================================ -->
         <!--  SUPERVISOR DASHBOARD                                         -->
         <!-- ============================================================ -->
@@ -11352,51 +9636,383 @@ document.getElementById('newUserRole').addEventListener('change', function() {
                 </div>
 
             </div>
+        
+    <!-- Edit Task Modal -->
+    <div id="editTaskModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000;">
+        <div style="background: white; margin: 5% auto; max-width: 500px; max-height: 80vh; overflow-y: auto; padding: 20px; border-radius: 16px;">
+            <h3>✏️ Edit Task Template</h3>
+            <input type="hidden" id="editTaskId">
             
+            <label>Title:</label>
+            <input type="text" id="editTaskTitle" placeholder="Task Title">
+            
+            <label>Description:</label>
+            <textarea id="editTaskDesc" rows="3" style="width: 100%;"></textarea>
+            
+            <label>Task Type:</label>
+            <select id="editTaskType">
+                <option value="daily">Daily</option>
+                <option value="interval">Interval</option>
+                <option value="manual">Manual</option>
+            </select>
+            
+            <label>Time Slot:</label>
+            <select id="editTaskTimeSlot">
+                <option value="morning">🌅 Morning</option>
+                <option value="night">🌙 Night</option>
+                <option value="anytime">🕐 Anytime</option>
+            </select>
+            
+            <label>Location:</label>
+            <select id="editTaskLocationId"></select>
+            
+            <label>Zone:</label>
+            <select id="editTaskZoneId">
+                <option value="">No Zone (Whole Farm)</option>
+            </select>
+            
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button onclick="saveTaskEdit()" style="background: #4CAF50; flex: 1;">💾 Save Changes</button>
+                <button onclick="closeEditTaskModal()" style="background: #999; flex: 1;">Cancel</button>
+            </div>
         </div>
+    </div>
 
-        <div id="loadingOverlay" style="
-                display:none;
-                position:fixed;
-                top:0;
-                left:0;
-                width:100%;
-                height:100%;
-                background:rgba(0,0,0,0.6);
-                z-index:99999;
-                justify-content:center;
-                align-items:center;
-            ">
+    <!-- Progress Update Modal -->
+    <div id="progressModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 5000;">
+        <div style="background: white; margin: 10% auto; max-width: 400px; padding: 20px; border-radius: 16px;">
+            <h3 id="progressTaskTitle">Update Progress</h3>
+            <input type="hidden" id="progressTaskId">
+            
+            <label>Current Progress: <span id="currentProgressDisplay">0</span>%</label>
+            
+            <label style="margin-top: 12px; display: block;">New Progress:</label>
+            <select id="newProgressSelect" style="width: 100%; padding: 10px; margin-bottom: 12px;">
+                <option value="0">0% - Not Started</option>
+                <option value="25">25% - Quarter Done</option>
+                <option value="50">50% - Half Done</option>
+                <option value="75">75% - Almost Done</option>
+                <option value="100">100% - Complete</option>
+            </select>
+            
+            <!-- ✅ ADD THIS COMMENT FIELD -->
+            <label style="font-weight: bold; display: block; margin-bottom: 8px;">💬 Comment (Optional)</label>
+            <textarea id="progressComment" rows="2" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 12px;" placeholder="Add a comment about this progress update..."></textarea>
+            
+            <!-- Photo Input -->
+            <label style="font-weight: bold; display: block; margin-bottom: 8px;">📸 Photo (Recommended)</label>
+            <input type="file" id="progressPhoto" accept="image/*" capture="environment" style="margin-bottom: 16px; width: 100%;">
+            
+            <!-- Audio Input -->
+            <label style="font-weight: bold; display: block; margin-bottom: 8px;">🎤 Audio (Voice Note)</label>
+            <input type="file" id="progressAudio" accept="audio/*" capture="user" style="margin-bottom: 16px; width: 100%;">
+            
+            <!-- Video Input -->
+            <label style="font-weight: bold; display: block; margin-bottom: 8px;">📹 Video (Optional)</label>
+            <input type="file" id="progressVideo" accept="video/*, video/mp4, video/3gp, video/mkv, video/avi" capture="environment" style="margin-bottom: 16px; width: 100%;">
 
-                <div style="
-                    background:white;
-                    padding:25px;
-                    border-radius:16px;
-                    text-align:center;
-                    width:300px;
-                    max-width:90%;
-                ">
-
-                    <div style="
-                        width:50px;
-                        height:50px;
-                        border:5px solid #ddd;
-                        border-top:5px solid #4CAF50;
-                        border-radius:50%;
-                        animation:spin 1s linear infinite;
-                        margin:0 auto 20px;
-                    "></div>
-
-                    <h3 id="loadingTitle">Uploading...</h3>
-
-                    <p id="loadingMessage">
-                        Please wait...
-                    </p>
-
-                </div>
-
-            </div>            
+            <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
+                <input type="checkbox" id="waterReleasedCheckbox"> 
+                <span>💧 Water released today</span>
+            </label>
+            
+            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                <button onclick="submitProgressUpdate()" style="background: #4CAF50; flex: 1;">✓ Update Progress</button>
+                <button onclick="closeProgressModal()" style="background: #999; flex: 1;">Cancel</button>
+            </div>
+        </div>
+    </div>
     
+
+    <!-- Edit User Modal -->
+    <div id="editUserModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; overflow-y: auto;">
+        <div style="background: white; margin: 5% auto; max-width: 500px; max-height: 90vh; overflow-y: auto; padding: 20px; border-radius: 16px;">
+            <h3>✏️ Edit User</h3>
+            
+            <input type="text" id="editUserName" placeholder="Full Name">
+            
+            <select id="editUserRole">
+                <option value="admin">Admin</option>
+                <option value="supervisor">Supervisor</option>
+                <option value="worker">Worker</option>
+            </select>
+            
+            <!-- Region Dropdown with Add Button -->
+            <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 12px;">
+                <select id="editUserRegion" style="flex: 2; margin-bottom: 0; padding: 10px; border: 1px solid #ddd; border-radius: 8px;">
+                    <option value="">Select Region</option>
+                    <option value="Ramanjapur">Ramanjapur</option>
+                    <option value="Maharashtra">Maharashtra</option>
+                </select>
+                <input type="text" id="editNewRegionInput" placeholder="New region" style="flex: 1; margin-bottom: 0; padding: 10px; border: 1px solid #ddd; border-radius: 8px;">
+                <button onclick="addNewRegion('editUserRegion', 'editNewRegionInput')" style="width: auto; padding: 10px 16px; background: #4CAF50; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; white-space: nowrap;">+ Add</button>
+            </div>
+            
+            <input type="tel" id="editUserPhone" placeholder="Phone Number">
+            <input type="password" id="editUserPassword" placeholder="New Password (leave empty to keep same)">
+
+            <!-- Supervisor Permissions (Only shown when Role = Supervisor) -->
+            <div id="editSupervisorPermissionsSection" style="display: none; margin-top: 16px; padding: 16px; background: #f5f5f5; border-radius: 12px; border: 1px solid #ddd;">
+                <h4 style="margin-bottom: 12px; color: #2E7D32;">👔 Supervisor Permissions</h4>
+                
+                <!-- Task Management -->
+                <div style="margin-bottom: 12px;">
+                    <strong>📋 Task Management</strong>
+                    <div style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 4px;">
+                        <label><input type="checkbox" id="edit_perm_create_tasks"> Create Tasks</label>
+                        <label><input type="checkbox" id="edit_perm_assign_tasks"> Assign Tasks</label>
+                        <label><input type="checkbox" id="edit_perm_view_all_tasks"> View All Tasks</label>
+                        <label><input type="checkbox" id="edit_perm_delete_tasks"> Delete Tasks</label>
+                    </div>
+                </div>
+                
+                <!-- Farm Management -->
+                <div style="margin-bottom: 12px;">
+                    <strong>📍 Farm Management</strong>
+                    <div style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 4px;">
+                        <label><input type="checkbox" id="edit_perm_add_locations"> Add Locations</label>
+                        <label><input type="checkbox" id="edit_perm_add_zones"> Add Zones</label>
+                        <label><input type="checkbox" id="edit_perm_manage_zones"> Manage Zones</label>
+                    </div>
+                </div>
+                
+                <!-- User Management -->
+                <div style="margin-bottom: 12px;">
+                    <strong>👥 User Management</strong>
+                    <div style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 4px;">
+                        <label><input type="checkbox" id="edit_perm_add_users"> Add Users</label>
+                        <label><input type="checkbox" id="edit_perm_view_users"> View Users</label>
+                        <label><input type="checkbox" id="edit_perm_edit_users"> Edit Users</label>
+                        <label><input type="checkbox" id="edit_perm_delete_users"> Delete Users</label>
+                    </div>
+                </div>
+                
+                <!-- Issue Management -->
+                <div style="margin-bottom: 12px;">
+                    <strong>🚨 Issue Management</strong>
+                    <div style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 4px;">
+                        <label><input type="checkbox" id="edit_perm_view_all_issues"> View All Issues</label>
+                        <label><input type="checkbox" id="edit_perm_update_issue_status"> Update Status</label>
+                        <label><input type="checkbox" id="edit_perm_resolve_issues"> Resolve Issues</label>
+                    </div>
+                </div>
+                
+                <!-- Grass Health -->
+                <div style="margin-bottom: 12px;">
+                    <strong>🌿 Grass Health</strong>
+                    <div style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 4px;">
+                        <label><input type="checkbox" id="edit_perm_view_grass_health"> View Reports</label>
+                        <label><input type="checkbox" id="edit_perm_resolve_grass_health"> Resolve Issues</label>
+                        <label><input type="checkbox" id="edit_perm_add_grass_comments"> Add Comments</label>
+                    </div>
+                </div>
+                
+                <!-- Equipment -->
+                <div style="margin-bottom: 12px;">
+                    <strong>🔧 Equipment</strong>
+                    <div style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 4px;">
+                        <label><input type="checkbox" id="edit_perm_add_equipment"> Add Equipment</label>
+                        <label><input type="checkbox" id="edit_perm_edit_equipment"> Edit Equipment</label>
+                        <label><input type="checkbox" id="edit_perm_delete_equipment"> Delete Equipment</label>
+                        <label><input type="checkbox" id="edit_perm_add_maintenance"> Add Maintenance</label>
+                    </div>
+                </div>
+                
+                <!-- Contacts -->
+                <div style="margin-bottom: 12px;">
+                    <strong>📞 Contacts</strong>
+                    <div style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 4px;">
+                        <label><input type="checkbox" id="edit_perm_add_contacts"> Add Contacts</label>
+                        <label><input type="checkbox" id="edit_perm_edit_contacts"> Edit Contacts</label>
+                        <label><input type="checkbox" id="edit_perm_delete_contacts"> Delete Contacts</label>
+                    </div>
+                </div>
+                
+                <!-- Reports -->
+                <div style="margin-bottom: 12px;">
+                    <strong>📊 Reports</strong>
+                    <div style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 4px;">
+                        <label><input type="checkbox" id="edit_perm_export_csv"> Export CSV</label>
+                        <label><input type="checkbox" id="edit_perm_view_analytics"> View Analytics</label>
+                    </div>
+                </div>
+                
+                <!-- Weather -->
+                <div style="margin-bottom: 12px;">
+                    <strong>🌤️ Weather</strong>
+                    <div style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 4px;">
+                        <label><input type="checkbox" id="edit_perm_view_weather"> View Weather</label>
+                        <label><input type="checkbox" id="edit_perm_all_locations_weather"> All Locations</label>
+                    </div>
+                </div>
+                
+                <!-- Location Access -->
+                <div style="margin-bottom: 12px; padding-top: 12px; border-top: 2px solid #ddd;">
+                    <strong>📍 Location Access</strong>
+                    <div style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 4px;">
+                        <label><input type="checkbox" id="edit_perm_location_ramanujapur"> Ramanjapur</label>
+                        <label><input type="checkbox" id="edit_perm_location_maharashtra"> Maharashtra</label>
+                    </div>
+                </div>
+            </div>
+            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                <button onclick="updateUser()" style="background: #2196F3;">💾 Save</button>
+                <button onclick="closeEditModal()" style="background: #999;">Cancel</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Equipment Detail Modal -->
+    <div id="equipmentDetailModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 7000; overflow-y: auto;">
+        <div style="background: white; margin: 5% auto; max-width: 500px; max-height: 80vh; overflow-y: auto; padding: 20px; border-radius: 16px; width: 90%;">
+            <h3 id="detailTitle" style="margin-top: 0;">Equipment Details</h3>
+            <div id="equipmentDetailContent"></div>
+            <button onclick="closeEquipmentDetailModal()" style="background: #4CAF50; padding: 10px; margin-top: 20px; border: none; border-radius: 8px; color: white; cursor: pointer; width: 100%;">Close</button>
+        </div>
+    </div>
+
+    <!-- Equipment Add/Edit Modal -->
+    <div id="equipmentModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 7000; overflow-y: auto;">
+        <div style="background: white; margin: 5% auto; max-width: 500px; max-height: 80vh; overflow-y: auto; padding: 20px; border-radius: 16px; width: 90%;">
+            <h3 id="equipmentModalTitle" style="margin-top: 0;">Add Equipment</h3>
+            <input type="hidden" id="editEquipmentId">
+            
+            <label style="display: block; margin: 10px 0 5px; font-weight: 500;">Equipment Name:</label>
+            <input type="text" id="equipmentName" placeholder="Equipment Name" required>
+            
+            <label style="display: block; margin: 10px 0 5px; font-weight: 500;">Equipment Type:</label>
+            <select id="equipmentType"></select>
+            
+            <label style="display: block; margin: 10px 0 5px; font-weight: 500;">Location:</label>
+            <select id="equipmentLocationId" onchange="loadEquipmentZones()"></select>
+            
+            <label style="display: block; margin: 10px 0 5px; font-weight: 500;">Zone (Optional):</label>
+            <select id="equipmentZoneId"><option value="">Select Zone</option></select>
+            
+            <label style="display: block; margin: 10px 0 5px; font-weight: 500;">Serial Number:</label>
+            <input type="text" id="equipmentSerial" placeholder="Serial Number">
+            
+            <label style="display: block; margin: 10px 0 5px; font-weight: 500;">Purchase Date:</label>
+            <input type="date" id="equipmentPurchaseDate">
+            
+            <label style="display: block; margin: 10px 0 5px; font-weight: 500;">Purchase Cost (₹):</label>
+            <input type="number" id="equipmentPurchaseCost" placeholder="Purchase Cost">
+            
+            <label style="display: block; margin: 10px 0 5px; font-weight: 500;">Running Hours:</label>
+            <input type="number" id="equipmentRunningHours" placeholder="Running Hours" value="0">
+            
+            <label style="display: block; margin: 10px 0 5px; font-weight: 500;">Status:</label>
+            <select id="equipmentStatus">
+                <option value="active">🟢 Active</option>
+                <option value="service_due">🟡 Service Due</option>
+                <option value="repair_required">🔴 Repair Required</option>
+                <option value="inactive">⚫ Inactive</option>
+            </select>
+            
+            <label style="display: block; margin: 10px 0 5px; font-weight: 500;">Last Service Date:</label>
+            <input type="date" id="equipmentLastServiceDate">
+            
+            <label style="display: block; margin: 10px 0 5px; font-weight: 500;">Next Service Date:</label>
+            <input type="date" id="equipmentNextServiceDate">
+            
+            <label style="display: block; margin: 10px 0 5px; font-weight: 500;">Notes:</label>
+            <textarea id="equipmentNotes" rows="3" placeholder="Additional notes" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd;"></textarea>
+            
+            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                <button onclick="saveEquipment()" style="background: #4CAF50; flex: 1; padding: 12px; border: none; border-radius: 8px; color: white; cursor: pointer; font-weight: 600;">💾 Save</button>
+                <button onclick="closeEquipmentModal()" style="background: #999; flex: 1; padding: 12px; border: none; border-radius: 8px; color: white; cursor: pointer; font-weight: 600;">Cancel</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Maintenance Modal -->
+    <div id="maintenanceModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 7000; overflow-y: auto;">
+        <div style="background: white; margin: 10% auto; max-width: 400px; padding: 20px; border-radius: 16px; width: 90%;">
+            <h3 style="margin-top: 0;">🔧 Add Maintenance Record</h3>
+            <input type="hidden" id="maintenanceEquipmentId">
+            
+            <label style="display: block; margin: 10px 0 5px; font-weight: 500;">Maintenance Date:</label>
+            <input type="date" id="maintenanceDate">
+            
+            <label style="display: block; margin: 10px 0 5px; font-weight: 500;">Maintenance Type:</label>
+            <select id="maintenanceType">
+                <option value="preventive">🟢 Preventive</option>
+                <option value="repair">🔴 Repair</option>
+                <option value="inspection">🔍 Inspection</option>
+            </select>
+            
+            <label style="display: block; margin: 10px 0 5px; font-weight: 500;">Cost (₹):</label>
+            <input type="number" id="maintenanceCost" placeholder="Cost">
+            
+            <label style="display: block; margin: 10px 0 5px; font-weight: 500;">Performed By:</label>
+            <input type="text" id="maintenancePerformedBy" placeholder="Mechanic name">
+            
+            <label style="display: block; margin: 10px 0 5px; font-weight: 500;">Running Hours After:</label>
+            <input type="number" id="maintenanceRunningHours" placeholder="Running hours">
+            
+            <label style="display: block; margin: 10px 0 5px; font-weight: 500;">Notes:</label>
+            <textarea id="maintenanceNotes" rows="3" placeholder="Maintenance notes" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd;"></textarea>
+            
+            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                <button onclick="saveMaintenance()" style="background: #4CAF50; flex: 1; padding: 12px; border: none; border-radius: 8px; color: white; cursor: pointer; font-weight: 600;">💾 Save</button>
+                <button onclick="closeMaintenanceModal()" style="background: #999; flex: 1; padding: 12px; border: none; border-radius: 8px; color: white; cursor: pointer; font-weight: 600;">Cancel</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="editContactModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,.5); z-index:7000;">
+        <div style="background:white; width:500px; max-width:95%; margin:60px auto; padding:20px; border-radius:10px;">
+
+            <h3>Edit Contact</h3>
+
+            <input type="text" id="editContactName" placeholder="Contact Name">
+
+            <input type="tel" id="editContactPhone" placeholder="Phone Number">
+
+            <select id="editContactIssueType">
+                <option value="Motor Problem">Motor Problem</option>
+                <option value="Line Problem">Line Problem</option>
+                <option value="Leakage">Leakage</option>
+                <option value="Starter Problem">Starter Problem</option>
+                <option value="Other">Other</option>
+            </select>
+
+            <select id="editContactLocationId"></select>
+
+            <div style="margin-top:20px;">
+                <button onclick="updateContact()">💾 Save</button>
+                <button onclick="closeEditContactModal()">❌ Cancel</button>
+            </div>
+
+        </div>
+    </div>
+    
+    
+    <!-- Media Viewer Modal -->
+    <div id="mediaViewerModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 10000;">
+        <div style="position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+            <button onclick="closeMediaViewer()" style="position: absolute; top: 20px; right: 20px; background: red; color: white; border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 20px; cursor: pointer; z-index: 3001;">✕</button>
+            
+            <!-- Image Viewer -->
+            <img id="viewerImage" src="" style="max-width: 90%; max-height: 90%; object-fit: contain; display: none;">
+            
+            <!-- Audio Player -->
+            <audio id="viewerAudio" controls style="width: 80%; display: none;">
+                <source src="" type="audio/mpeg">
+                Your browser does not support audio.
+            </audio>
+            
+            <!-- Video Player -->
+            <video id="viewerVideo" controls style="max-width: 90%; max-height: 90%; display: none;">
+                <source src="" type="video/mp4">
+                Your browser does not support video.
+            </video>
+            
+            <div id="noMediaMessage" style="color: white; text-align: center; display: none;">
+                <p>No media available for this task completion</p>
+            </div>
+        </div>
+    </div>
 
 
 </body>

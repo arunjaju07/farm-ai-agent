@@ -6,6 +6,8 @@ from datetime import datetime
 
 from app.database.db import SessionLocal, get_db
 from app.models.user_model import Location
+from app.models.zone_model import Zone
+
 
 router = APIRouter(prefix="/locations", tags=["Locations"])
 
@@ -85,3 +87,31 @@ def get_locations_by_region(region: str, db: Session = Depends(get_db)):
         }
         for loc in locations
     ]
+
+@router.put("/update/{location_id}")
+def update_location(location_id: int, location: LocationCreate, db: Session = Depends(get_db)):
+    existing = db.query(Location).filter(Location.id == location_id).first()
+    if not existing:
+        raise HTTPException(status_code=404, detail="Location not found")
+    
+    existing.name = location.name
+    existing.area_acres = location.area_acres
+    existing.region = location.region
+    existing.layout_url = location.layout_url
+    
+    db.commit()
+    db.refresh(existing)
+    return {"message": "Location updated successfully", "location": existing}
+
+@router.delete("/delete/{location_id}")
+def delete_location(location_id: int, db: Session = Depends(get_db)):
+    location = db.query(Location).filter(Location.id == location_id).first()
+    if not location:
+        raise HTTPException(status_code=404, detail="Location not found")
+    
+    # Delete all zones belonging to this location
+    db.query(Zone).filter(Zone.location_id == location_id).delete()
+    
+    db.delete(location)
+    db.commit()
+    return {"message": "Location and all its zones deleted successfully"}
