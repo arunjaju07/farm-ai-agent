@@ -970,6 +970,42 @@
         }
 
 
+        /* Login mobile alignment */
+        #loginSection {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Mobile adjustment */
+        @media (max-width: 600px) {
+
+            #loginSection {
+                align-items: flex-start;
+                padding-top: 120px;
+            }
+
+            #loginSection .card {
+                width: calc(100% - 40px);
+                margin: 0 auto;
+            }
+
+        }
+
+        @media (max-width: 600px) {
+
+            .header-new {
+                padding-top: 20px;
+            }
+
+            .header-new-top {
+                padding-top: 10px;
+            }
+
+        }
+
+
     </style>
 </head>
 <body>
