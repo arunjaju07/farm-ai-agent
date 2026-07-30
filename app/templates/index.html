@@ -6502,11 +6502,16 @@
                 return;
             }
             
-            showMessage("Uploading media...", "success");
-            
+            showLoadingOverlay(
+                "Uploading Media",
+                "Please wait while your photos, audio and videos are uploaded..."
+            );
+
+            // ADD THESE
             let photoUrl = null;
             let audioUrl = null;
             let videoUrl = null;
+                        
             
             // Upload photo if selected
             if (photoFile) {
@@ -6602,7 +6607,9 @@
                 }
             } catch (err) {
                 console.error("Progress update error:", err);
-                showMessage('Network error', 'error');
+                showMessage("Failed to update progress", "error");
+            } finally {
+                hideLoadingOverlay();
             }
         }
         
@@ -7425,10 +7432,11 @@
                 "Please wait while your report and media are uploaded..."
             );
 
+            // ADD THESE
             let photoUrl = null;
             let audioUrl = null;
             let videoUrl = null;
-
+            
             try {
 
                 // ===========================
@@ -10521,7 +10529,21 @@ document.getElementById('newUserRole').addEventListener('change', function() {
 
             // Show Worker Dashboard
             const dashboard = document.getElementById('workerDashboardSection');
+            const supervisorDashboard = document.getElementById('supervisorDashboardSection');
+            if (supervisorDashboard) {
+                supervisorDashboard.style.display = 'none';
+                supervisorDashboard.style.visibility = 'hidden';
+                supervisorDashboard.classList.remove('active');
+            }
+
+            const adminDashboard = document.getElementById('adminSection');
+            if (adminDashboard) {
+                adminDashboard.style.display = 'none';
+                adminDashboard.style.visibility = 'hidden';
+                adminDashboard.classList.remove('active');
+            }
             if (dashboard) {
+                dashboard.classList.remove('active');
                 dashboard.style.display = 'block';
                 dashboard.style.visibility = 'visible';
                 dashboard.style.opacity = '1';
@@ -10773,20 +10795,20 @@ document.getElementById('newUserRole').addEventListener('change', function() {
 
         }
         
-        async function submitGrassHealth(){
+        async function submitGrassHealth() {
 
-            const locationId=document.getElementById("grassHealthLocation").value;
-            const crop=document.getElementById("grassCropName").value;
-            const comments=document.getElementById("grassHealthComments").value;
-            const photo=document.getElementById("grassHealthPhoto").files[0];
+            const locationId = document.getElementById("grassHealthLocation").value;
+            const crop = document.getElementById("grassCropName").value;
+            const comments = document.getElementById("grassHealthComments").value;
+            const photo = document.getElementById("grassHealthPhoto").files[0];
 
-            if(!locationId){
-                showMessage("Please select location","error");
+            if (!locationId) {
+                showMessage("Please select location", "error");
                 return;
             }
 
-            if(!photo){
-                showMessage("Please upload a photo","error");
+            if (!photo) {
+                showMessage("Please upload a photo", "error");
                 return;
             }
 
@@ -10795,14 +10817,24 @@ document.getElementById('newUserRole').addEventListener('change', function() {
                 "Uploading photo and running AI analysis..."
             );
 
-            try{
+            // ADD THESE
+            let photoUrl = null;
+            let audioUrl = null;
+            let videoUrl = null;
+
+            try {
+
                 const formData = new FormData();
                 formData.append("file", photo);
-                const response = await fetch("/grass-health/analyze", {
 
+                // Send additional information (if your backend supports it)
+                formData.append("location_id", locationId);
+                formData.append("crop", crop);
+                formData.append("comments", comments);
+
+                const response = await fetch("/grass-health/analyze", {
                     method: "POST",
                     body: formData
-
                 });
 
                 console.log("Analyze Status:", response.status);
@@ -10813,31 +10845,31 @@ document.getElementById('newUserRole').addEventListener('change', function() {
 
                 if (response.ok) {
 
-                    showMessage("Grass health analyzed successfully","success");
+                    showMessage("Grass health analyzed successfully", "success");
 
-                    document.getElementById("grassHealthComments").value="";
-                    document.getElementById("grassHealthPhoto").value="";
+                    document.getElementById("grassHealthComments").value = "";
+                    document.getElementById("grassHealthPhoto").value = "";
 
-                    showWorkerHealthTab("history");
+                    if (typeof showWorkerHealthTab === "function") {
+                        showWorkerHealthTab("history");
+                    }
 
-                }else{
+                } else {
 
-                    showMessage(result.detail || "Analysis failed","error");
+                    showMessage(result.detail || "Analysis failed", "error");
 
                 }
 
-            }catch(err){
+            } catch (err) {
 
-                console.error(err);
+                console.error("Grass Health Error:", err);
+                showMessage("Analysis failed", "error");
 
-                showMessage("Analysis failed","error");
-
-            }finally{
+            } finally {
 
                 hideLoadingOverlay();
 
             }
-
         }
 
         async function loadWorkerGrassHistory(){
@@ -10986,43 +11018,33 @@ document.getElementById('newUserRole').addEventListener('change', function() {
             }
         }
 
+        
+        function showLoadingOverlay(
+            title = "Uploading...",
+            message = "Please wait..."
+        ) {
 
-        function showLoadingOverlay(title = "Uploading...", message = "Please wait...") {
+            console.log("showLoadingOverlay called");
+            console.log(document.getElementById("loadingOverlay"));
+
             const overlay = document.getElementById("loadingOverlay");
             const titleEl = document.getElementById("loadingTitle");
             const messageEl = document.getElementById("loadingMessage");
+
             if (titleEl) titleEl.textContent = title;
             if (messageEl) messageEl.textContent = message;
-            if (overlay) overlay.style.display = "flex";
-        }
 
-        function hideLoadingOverlay() {
-            const overlay = document.getElementById("loadingOverlay");
-            if (overlay) overlay.style.display = "none";
-        }
-
-
-        function showLoadingOverlay(message = "Uploading...") {
-            const overlay = document.getElementById("loadingOverlay");
-            const text = document.getElementById("loadingText");
-            if(text){
-                text.textContent = message;
-            }
-
-            if(overlay){
+            if (overlay) {
                 overlay.style.display = "flex";
             }
-
         }
 
         function hideLoadingOverlay() {
-
             const overlay = document.getElementById("loadingOverlay");
 
-            if(overlay){
+            if (overlay) {
                 overlay.style.display = "none";
             }
-
         }
 
 
