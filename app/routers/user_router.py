@@ -4,6 +4,7 @@ from typing import Optional, Dict, Any
 from ..database.db import SessionLocal
 from ..models.user_model import User
 from sqlalchemy import text
+from sqlalchemy.exc import IntegrityError
 import logging
 import json
 
@@ -208,26 +209,55 @@ async def test_permissions():
 async def delete_user(user_id: int):
     """Delete a user"""
     db = SessionLocal()
+
     try:
         # Check if user exists
         user = db.query(User).filter(User.id == user_id).first()
+
         if not user:
-            raise HTTPException(status_code=404, detail="User not found")
-        
+            raise HTTPException(
+                status_code=404,
+                detail="User not found"
+            )
+
         # Prevent deleting the last admin
         if user.role == "admin":
             admin_count = db.query(User).filter(User.role == "admin").count()
+
             if admin_count <= 1:
-                raise HTTPException(status_code=400, detail="Cannot delete the last admin")
-        
+                raise HTTPException(
+                    status_code=400,
+                    detail="Cannot delete the last admin."
+                )
+
         # Delete user
         db.delete(user)
         db.commit()
-        
-        return {"message": "User deleted successfully"}
+
+        return {
+            "message": "User deleted successfully"
+        }
+
+    except IntegrityError:
+        db.rollback()
+
+        raise HTTPException(
+            status_code=400,
+            detail="Cannot delete this user because they are assigned to one or more tasks. Please reassign or delete those tasks first."
+        )
+
+    except HTTPException:
+        db.rollback()
+        raise
+
     except Exception as e:
         db.rollback()
         logger.error(f"Error deleting user {user_id}: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to delete user."
+        )
+
     finally:
         db.close()

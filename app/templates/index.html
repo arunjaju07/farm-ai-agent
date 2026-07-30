@@ -674,11 +674,19 @@
         }
 
         /* ── 1.7 Message Alerts (existing, updated) ── */
-        .message {
-            padding: var(--space-md);
-            border-radius: var(--radius-md);
-            margin-bottom: var(--space-lg);
-            display: none;
+        .message{
+            position:fixed;
+            top:20px;
+            left:50%;
+            transform:translateX(-50%);
+            min-width:320px;
+            max-width:90%;
+            padding:15px 20px;
+            border-radius:10px;
+            display:none;
+            z-index:999999;
+            font-weight:600;
+            box-shadow:0 6px 20px rgba(0,0,0,.2);
         }
 
         .message.success {
@@ -1010,6 +1018,7 @@
 </head>
 <body>
 
+            
         <!-- Login Section -->
         <div id="loginSection" class="section active">
             <div class="card">
@@ -1058,8 +1067,7 @@
         </div>
     </div>
 
-    <div id="message" class="message"></div>
-
+    
     <!-- ── 4x4 Dashboard Cards ── -->
     <div class="card-grid-4" id="adminDashboardCards">
         
@@ -1899,7 +1907,7 @@
         </div>
     </div>
 
-    <div id="message" class="message"></div>
+    <div id="workerMessage" class="message"></div>
 
     <!-- ── 4x4 Dashboard Cards (Worker) ── -->
     <div class="card-grid-4" id="workerDashboardCards">
@@ -2811,11 +2819,27 @@
         const API_URL = ""; // Empty means same origin
 
         function showMessage(msg, type = "success") {
+
             const msgDiv = document.getElementById("message");
+
+            if (!msgDiv) {
+                alert(msg);
+                return;
+            }
+
             msgDiv.textContent = msg;
             msgDiv.className = `message ${type}`;
+            msgDiv.style.display = "block";
+            msgDiv.style.opacity = "1";
+
             setTimeout(() => {
-                msgDiv.className = "message";
+                msgDiv.style.opacity = "0";
+
+                setTimeout(() => {
+                    msgDiv.style.display = "none";
+                    msgDiv.className = "message";
+                }, 300);
+
             }, 3000);
         }
 
@@ -4452,25 +4476,41 @@
         
         
         async function deleteUser(userId) {
-            if (confirm('Are you sure you want to delete this user?')) {
-                try {
-                    const response = await fetch(`/user/delete/${userId}`, {
-                        method: 'DELETE'
-                    });
-                    
-                    if (response.ok) {
-                        showMessage('User deleted successfully!');
-                        loadAllUsers(); // Refresh the list
-                    } else {
-                        const error = await response.text();
-                        showMessage('Failed to delete user: ' + error, 'error');
-                    }
-                } catch (err) {
-                    showMessage('Error deleting user', 'error');
-                }
+
+            if (!confirm("Are you sure you want to delete this user?")) {
+                return;
             }
+
+            try {
+
+                const response = await fetch(`/user/delete/${userId}`, {
+                    method: "DELETE"
+                });
+
+                console.log("Status:", response.status);
+
+                const result = await response.json();
+                console.log("Response:", result);
+
+                if (response.ok) {
+
+                    showMessage(result.message || "User deleted successfully!", "success");
+                    loadAllUsers();
+
+                } else {
+
+                    showMessage(result.detail || "Failed to delete user.", "error");
+
+                }
+
+            } catch (err) {
+
+                console.error("Delete Error:", err);
+                showMessage("Error deleting user.", "error");
+
+            }
+
         }
-        
         async function loadLocations() {
             try {
                 const response = await fetch(`${API_URL}/locations/all`);
