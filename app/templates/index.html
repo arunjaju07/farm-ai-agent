@@ -3819,27 +3819,33 @@
 
                     // Show dashboard based on role
                     if (currentUser.role.toLowerCase() === "admin") {
+
                         console.log("🔍 4. Admin - showing admin dashboard");
                         showAdminDashboardDefault();
                         loadAllTasks();
+
                     } else if (currentUser.role.toLowerCase() === "supervisor") {
+
                         console.log("🔍 4. Supervisor - showing supervisor dashboard");
                         showSupervisorDashboardDefault();
                         loadAllTasks();
+
                     } else if (currentUser.role.toLowerCase() === "worker") {
+
                         console.log("🔍 4. Worker - showing worker dashboard");
-
                         showWorkerDashboardDefault();
-
                         loadTasks();
-                    }
+
                     } else {
+
                         console.log("🔍 4. Unknown role - showing tasks");
                         const tasksSection = document.getElementById("tasksSection");
+
                         if (tasksSection) {
-                            tasksSection.style.display = 'block';
-                            tasksSection.classList.add('active');
+                            tasksSection.style.display = "block";
+                            tasksSection.classList.add("active");
                         }
+
                     }
                     console.log("🔍 5. Dashboard shown");
 
