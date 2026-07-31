@@ -3820,40 +3820,19 @@
                     // Show dashboard based on role
                     if (currentUser.role.toLowerCase() === "admin") {
                         console.log("🔍 4. Admin - showing admin dashboard");
-                        const adminSection = document.getElementById("adminSection");
-                        if (adminSection) {
-                            adminSection.style.display = 'block';
-                            adminSection.style.visibility = 'visible';
-                            adminSection.style.opacity = '1';
-                            adminSection.classList.add('active');
-                        }
-                        updateDashboardStats();
+                        showAdminDashboardDefault();
                         loadAllTasks();
                     } else if (currentUser.role.toLowerCase() === "supervisor") {
                         console.log("🔍 4. Supervisor - showing supervisor dashboard");
-                        const supervisorSection = document.getElementById("supervisorDashboardSection");
-                        if (supervisorSection) {
-                            supervisorSection.style.display = 'block';
-                            supervisorSection.style.visibility = 'visible';
-                            supervisorSection.style.opacity = '1';
-                            supervisorSection.classList.add('active');
-                        }
-                        // Update supervisor dashboard with permissions
-                        setTimeout(() => {
-                            updateSupervisorDashboard();
-                        }, 100);
+                        showSupervisorDashboardDefault();
                         loadAllTasks();
                     } else if (currentUser.role.toLowerCase() === "worker") {
                         console.log("🔍 4. Worker - showing worker dashboard");
-                        const workerSection = document.getElementById("workerDashboardSection");
-                        if (workerSection) {
-                            workerSection.style.display = 'block';
-                            workerSection.style.visibility = 'visible';
-                            workerSection.style.opacity = '1';
-                            workerSection.classList.add('active');
-                        }
-                        updateWorkerDashboard();
+
+                        showWorkerDashboardDefault();
+
                         loadTasks();
+                    }
                     } else {
                         console.log("🔍 4. Unknown role - showing tasks");
                         const tasksSection = document.getElementById("tasksSection");
