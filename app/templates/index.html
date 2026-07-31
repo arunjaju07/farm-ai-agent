@@ -743,6 +743,11 @@
             display: block;
         }
 
+        /* Worker dashboard spacing for fixed bottom navigation */
+        #workerDashboardSection {
+            padding-bottom: 100px;
+        }
+
         /* ── 1.7 Task List (existing, updated) ── */
         .task-item {
             background: var(--gray-50);
@@ -10542,12 +10547,29 @@ document.getElementById('newUserRole').addEventListener('change', function() {
             }
 
             // Refresh dashboard
-            updateWorkerDashboard();
+            updateWorkerDashboard().then(() => {
 
-            // Scroll to top
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
+                console.log(
+                    "Dashboard Height:",
+                    document.getElementById("workerDashboardSection")?.offsetHeight
+                );
+
+                console.log(
+                    "Body ScrollHeight:",
+                    document.body.scrollHeight
+                );
+
+                console.log(
+                    "Cards:",
+                    document.getElementById("workerDashboardCards")?.offsetHeight
+                );
+
+                console.log(
+                    "Logout Button:",
+                    document.querySelectorAll('button[onclick="logout()"]')[1]?.getBoundingClientRect()
+                );
+
+                window.scrollTo(0, 0);
             });
 
             console.log("✅ Worker dashboard restored");
